@@ -17,7 +17,7 @@ class Lead(Base):
     Phone = Column(String(12))
     Email = Column(String(255))
 
-    Owner_ID = Column(Integer,ForeignKey("users.User_ID"))
+    Owner_ID = Column(Integer,ForeignKey("user.User_ID"))
     leads = relationship("User",back_populates="owner")
 
     Value = Column(DECIMAL)
