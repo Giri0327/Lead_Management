@@ -1,8 +1,10 @@
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import create_engine
-
-dburl="mysql://4WUWyWmxdkEPJB7.root:BSGkzQO4R1Vb1R5O@gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/Lead_Management"
-engine = create_engine(dburl,
+from dotenv import load_dotenv
+import os
+load_dotenv()
+DATABASE_URL = os.getenv("DATABASE_URL")
+engine = create_engine(DATABASE_URL,
     connect_args={
         "ssl": {
             "ca": "path/to/ca-cert.pem"
