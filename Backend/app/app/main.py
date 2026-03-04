@@ -1,2 +1,1 @@
 print("hii")
-print("hari")
