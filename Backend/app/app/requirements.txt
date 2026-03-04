@@ -1,0 +1,14 @@
+SQLAlchemy
+fastapi
+mysql
+alembic
+pydantic
+requests
+uvicorn
+jose
+PyMySQL
+passlib
+bcrypt==4.0.1
+pydantic[email]
+python-jose
+passlib[bcrypt]
