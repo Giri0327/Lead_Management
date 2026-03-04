@@ -1,2 +1,2 @@
-print("hii")
+print("G")
 print("K")
