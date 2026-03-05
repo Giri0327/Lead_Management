@@ -9,7 +9,6 @@ class Lead(Base):
 
     Lead_ID = Column(Integer,primary_key=True) 
     lead= relationship("Follow_Up",back_populates="lead_id")
-    lead_note = relationship("Lead_Notes",back_populates="lead")
     lead_activity = relationship("Lead_Activity",back_populates="lead_")
 
     Lead_Name = Column(String(255))

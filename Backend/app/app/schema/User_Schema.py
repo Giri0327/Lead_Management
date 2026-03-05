@@ -6,7 +6,6 @@ class User(BaseModel):
     last_name: str
     email: EmailStr
     phone:int
-    profile_pic:str
     password:str
     role_id:int
     is_active:bool
@@ -19,6 +18,10 @@ class UserVerify(BaseModel):
     otp: str
     token: str
 
+class OTPVerify(BaseModel):
+    email: str
+    otp: int
+    
 class ForgotPass(BaseModel):
     email:EmailStr
 
