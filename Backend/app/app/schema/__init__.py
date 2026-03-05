@@ -1,4 +1,4 @@
-from app.schema.User_Schema import User,UserLogin,UserVerify
+from app.schema.User_Schema import User,UserLogin,UserVerify,ForgotPass,ResetPass,ChangePass
 from app.schema.Tokens_Schema import Token
 from app.schema.Status_Schema import Status
 from app.schema.Stage_Schema import Stage
