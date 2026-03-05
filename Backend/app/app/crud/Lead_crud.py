@@ -24,7 +24,7 @@ class Creat:
         if new_lead is not None:   
             return "User created successfully"  
         
-        
+
 from app.models.Lead_Table import Lead
 
 class Create:
@@ -47,15 +47,13 @@ class Create:
             "priority_id": "Priority_ID"
         }
 
-        # Build dictionary for SQLAlchemy model
+        
         lead_data = {field_mapping[k]: v for k, v in self.lead.dict().items()}
 
-        # Create Lead instance
         new_lead = Lead(**lead_data)
 
-        # Add to DB
         self.db.add(new_lead)
         self.db.commit()
-        self.db.refresh(new_lead)  # Refresh to get Lead_ID and timestamps
+        self.db.refresh(new_lead)
 
         return new_lead
