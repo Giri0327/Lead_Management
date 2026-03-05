@@ -26,6 +26,6 @@ async def Reset_Pass(user:ResetPass,otp:int,db:Session=Depends(get_db)):
 async def Change_Pass(user:ChangePass,db:Session=Depends(get_db)):
     return change_password(user,db)
 
-@router.post("/createDB")
+#@router.post("/createDB")
 async def db():
     Base.metadata.create_all(bind=engine) 
