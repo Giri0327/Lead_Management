@@ -6,7 +6,6 @@ class User(BaseModel):
     last_name: str
     email: str
     phone:int
-    profile_pic:str
     password:str
     role_id:int
     is_active:bool
