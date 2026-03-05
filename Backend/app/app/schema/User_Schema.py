@@ -8,6 +8,8 @@ class User(BaseModel):
     phone:int
     profile_pic:str
     password:str
+    role_id:int
+    is_active:bool
 
 class UserLogin(BaseModel):
     username_or_email:str

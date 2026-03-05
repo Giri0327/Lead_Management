@@ -1,2 +1,2 @@
-from db.base_class import Base
-from db.session import get_db,SessionLocal
+from app.db.base_class import Base
+from app.db.session import get_db,SessionLocal
