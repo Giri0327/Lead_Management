@@ -1,9 +1,9 @@
 from fastapi import APIRouter,Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.crud.Create_user import Create_user
+from app.crud.User_crud import Create_user
 from app.schema.User_Schema import User
-router =APIRouter()
+router =APIRouter(prefix="/user",tags=["User"])
 
 
 @router.post("/CreateUser")

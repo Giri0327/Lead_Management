@@ -11,4 +11,3 @@ class Leads(BaseModel):
     status_id:int
     stage_id:int
     priority_id:int
-    
