@@ -7,11 +7,9 @@ class User(Base):
 
     __tablename__ = "user"
 
-
     User_ID = Column(Integer,primary_key=True)
     lead_activity  =relationship("Lead_Activity",back_populates="lead_user")
     follow_ups = relationship("Follow_Up",back_populates="user")
-
 
     Username = Column(String(255),unique=True,nullable=False)
     First_Name = Column(String(255),nullable=False)
