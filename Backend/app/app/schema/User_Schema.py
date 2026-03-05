@@ -1,10 +1,10 @@
-from pydantic import BaseModel
+from pydantic import BaseModel,EmailStr
 
 class User(BaseModel):
     username: str
     first_name:str
     last_name: str
-    email: str
+    email: EmailStr
     phone:int
     profile_pic:str
     password:str
@@ -19,5 +19,14 @@ class UserVerify(BaseModel):
     otp: str
     token: str
 
+class ForgotPass(BaseModel):
+    email:EmailStr
 
+class ResetPass(BaseModel):
+    new_password:str
 
+class ChangePass(BaseModel):
+    email:EmailStr
+    Current_Password:str
+    New_Password:str
+    Confirm_Password:str
