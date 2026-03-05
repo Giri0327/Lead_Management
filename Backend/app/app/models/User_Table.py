@@ -9,7 +9,6 @@ class User(Base):
 
 
     User_ID = Column(Integer,primary_key=True)
-    leads_user_note = relationship("Lead_Notes",back_populates="leads_note")
     lead_activity  =relationship("Lead_Activity",back_populates="lead_user")
     follow_ups = relationship("Follow_Up",back_populates="user")
 
@@ -23,6 +22,8 @@ class User(Base):
     Password= Column(String(255),nullable=False)
     OTP= Column(Integer)
     OTP_Expiry= Column(DateTime)
+    User_Type=Column(String(255))
+    Is_two_fath=Column(Boolean)
 
     Role_ID = Column(Integer,ForeignKey("roles.Role_ID"))  #FK
     role_id_user = relationship("Roles",back_populates="roles")
@@ -31,8 +32,8 @@ class User(Base):
     Created_At= Column(DateTime,server_default=func.now())
     Updated_At=Column(DateTime,server_default=func.now(),onupdate=func.now())
 
-    user_token = relationship("Token",back_populates="token")
-
+    user_token = relationship("Token",back_populates="user")
+    
     owner = relationship("Lead",back_populates="leads")
 
 

@@ -10,7 +10,7 @@ class Token(Base):
     Token_ID = Column(Integer,primary_key=True)
 
     User_Id = Column (Integer,ForeignKey("user.User_ID"))  #FK
-    token = relationship("User",back_populates="user_token")
+    user = relationship("User",back_populates="user_token")
 
     Token = Column(String(255))
     Token_Expiry = Column(DateTime)

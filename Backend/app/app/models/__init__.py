@@ -6,6 +6,5 @@ from app.models.Roles_Table import Roles
 from app.models.Priority_Table import Priority
 from app.models.Lead_Table import Lead
 from app.models.Lead_Sources_Table import Sources
-from app.models.Lead_Notes_Table import Lead_Notes
 from app.models.Lead_Activities_Table import Lead_Activity
 from app.models.Follow_Ups_Table import Follow_Up

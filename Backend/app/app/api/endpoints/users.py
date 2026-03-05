@@ -4,6 +4,8 @@ from app.db.session import get_db
 from app.crud.User_crud import Create_user,forgot_password,reset_password,change_password
 from app.schema.User_Schema import User
 from app.schema import *
+from app.db.base_class import Base
+from app.db.session import engine
 router =APIRouter(prefix="/user",tags=["User"])
 
 
@@ -23,3 +25,7 @@ async def Reset_Pass(user:ResetPass,otp:int,db:Session=Depends(get_db)):
 @router.post("/change_password")
 async def Change_Pass(user:ChangePass,db:Session=Depends(get_db)):
     return change_password(user,db)
+
+@router.post("/createDB")
+async def db():
+    Base.metadata.create_all(bind=engine) 
