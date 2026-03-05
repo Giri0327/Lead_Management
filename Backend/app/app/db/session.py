@@ -3,14 +3,13 @@ from sqlalchemy import create_engine
 from dotenv import load_dotenv
 import os
 load_dotenv()
-DATABASE_URL = "mysql+pymysql://4WUWyWmxdkEPJB7.root:BSGkzQO4R1Vb1R5O@gateway01.ap-southeast-1.prod.aws.tidbcloud.com:4000/Lead_Management"
-
+DATABASE_URL=os.getenv("DATABASE_URL")
 BASE_DIR = os.path.dirname(os.path.abspath(__file__)) #use this to get the absolute path of the current file, then navigate to the certificate
 cert_path = os.path.join(BASE_DIR, "isrgrootx.pem") #use to get the absolute path of the certificate file, assuming it's in the same directory as this file
 engine = create_engine(DATABASE_URL,
     connect_args={
         "ssl": {
-            "ca": "C:/Users/traje/Downloads/isrgrootx.pem"  # Put real path here
+            "ca": os.getenv("ca")  # Put real path here
         }
     },
     pool_pre_ping=True  # Recommended for cloud DB
