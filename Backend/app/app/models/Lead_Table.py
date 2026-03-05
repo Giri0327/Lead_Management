@@ -7,10 +7,8 @@ class Lead(Base):
 
     __tablename__ = "lead"
 
-    Lead_ID = Column(Integer,primary_key=True) ##
-
+    Lead_ID = Column(Integer,primary_key=True) 
     lead= relationship("Follow_Up",back_populates="lead_id")
-    lead_note = relationship("Lead_Notes",back_populates="lead")
     lead_activity = relationship("Lead_Activity",back_populates="lead_")
 
     Lead_Name = Column(String(255))
@@ -19,10 +17,8 @@ class Lead(Base):
 
     Owner_ID = Column(Integer,ForeignKey("user.User_ID"))
     leads = relationship("User",back_populates="owner")
-
     Value = Column(DECIMAL)
     Notes=Column(Text)
-
     Source_ID = Column(Integer,ForeignKey("sources.Source_ID"))
     lead_source = relationship("Sources",back_populates="source")
 
