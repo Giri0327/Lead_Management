@@ -2,7 +2,7 @@ from fastapi import APIRouter,Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
 #from app.crud.User_crud import Create_user,forgot_password,reset_password,change_password,Verify_user,OTPTokenVerify
-from app.crud.user_crud import Create_user,forgot_password,reset_password,change_password,verify_password,OTPTokenVerify
+from app.crud.user_crud import Create_user,forgot_password,reset_password,change_password,Verify_user,OTPTokenVerify
 from app.schema.User_Schema import User,OTPVerify
 from app.schema import *
 from app.db.base_class import Base
