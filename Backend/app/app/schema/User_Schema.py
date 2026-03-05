@@ -18,6 +18,10 @@ class UserVerify(BaseModel):
     otp: str
     token: str
 
+class OTPVerify(BaseModel):
+    email: str
+    otp: int
+    
 class ForgotPass(BaseModel):
     email:EmailStr
 

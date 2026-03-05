@@ -1,8 +1,8 @@
 from fastapi import APIRouter,Depends
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.crud.User_crud import Create_user,forgot_password,reset_password,change_password,Verify_user
-from app.schema.User_Schema import User
+from app.crud.User_crud import Create_user,forgot_password,reset_password,change_password,Verify_user,OTPTokenVerify
+from app.schema.User_Schema import User,OTPVerify
 from app.schema import *
 from app.db.base_class import Base
 from app.db.session import engine
@@ -33,6 +33,12 @@ async def UserLogin(user:UserLogin,db:Session=Depends(get_db)):
     result = login.verify_user()
     return result  
 
-@router.post("/createDB")
+@router.post("/Otpverify")
+async def Otpverify(user: OTPVerify, db: Session = Depends(get_db)):
+    x = OTPTokenVerify(db, user.email, user.otp)
+    result = x.otp_verify()
+    return result
+
+#@router.post("/createDB")
 async def db():
     Base.metadata.create_all(bind=engine) 

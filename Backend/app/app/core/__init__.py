@@ -1,1 +1,1 @@
-from app.core.security import emailOTP,pwd_context,verify_password,get_password_hash
+from app.core.security import pwd_context,verify_password,get_password_hash

@@ -21,7 +21,7 @@ def Create_user(user,db:Session):
            Email=user.email,
            Phone=user.phone,
            Password=get_password_hash(user.password),
-           Role_ID=user.role_id,
+           #Role_ID=user.role_id,
            Is_Active=user.is_active
            )
     db.add(x)
@@ -57,7 +57,7 @@ class Verify_user(Userabs):
              token_gen = create_token(data = {"sub": user.User_ID})
              self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
              new_token =Token(User_Id=user.User_ID,
-                              token=token_gen)
+                              Token=token_gen)
              self.db.add(new_token)
              self.db.commit()
 
@@ -65,7 +65,33 @@ class Verify_user(Userabs):
                   return "Invalid Password"
              
 
+class OTPToken(ABC):
+    @abstractmethod
+    def otp_verify(self):
+        pass
 
+
+class OTPTokenVerify(OTPToken):
+    def __init__(self, db: Session, email: str, otp: int ):
+        self.db = db
+        self.Email = email
+        self.OTP = otp
+
+    def otp_verify(self):
+        user = self.db.query(User).filter(
+            User.Email == self.Email,
+            User.OTP == self.OTP
+        ).first()
+
+        if not user:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Invalid OTP"
+            )
+        user.OTP = None
+        self.db.commit()
+
+        return {"Message":"Login Success"}      
 
 def forgot_password(user:ForgotPass,db:Session):
 
