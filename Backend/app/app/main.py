@@ -2,8 +2,8 @@
 from app.db.session import engine
 from app.db.base_class import Base
 from app.api.endpoints import users,password
-import app.models
-import app.api
+# this is changed by k
+#this is changed
 from app.api.endpoints import users
 from app.api.endpoints import lead
 from fastapi import FastAPI
