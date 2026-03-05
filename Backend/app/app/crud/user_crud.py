@@ -1,6 +1,7 @@
 from app.db import session
 from app.core.security import get_password_hash
 from sqlalchemy.orm import Session
+from sqlalchemy import or_
 from app.models.User_Table import User
 from abc import ABC,abstractmethod
 #CREATE USER
@@ -23,11 +24,21 @@ def Create_user(user,db:Session):
 
 #USER LOGIN    
 
-'''class Userabs(ABC):
+class Userabs(ABC):
     @abstractmethod
     def create_user():
         pass
 
 class Verify_user(Userabs):
-        def __init__(self,db:Session,):'''
-             
+        def __init__(self,db:Session,user_data):
+             self.db=db
+             self.user_data=user_data
+
+        def verify_user(self):
+             user=self.db.query(User).filter(
+                or_(
+                User.user_name == self.user_data.identifier,User.email == self.user_data.identifier)
+                ).first()  
+             if not user:
+                  return "Invalid Credientials"
+                           
