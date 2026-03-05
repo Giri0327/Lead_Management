@@ -16,11 +16,11 @@ import os
 load_dotenv()
 
 
-def emailOTP(to:str,otp:int):
+def emailOTP(to:str,otp:int,text:str):
 
     myemail="keerthikk0302@gmail.com"
     mypass="gmxqefyobsuwwnnl"
-    subject="Password reset link and OTP "
+    subject = text
     body=f""" YOur OTP to reset pass is: {otp}
 
               This linnk expires in 15 minutes"""

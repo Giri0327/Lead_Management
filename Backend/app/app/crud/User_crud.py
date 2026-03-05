@@ -63,12 +63,13 @@ def forgot_password(user:ForgotPass,db:Session):
     else:
         otp=random.randint(100000,999999)
         print("OTP:",otp)
+        text="OTP to reset password"
         expiry=(datetime.now()+timedelta(minutes=10))
         dbuser.OTP = otp
         dbuser.OTP_Expiry = expiry
         db.commit()
 
-        emailOTP(dbuser.Email,otp)
+        emailOTP(dbuser.Email,otp,text)
         return {"message":"OTP sent succesfully!"}
 
 
