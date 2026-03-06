@@ -1,3 +1,4 @@
+from fastapi import Depends
 from passlib.context import CryptContext
 import jwt 
 from datetime import datetime as dt
@@ -57,3 +58,4 @@ def emailOTP(to:str,otp:int,text:str):
     server.login(myemail,mypass)
     server.send_message(msg)
     server.quit()
+

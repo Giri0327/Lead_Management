@@ -25,10 +25,10 @@ class ADDUser:
             First_Name = self.user.first_name,
             Last_Name = self.user.last_name,
             Email = self.user.email,
-            Phone = self.user.phone,
+            # 3 = self.user.phone,
             Password = get_password_hash(self.user.password),
             #Role_ID=self.user.role_id,
-            Is_Active = self.user.is_active
+            # Is_Active = self.user.is_active
             )
         self.db.add(x)
         self.db.commit()
@@ -91,6 +91,7 @@ class Verify_user(Userabs):
              self.db.add(new_token)
              self.db.commit()
              print("Login")
+             
              if user.Is_two_fath:
                 otp =get_otp()
                 print("OTP generated")
@@ -103,6 +104,10 @@ class Verify_user(Userabs):
                 self.db.commit()
                 self.db.refresh(user)
                 emailOTP(user.Email,otp,text)
+                return {"OTP Sent Succesfulyy!!"}
+             
+             return {"message":"Login succesfull!!",
+                     "token":token_gen}
 
 #OTP and TOKEN VERIFICATION for USER          
 class OTPToken(ABC):
@@ -125,7 +130,7 @@ class OTPTokenVerify(OTPToken):
             raise HTTPException(status_code=404, detail="User not found")
 
         # OTP check
-        if user.OTP != self.otp:
+        if user.OTP != self.OTP:
             raise HTTPException(status_code=400, detail="Invalid OTP")
 
         # give error if otp expired

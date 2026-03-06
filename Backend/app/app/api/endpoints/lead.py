@@ -3,6 +3,8 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db
 from app.crud.Lead_crud import Create
 from app.schema.Lead_Schema import Leads
+from app.crud.Status_crud import create_status
+from app.schema.Status_Schema import Status
 
 router = APIRouter(prefix="/lead", tags=["Lead"])
 
@@ -14,3 +16,7 @@ def add_lead(lead: Leads, db: Session = Depends(get_db)):
         return new_lead
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
+@router.post("/create_status")
+def status_create(user:Status,db:Session=Depends(get_db)):
+    return create_status(user,db)

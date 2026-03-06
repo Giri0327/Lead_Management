@@ -1,3 +1,5 @@
+from requests import Session
+
 from app.models.Lead_Table import Lead
 
 from app.models.Lead_Table import Lead
@@ -30,3 +32,4 @@ class Create:
                 "message": "Lead created successfully",
                 "Lead_ID": new_lead.Lead_ID
             } 
+    
