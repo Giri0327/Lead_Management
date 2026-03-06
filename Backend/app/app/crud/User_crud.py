@@ -25,10 +25,10 @@ class ADDUser:
             First_Name = self.user.first_name,
             Last_Name = self.user.last_name,
             Email = self.user.email,
-            # 3 = self.user.phone,
+            #Phone = self.user.phone,
             Password = get_password_hash(self.user.password),
             #Role_ID=self.user.role_id,
-            # Is_Active = self.user.is_active
+            #Is_Active = self.user.is_active
             )
         self.db.add(x)
         self.db.commit()
@@ -90,12 +90,12 @@ class Verify_user(Userabs):
                               Token = token_gen)
              self.db.add(new_token)
              self.db.commit()
-             print("Login")
-             
+             #print("Login")
              if user.Is_two_fath:
                 otp =get_otp()
                 print("OTP generated")
                 expiry = datetime.now(timezone.utc) + timedelta(minutes=10)
+
 
 
                 text = "OTP for your Login verification"
@@ -104,10 +104,9 @@ class Verify_user(Userabs):
                 self.db.commit()
                 self.db.refresh(user)
                 emailOTP(user.Email,otp,text)
-                return {"OTP Sent Succesfulyy!!"}
-             
-             return {"message":"Login succesfull!!",
-                     "token":token_gen}
+                return {"message":"OTP sent to your email for verification","token":token_gen}
+             return {"message":"Login successful","token":token_gen}   
+
 
 #OTP and TOKEN VERIFICATION for USER          
 class OTPToken(ABC):
@@ -168,7 +167,7 @@ def forgot_password(user:ForgotPass,db:Session):
                             detail = "User not Found!")
     else:
         otp = get_otp()
-        print("OTP generated")
+        #print("OTP generated")
         expiry = (datetime.now()+timedelta(minutes=10))
     
         text = "OTP for forget password"
