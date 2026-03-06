@@ -6,8 +6,12 @@ import random
 import smtplib
 from email.message import EmailMessage
 from dotenv import load_dotenv
+import smtplib
+from email.mime.text import MIMEText
+import os
+load_dotenv()
 
-pwd_context=CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes = ["bcrypt"], deprecated = "auto")
 
 def get_password_hash(password:str):
     return pwd_context.hash(password)
@@ -22,57 +26,34 @@ EXPIRE_MINUTES = 5
 def create_token(data):
     user_token = {}
     user_token.update(data)
-    expire = dt.now()+timedelta(minutes=EXPIRE_MINUTES)
+    expire = dt.now()+timedelta(minutes = EXPIRE_MINUTES)
     user_token.update({"exp":expire})
-    return jwt.encode(user_token,SECRET_KEY,algorithm=ALGORITHM)
+    return jwt.encode(user_token,SECRET_KEY,algorithm = ALGORITHM)
 
-def get_otp(email):
-    otp = ""
 
-    for i in range(6):
-        otp+=str(random.randint(0,9))
-
-    server = smtplib.SMTP('smtp.gmail.com',587)
-    server.starttls()
-    server.login('girinath0327@gmail.com','wizi mybw gliz ilav')
-    to_mail = email
-
-    msg = EmailMessage()
-
-    msg['Subject'] = "OTP Verification"
-    msg['From'] = 'girinath0327@gmail.com'
-    msg['To'] = to_mail
-    msg.set_content('You have one-time password to reset your password \n  Your_otp_is: '+ otp)
-    server.send_message(msg)
-    server.quit()
-    print("Otp sent successfully")
-    return otp    
-
-'''import smtplib
-from email.mime.text import MIMEText
-import os
-load_dotenv()
+def get_otp():
+    otp = random.randint(100000,999999)
+    return otp  
 
 
 def emailOTP(to:str,otp:int,text:str):
 
-    myemail="keerthikk0302@gmail.com"
-    mypass="gmxqefyobsuwwnnl"
+    myemail = "keerthikk0302@gmail.com"
+    mypass ="gmxqefyobsuwwnnl"
     subject = text
     body=f""" YOur OTP to reset pass is: {otp}
 
-              This linnk expires in 15 minutes"""
+              This otp expires in 15 minutes"""
 
     msg=MIMEText(body)
-    msg["Subject"]=subject
-    msg["From"]=myemail
-    msg["To"]=to
+    msg["Subject"] = subject
+    msg["From"] = myemail
+    msg["To"] = to
 
     print("Sending email to:",to)
 
-    server= smtplib.SMTP("smtp.gmail.com",587)
+    server = smtplib.SMTP("smtp.gmail.com",587)
     server.starttls()
     server.login(myemail,mypass)
     server.send_message(msg)
     server.quit()
-'''

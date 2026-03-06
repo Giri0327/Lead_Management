@@ -9,17 +9,17 @@ class Follow_Up(Base):
 
     Follow_Up_ID = Column(Integer,primary_key=True)
 
-    User_ID  = Column(Integer,ForeignKey("user.User_ID",ondelete="CASCADE")) #FK
-    user = relationship("User",back_populates="follow_ups")
+    User_ID  = Column(Integer,ForeignKey("user.User_ID",ondelete = "CASCADE")) #FK
+    user = relationship("User",back_populates = "follow_ups")
 
     Lead_ID = Column(Integer,ForeignKey("lead.Lead_ID"))
-    lead_id = relationship("Lead",back_populates="lead")
+    lead_id = relationship("Lead",back_populates = "lead")
 
-    Contact_Type= Column(String(255),nullable=False)
+    Contact_Type = Column(String(255),nullable = False)
     Notes = Column(Text)
     Contacted_On = Column(DateTime)
 
-    Created_At= Column(DateTime,server_default=func.now())
+    Created_At= Column(DateTime,server_default = func.now())
 
 
 

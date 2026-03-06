@@ -10,6 +10,16 @@ class User(BaseModel):
     role_id:int
     is_active:bool
 
+class Update_User(BaseModel):
+    username: str
+    first_name:str
+    last_name: str
+    email: EmailStr
+    phone:int
+    role_id:int
+    profile_pic_URL:str
+    Is_two_fath:bool   
+
 class UserLogin(BaseModel):
     username_or_email:str
     password:str
@@ -21,6 +31,7 @@ class UserVerify(BaseModel):
 class OTPVerify(BaseModel):
     email: str
     otp: int
+    token : str
     
 class ForgotPass(BaseModel):
     email:EmailStr
