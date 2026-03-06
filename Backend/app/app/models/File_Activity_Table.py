@@ -12,6 +12,6 @@ class Activity_file(Base):
     File_url = Column(TEXT)
 
     # Relationships
-    activity = relationship("Lead_Activity", back_populates="activity_file")
+    activity = relationship("Lead_Activity", back_populates="Activity_file")
 
     Created_At = Column(DateTime, server_default=func.now())
