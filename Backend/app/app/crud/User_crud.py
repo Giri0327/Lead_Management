@@ -12,7 +12,7 @@ import random
 from datetime import datetime,timedelta
 from app.core import pwd_context,verify_password
 from app.core.security import get_otp,create_token
-from fastapi import HTTPException,status
+from fastapi import Depends, HTTPException,status
 #CREATE USER
 def Create_user(user,db:Session):
     x=User(Username=user.username,
@@ -29,6 +29,10 @@ def Create_user(user,db:Session):
     db.refresh(x)
     if x is not None:   
         return "User created successfully"  
+
+def view_users(db: Session = Depends(get_db)):
+    users = db.query(User).all()
+    return users
 
 #USER LOGIN    
 
@@ -51,6 +55,7 @@ class Verify_user(Userabs):
                   return "Invalid Credientials"
              verify_user_password = verify_password(self.user_data.password,user.Password)
              send_otp = get_otp(email=user.Email)
+             user.OTP =send_otp
              self.db.query(User).filter(User.Email == user.Email).update({User.OTP: send_otp})
              self.db.commit()
 
