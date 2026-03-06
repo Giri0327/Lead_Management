@@ -10,7 +10,7 @@ router =APIRouter(prefix="/user",tags=["User"])
 
 
 @router.post("/CreateUser")
-async def CreateUser(user:User,db:Session=Depends(get_db)):
+async def CreateUser(user:User,db:Session = Depends(get_db)):
     return Create_user(user,db)
 
 @router.post("/forgot_password")
@@ -19,16 +19,16 @@ async def forgot_pass(user: ForgotPass, db: Session = Depends(get_db)):
     return forgot_password(user, db)
 
 @router.post("/reset_password")
-async def Reset_Pass(user:ResetPass,otp:int,db:Session=Depends(get_db)):
+async def Reset_Pass(user:ResetPass,otp:int,db:Session = Depends(get_db)):
     return reset_password(user,otp,db)
 
 @router.post("/change_password")
-async def Change_Pass(user:ChangePass,db:Session=Depends(get_db)):
+async def Change_Pass(user:ChangePass,db:Session = Depends(get_db)):
     return change_password(user,db)
 
  
 @router.post("/Login")
-async def UserLogin(user:UserLogin,db:Session=Depends(get_db)):
+async def UserLogin(user:UserLogin,db:Session = Depends(get_db)):
     login= Verify_user(db,user)
     result = login.verify_user()
     return result  
