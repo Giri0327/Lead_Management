@@ -4,7 +4,7 @@ from sqlalchemy.orm import Session
 from app.db.session import get_db, engine
 from app.db.base_class import Base
 # CRUD operations
-from app.crud.user_crud import (ADDUser,forgot_password,reset_password,change_password,Verify_user,OTPTokenVerify)
+from app.crud.User_crud import (ADDUser,forgot_password,reset_password,change_password,Verify_user,OTPTokenVerify,view_users)
 # Schemas
 from app.schema.User_Schema import (User,OTPVerify,ForgotPass,ResetPass,ChangePass,UserLogin,Update_User)
 
@@ -22,6 +22,12 @@ async def CreateUser(user:User,db:Session = Depends(get_db)):
 async def UpdateUser(user_id: int,user:Update_User,db:Session=Depends(get_db)):
     x=ADDUser(user,db)
     return x.Update_user(user_id)
+
+@router.get("/view_Users")
+async def ViewUser(db: Session = Depends(get_db)):
+    return view_users(db)
+
+# view_users(db: Session = Depends(get_db)):
 
 @router.post("/forgot_password")
 async def forgot_pass(user: ForgotPass, db: Session = Depends(get_db)):

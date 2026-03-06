@@ -54,7 +54,9 @@ class ADDUser:
 
         return "User updated successfully"
 
-
+def view_users(db:Session):
+    users = db.query(User).all()
+    return users
 
 #USER LOGIN and OTP Generation
 class Userabs(ABC):
