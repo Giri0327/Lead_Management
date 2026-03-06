@@ -16,8 +16,8 @@ DATABASE_URL=os.getenv("DATABASE_URL")
 # load_dotenv(env_path)
 cert_path = os.getenv("ca")
 
-print("DATABASE_URL:", DATABASE_URL)
-print("CA:", cert_path)
+#print("DATABASE_URL:", DATABASE_URL)
+#print("CA:", cert_path)
 
 engine = create_engine(DATABASE_URL,
     connect_args={
