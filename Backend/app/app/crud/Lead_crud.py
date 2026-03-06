@@ -30,3 +30,12 @@ class Create:
                 "message": "Lead created successfully",
                 "Lead_ID": new_lead.Lead_ID
             } 
+
+
+class View:
+    def __init__(self, db):
+        self.db = db
+
+    def view_lead(self):
+        leads = self.db.query(Lead).all()
+        return leads

@@ -22,6 +22,7 @@ class User(Base):
     OTP_Expiry= Column(DateTime)
     User_Type=Column(String(255))
     Is_two_fath=Column(Boolean)
+    Reset_Key=Column(String(255))
 
     Role_ID = Column(Integer,ForeignKey("roles.Role_ID"))  #FK
     role_id_user = relationship("Roles",back_populates="roles")
