@@ -15,7 +15,7 @@ from app.core.security import create_token,emailOTP,get_otp
 from fastapi import HTTPException,status
 
 #CREATE USER
-class Create_user:
+class ADDUser:
     def __init__(self,user,db:Session):
         self.user = user
         self.db = db
@@ -48,7 +48,6 @@ class Create_user:
         user.Phone = self.user.phone
         user.Profile_Pic_URL = self.user.profile_pic_URL
         user.Is_two_fath = self.user.Is_two_fath
-        user.Is_Active = self.user.is_active
 
         self.db.commit()
         self.db.refresh(user)
@@ -89,6 +88,7 @@ class Verify_user(Userabs):
                               Token = token_gen)
              self.db.add(new_token)
              self.db.commit()
+             print("Login")
              if user.Is_two_fath:
                 otp =get_otp()
                 print("OTP generated")
@@ -117,7 +117,7 @@ class OTPTokenVerify(OTPToken):
         self.token = token
 
     def otp_verify(self):
-        user = self.db.query(User).filter(User.Email == self.email).first()
+        user = self.db.query(User).filter(User.Email == self.Email).first()
 
         if not user:
             raise HTTPException(status_code=404, detail="User not found")
