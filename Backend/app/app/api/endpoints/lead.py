@@ -1,8 +1,10 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy.orm import session
+#from sqlalchemy.orm import session
 from app.db import get_db,session
 from app.crud import Create
+from app.crud.Lead_crud import Updateleadd
 from app.schema import *
+from app.schema.Lead_Schema import Updatelead
 
 router = APIRouter(prefix="/lead", tags=["Lead"])
 
@@ -20,13 +22,7 @@ def view_lead(db: session = Depends(get_db)):
     all_leads = Create(None, db)
     return all_leads.view_lead()
 
-# @router.put("/update_lead")
-# def update_lead_endpoint(lead_id: int, lead: Leads, db: session = Depends(get_db)):
-#     lead_service = Create(None, db) 
-#     return lead_service.update_lead(lead_id, lead)
-
-# @router.put("/update_lead")
-# def update_lead_endpoint(lead_id: int, lead: Leads, db: session = Depends(get_db),response_model =):
-#     lead_service = Create(None, db) 
-#     updated_lead = lead_service.update_lead(lead_id, lead)
-#     return updated_lead
+@router.put("/Update Lead")
+def update_lead(leadupdate:Updatelead):
+    data=Updateleadd(db,leadupdate)
+    return data.update_lead()

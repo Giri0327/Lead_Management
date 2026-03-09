@@ -2,9 +2,8 @@ from fastapi import APIRouter, Depends
 from fastapi.security import OAuth2PasswordRequestForm
 from app.db import session,get_db
 from app.crud import ADDUser,forgot_password,reset_password,change_password,verify_password,OTPTokenVerify,Verify_user
-from app.schema import UserInfo,Update_User,ForgotPass,ResetPass,ChangePass,OTPVerify
+from app.schema import UserInfo,Update_User,ForgotPass,ResetPass,ChangePass ,OTPVerify
 from app.core import oauth2_scheme
-
 
 
 #router
@@ -50,7 +49,7 @@ async def UserLogin(form_data: OAuth2PasswordRequestForm = Depends(),db:session=
 
 @router.post("/Otpverify")
 async def Otpverify(user: OTPVerify, db: session = Depends(get_db)):
-    x = OTPTokenVerify(db, user.email, user.otp, user.otp)
+    x = OTPTokenVerify(db, user.otp, user.resetkey)
     result = x.otp_verify()
     return result
 

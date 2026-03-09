@@ -31,9 +31,9 @@ class UserVerify(BaseModel):
     otp: int 
     resetkey: str
 
-# class OTPVerify(BaseModel):
-#     resetkey : str
-#     otp: int
+class OTPVerify(BaseModel):
+    resetkey : str
+    otp: int
 
 
 class ForgotPass(BaseModel):

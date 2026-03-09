@@ -34,3 +34,16 @@ class Create:
         lead=self.db.query(Lead).all()
         return lead
 
+class Updateleadd:
+    def __init__(self,db,lead):
+        self.db=db
+        self.lead=lead
+    
+    def update_lead(self):
+        self.db.query(Lead).filter(Lead.Lead_ID==lead.lead_id).update({
+            "Status_ID":lead.status_id,
+            "Stage_ID":lead.stage_id,
+            "Priority_ID":lead.priority_id
+        })
+
+

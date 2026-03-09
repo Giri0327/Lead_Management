@@ -53,3 +53,9 @@ class LeadResponse(BaseModel):
 
     # class Config:
     #     orm_mode = True
+
+class Updatelead(BaseModel):
+    lead_id:int
+    stage_id:int
+    status_id:int
+    priority_id:int
