@@ -85,7 +85,6 @@ def emailOTP(to:str,otp:int,text:str):
     server.send_message(msg)
     server.quit()
 
-# resetkey="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 def reset_key():
     s = os.getenv("resetkey")
     reset_key = ""
