@@ -27,7 +27,7 @@ async def update_user(user_id: int, user: Update_User, db: Session = Depends(get
     return user_service.Update_user(user_id)
 
 @router.get("/view_Users")
-async def ViewUser(db: Session = Depends(get_db)):
+async def ViewUser(token:str=Depends(oauth2_scheme),db:Session=Depends(get_db)):
     x=ADDUser(None,db)
     return x.view_users()
 
@@ -39,17 +39,17 @@ async def forgot_pass(user: ForgotPass, db: Session = Depends(get_db)):
     return forgot_password(user, db)
 
 @router.post("/reset_password")
-async def Reset_Pass(user:ResetPass,otp:int,db:Session = Depends(get_db)):
-    return reset_password(user,otp,db)
+async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,db:Session = Depends(get_db)):
+    return reset_password(user,otp,reset_key,db)
 
 @router.post("/change_password")
 async def Change_Pass(user:ChangePass,db:Session = Depends(get_db)):
     return change_password(user,db)
 
- 
+# oauth2_scheme = OAuth2PasswordRequestForm(token_url)
 @router.post("/Login")
-async def UserLogin(user:UserLogin,db:Session = Depends(get_db)):
-    login= Verify_user(db,user)
+async def UserLogin(form_data: OAuth2PasswordRequestForm = Depends(),db:Session=Depends(get_db)):
+    login= Verify_user(db,form_data)
     result = login.verify_user()
     return result  
 
