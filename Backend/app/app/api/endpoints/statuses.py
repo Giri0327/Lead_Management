@@ -7,7 +7,6 @@ from app.schema.Status_Schema import Status
 
 router = APIRouter(prefix="/lead", tags=["Status"])
 
-
 @router.post("/create_Status")
 def status_create(user:Status,db:Session=Depends(get_db)):
     return create_status(user,db)
