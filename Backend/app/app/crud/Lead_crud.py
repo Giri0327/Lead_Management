@@ -1,5 +1,10 @@
-from app.models import Lead
+from cProfile import label
+
+from executing import Source
+
+from app.models import Lead,User,Sources,Stage,Status,Priority
 from fastapi import HTTPException, status
+from sqlalchemy.orm import joinedload
 
 class Create:
     def __init__(self, leads, db):
@@ -32,7 +37,7 @@ class Create:
             } 
         
     def view_lead(self, limit, offset):
-        lead=self.db.query(Lead).offset(offset).limit(limit).all()
+        lead=self.db.query(Lead).order_by(Lead.Lead_ID.asc()).offset(offset).limit(limit).all()
         return lead
 
 class Updateleadd:
@@ -49,6 +54,57 @@ class Updateleadd:
         })
         self.db.commit()
         return "updated successfully"
+    
+class ViewLeadByID:
+    def __init__(self,db,lead_id):
+        self.db=db
+        self.lead_id=lead_id
 
+    def view_lead_by_id(self):
+        results = (
+            self.db.query(
+                Lead.Lead_Name.label("lead_name"),
+                Lead.Company_Name.label("company"),
+                Lead.Email,
+                Lead.Phone,
+                User.Username.label("owner"),
+                Lead.Value,
+                Sources.Source_Name,
+                Stage.Stage_Name,
+                Status.Status_Name,
+                Priority.Priority_Name
+            )
+            .join(Stage, Lead.Stage_ID == Stage.Stage_ID).join(Priority, Lead.Priority_ID == Priority.Priority_ID)
+            .join(Status, Lead.Status_ID == Status.Status_ID).join(User, Lead.Owner_ID == User.User_ID)
+            .join(Sources, Lead.Source_ID == Sources.Source_ID)
+            .filter(Lead.Lead_ID == self.lead_id).first() #.one_or_none() # ensures only one record exists
+        )
+        return results
+    
+    """def view_lead_by_id(self):
+        lead = (
+            self.db.query(Lead)
+            .options(
+                joinedload(Lead.stage),
+                joinedload(Lead.status),
+                joinedload(Lead.priority),
+                joinedload(Lead.source),
+                joinedload(Lead.owner)
+            )
+            .filter(Lead.Lead_ID == self.lead_id)
+            .first()
+        )
+        return {
+            "lead_name": lead.Lead_Name,
+            "company": lead.Company_Name,
+            "email": lead.Email,
+            "phone": lead.Phone,
+            "owner": lead.owner.Username if lead.owner else None,
+            "value": lead.Value,
+            "source": lead.source.Source_Name if lead.source else None,
+            "stage": lead.stage.Stage_Name if lead.stage else None,
+            "status": lead.status.Status_Name if lead.status else None,
+            "priority": lead.priority.Priority_Name if lead.priority else None
+        }"""
 
 
