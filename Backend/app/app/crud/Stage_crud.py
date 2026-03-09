@@ -1,11 +1,9 @@
 from fastapi import HTTPException
-from requests import Session
-
 from app.schema import Stage_Schema
 from app.models import Stage
+from app.db import session
 
-
-def create_Stage(user,db:Session):
+def create_Stage(user,db:session):
         new_stage = Stage(
         Stage_Name=user.stage_name
     )
@@ -14,11 +12,11 @@ def create_Stage(user,db:Session):
         db.refresh(new_stage)
         return {"Stage Created succesfully"}
 
-def view_all_Stage(db:Session):
+def view_all_Stage(db:session):
         dbuser=db.query(Stage).all()
         return dbuser
 
-def update_Stage(stage_id:int,user,db:Session):
+def update_Stage(stage_id:int,user,db:session):
         dbuser=db.query(Stage).filter(Stage.Stage_ID==stage_id).first()
         if not dbuser:
             raise HTTPException(status_code=404,
@@ -28,7 +26,7 @@ def update_Stage(stage_id:int,user,db:Session):
         db.refresh(dbuser)
         return {"message":"Stage Updated Succesfully!!"}
 
-def delete_Stage(stage_id:int,db:Session):
+def delete_Stage(stage_id:int,db:session):
        dbuser = db.query(Stage).filter(Stage.Stage_ID==stage_id).first()
        if not dbuser:
               raise HTTPException(status_code=404,detail="User not Found!!")

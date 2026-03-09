@@ -1,8 +1,4 @@
-from requests import Session
-
-from app.models import *
-
-
+from app.models import Lead
 from fastapi import HTTPException, status
 
 class Create:
