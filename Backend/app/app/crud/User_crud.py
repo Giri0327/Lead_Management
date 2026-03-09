@@ -84,6 +84,7 @@ class Verify_user(Userabs):
              self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
              new_token = Token(User_Id = user.User_ID,
                               Token = token_gen)
+
              self.db.add(new_token)
              self.db.commit()
              #print("Login")
@@ -91,8 +92,6 @@ class Verify_user(Userabs):
                 otp =get_otp()
                 print("OTP generated")
                 expiry = datetime.now(timezone.utc) + timedelta(minutes=10)
-
-
 
                 text = "OTP for your Login verification"
                 user.OTP = otp
@@ -167,21 +166,41 @@ def forgot_password(user:ForgotPass,db:Session):
         expiry = (datetime.now()+timedelta(minutes=10))
     
         text = "OTP for forget password"
+             
+        if user:
+                
+            s = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
+            reset_key = ""
+
+            for i in range(30):
+                reset_key += random.choice(s)
+
+            print("Generated reset_key:", reset_key)
+
+        dbuser.add(reset_key)   
+
         dbuser.OTP = otp
         dbuser.OTP_Expiry = expiry
         db.commit()
 
         emailOTP(dbuser.Email,otp,text)
-        return {"message":"OTP sent succesfully!"}
+        return {"message":"OTP sent succesfully!","resetkey":{reset_key}}
 
 #USER RESET PASSWORD
-def reset_password(user:ResetPass,otp:int,db:Session):
+def reset_password(user:ResetPass,otp:int,reset_key:str,db:Session):
 
-    dbuser=db.query(User).filter(User.OTP == otp).first()
+
+    dbuser=db.query(User).filter(User.Reset_Key == reset_key).first()
+
     if not dbuser:
-        raise HTTPException(status_code=400, detail="Invalid OTP")
+        raise HTTPException(status_code=400, detail="Invalid reset key")
+    
+    
     if datetime.now()>dbuser.OTP_Expiry:
         raise HTTPException(status_code=400, detail="OTP expired")
+    
+    if dbuser.OTP == otp:
+        return {"OTP verified"}
     
     dbuser.Password = pwd_context.hash(user.new_password)
     db.commit()
