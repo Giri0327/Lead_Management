@@ -5,10 +5,11 @@ class User(BaseModel):
     first_name:str
     last_name: str
     email: EmailStr
-    phone:int
+    #phone:int
     password:str
-    role_id:int
-    is_active:bool
+    #role_id:int
+    #is_active:bool
+
 
 class Update_User(BaseModel):
     username: str

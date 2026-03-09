@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.db.session import get_db
-from app.crud.Lead_crud import Create
+from app.crud.Lead_crud import Create,View
 from app.schema.Lead_Schema import Leads
 
 router = APIRouter(prefix="/lead", tags=["Lead"])
@@ -14,3 +14,8 @@ def add_lead(lead: Leads, db: Session = Depends(get_db)):
         return new_lead
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
+    
+@router.get("/view_leads")
+def view_lead(db: Session = Depends(get_db)):
+    view = View(db)
+    return view.view_lead()
