@@ -1,6 +1,6 @@
-from pydantic import BaseModel,EmailStr
+from pydantic import BaseModel,EmailStr,Field
 
-class User(BaseModel):
+class UserInfo(BaseModel):
     username: str
     first_name:str
     last_name: str
@@ -17,7 +17,7 @@ class Update_User(BaseModel):
     last_name: str
     email: EmailStr
     phone:int
-    role_id:int
+    role_id:str = Field(example="Admin/User")
     profile_pic_URL:str
     Is_two_fath:bool   
 

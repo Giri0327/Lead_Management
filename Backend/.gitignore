@@ -2,5 +2,5 @@
 myenv/
 *.pem
 __pycache__/
-alembic/
-alembic.ini
+app/alembic/
+app/alembic.ini

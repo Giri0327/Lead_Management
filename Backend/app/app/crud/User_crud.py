@@ -1,18 +1,14 @@
-from app.core.security import get_password_hash
-from sqlalchemy.orm import Session
-from sqlalchemy import or_
-from app.models.User_Table import User
-from app.models.Tokens_Table import Token
 from abc import ABC,abstractmethod
-from app.schema import *
+from fastapi import HTTPException,status
 from sqlalchemy.orm import Session
-from app.models import *
-from app.db import *
 import random
 from datetime import datetime,timedelta,timezone
-from app.core import pwd_context,verify_password
-from app.core.security import create_token,emailOTP,get_otp
-from fastapi import HTTPException,status
+from sqlalchemy.orm import Session
+from sqlalchemy import or_
+from app.models import *
+#from app.schema import *
+from app.db import *
+from app.core import *
 
 #CREATE USER
 class ADDUser:
@@ -54,9 +50,9 @@ class ADDUser:
 
         return "User updated successfully"
 
-def view_users(db:Session):
-    users = db.query(User).all()
-    return users
+    def view_users(self):
+        users = self.db.query(User).all()
+        return users
 
 #USER LOGIN and OTP Generation
 class Userabs(ABC):
@@ -71,10 +67,8 @@ class Verify_user(Userabs):
 
         def verify_user(self):
              try:
-                user = self.db.query(User).filter(
-                    or_(
-                    User.Username == self.user_data.username_or_email,User.Email == self.user_data.username_or_email)
-                    ).first()  
+                user = self.db.query(User).filter(or_(
+                    User.Username == self.user_data.username_or_email,User.Email == self.user_data.username_or_email)).first()  
                 if not user:
                     raise HTTPException(status_code=404,
                                         detail="User not found")
@@ -84,15 +78,15 @@ class Verify_user(Userabs):
                 if not verify_user_password:
                     raise HTTPException(status_code=404,
                                         detail="Invalid Password")
-                
-                token_gen = create_token(data = {"sub": user.User_ID})
-                self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
-                new_token = Token(User_Id = user.User_ID,
-                                Token = token_gen)
-                self.db.add(new_token)
-                self.db.commit()
-                #print("Login")
-                if user.Is_two_fath:
+                if not user.Is_two_fath:
+                    token_gen = create_token(user)
+                    self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
+                    new_token = Token(User_Id = user.User_ID,
+                                    Token = token_gen)
+                    self.db.add(new_token)
+                    self.db.commit()
+                    print("Login")
+                else:
                     otp =get_otp()
                     print("OTP generated")
                     expiry = datetime.now(timezone.utc) + timedelta(minutes=10)
@@ -104,9 +98,10 @@ class Verify_user(Userabs):
                     self.db.refresh(user)
                     emailOTP(user.Email,otp,text)
                     return {"message":"OTP sent to your email for verification","token":token_gen}
+                
                 return {"message":"Login successful","token":token_gen}   
              except Exception as e:
-                 return e
+                 raise HTTPException(status_code=500, detail=str(e))
              
              
 #OTP and TOKEN VERIFICATION for USER          
@@ -130,7 +125,7 @@ class OTPTokenVerify(OTPToken):
             raise HTTPException(status_code=404, detail="User not found")
 
         # OTP check
-        if user.OTP != self.otp:
+        if user.OTP != self.OTP:
             raise HTTPException(status_code=400, detail="Invalid OTP")
 
         # give error if otp expired
@@ -159,7 +154,7 @@ class OTPTokenVerify(OTPToken):
         return {"message": "OTP Verified Successfully"}     
     
 #FORGET PASSWORD
-def forgot_password(user:ForgotPass,db:Session):
+def forgot_password(user,db:Session):
 
     dbuser = db.query(User).filter(User.Email == user.email).first()
 
@@ -180,7 +175,7 @@ def forgot_password(user:ForgotPass,db:Session):
         return {"message":"OTP sent succesfully!"}
 
 #USER RESET PASSWORD
-def reset_password(user:ResetPass,otp:int,db:Session):
+def reset_password(user,otp:int,db:Session):
 
     dbuser=db.query(User).filter(User.OTP == otp).first()
     if not dbuser:
@@ -193,7 +188,7 @@ def reset_password(user:ResetPass,otp:int,db:Session):
     return {"Message":"Password reset successful"}
 
 #USER CHANGE PASSWORD
-def change_password(user:ChangePass,db:Session):
+def change_password(user,db:Session):
 
     dbuser = db.query(User).filter(User.Email == user.email).first()
     if not dbuser:

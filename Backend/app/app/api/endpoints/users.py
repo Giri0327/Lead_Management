@@ -3,10 +3,13 @@ from sqlalchemy.orm import Session
 # Database
 from app.db.session import get_db, engine
 from app.db.base_class import Base
+
 # CRUD operations
-from app.crud.User_crud import (ADDUser,forgot_password,reset_password,change_password,Verify_user,OTPTokenVerify,view_users)
+from app.crud import *
+
 # Schemas
-from app.schema.User_Schema import (User,OTPVerify,ForgotPass,ResetPass,ChangePass,UserLogin,Update_User)
+from app.schema import *
+
 
 
 #router
@@ -14,18 +17,19 @@ router =APIRouter(prefix="/user",tags=["User"])
 
 
 @router.post("/CreateUser")
-async def CreateUser(user:User,db:Session = Depends(get_db)):
+async def CreateUser(user:UserInfo,db:Session = Depends(get_db)):
     x= ADDUser(user,db)
     return x.Create_user()
 
-@router.post("/UpdateUser")
-async def UpdateUser(user_id: int,user:Update_User,db:Session=Depends(get_db)):
-    x=ADDUser(user,db)
-    return x.Update_user(user_id)
+@router.put("/UpdateUser/{user_id}")
+async def update_user(user_id: int, user: Update_User, db: Session = Depends(get_db)):
+    user_service = ADDUser(user, db)
+    return user_service.Update_user(user_id)
 
 @router.get("/view_Users")
 async def ViewUser(db: Session = Depends(get_db)):
-    return view_users(db)
+    x=ADDUser(None,db)
+    return x.view_users()
 
 # view_users(db: Session = Depends(get_db)):
 

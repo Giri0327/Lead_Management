@@ -1,8 +1,5 @@
-from app.db.session import engine
-from app.db.base_class import Base
-from app.api.endpoints import users
-from app.api.endpoints import users
-from app.api.endpoints import lead
+from app.db import *
+from app.api.endpoints import lead,priority,stage,statuses,users,sources
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
@@ -22,6 +19,10 @@ app.add_middleware(
 
 app.include_router(users.router)
 app.include_router(lead.router)
+app.include_router(stage.router)
+app.include_router(statuses.router)
+app.include_router(priority.router)
+app.include_router(sources.router)
 
 
 

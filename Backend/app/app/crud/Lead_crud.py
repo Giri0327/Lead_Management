@@ -1,6 +1,9 @@
-from app.models.Lead_Table import Lead
+from sqlalchemy.orm import Session
 
-from app.models.Lead_Table import Lead
+from app.models import *
+
+
+from fastapi import HTTPException, status
 
 class Create:
     def __init__(self, lead, db):
@@ -9,13 +12,13 @@ class Create:
 
     def create_lead(self):
         new_lead = Lead(
-            Lead_Name=self.lead.lead_name,
-            Phone=self.lead.phone,
-            Email=self.lead.email,
+            Lead_Name=self.lead.Lead_Name,
+            Phone=self.lead.Phone,
+            Email=self.lead.Email,
             #Owner_ID=self.lead.owner_id,
-            Value=self.lead.value,
+            Value=self.lead.Value,
             #Status_ID=self.lead.status_id,
-            Notes=self.lead.notes,
+            Notes=self.lead.Notes,
             #Source_ID=self.lead.source_id,
             #Stage_ID=self.lead.stage_id,
             #Priority_ID=self.lead.priority_id
@@ -30,12 +33,8 @@ class Create:
                 "message": "Lead created successfully",
                 "Lead_ID": new_lead.Lead_ID
             } 
-
-
-class View:
-    def __init__(self, db):
-        self.db = db
-
+        
     def view_lead(self):
-        leads = self.db.query(Lead).all()
-        return leads
+        lead=self.db.query(Lead).all()
+        return lead
+
