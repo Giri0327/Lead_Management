@@ -1,4 +1,3 @@
-
 from app.api.endpoints import lead,priority,stage,statuses,users,sources
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware

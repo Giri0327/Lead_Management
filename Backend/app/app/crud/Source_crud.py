@@ -1,11 +1,9 @@
 from fastapi import HTTPException
-from requests import Session
-
-from app.schema import *
-from app.models import *
+from app.models import Sources
+from app.db import session
 
 
-def create_Source(user,db:Session):
+def create_Source(user,db:session):
         new_Source = Sources(
         Source_Name=user.source_name
     )
@@ -14,11 +12,11 @@ def create_Source(user,db:Session):
         db.refresh(new_Source)
         return {"Source Created succesfully"}
 
-def view_all_Source(db:Session):
+def view_all_Source(db:session):
         dbuser=db.query(Sources).all()
         return dbuser
 
-def update_Source(source_id:int,user,db:Session):
+def update_Source(source_id:int,user,db:session):
         dbuser=db.query(Sources).filter(Sources.Source_ID==source_id).first()
         if not dbuser:
             raise HTTPException(status_code=404,
@@ -28,7 +26,7 @@ def update_Source(source_id:int,user,db:Session):
         db.refresh(dbuser)
         return {"message":"Source Updated Succesfully!!"}
 
-def delete_Source(source_id:int,db:Session):
+def delete_Source(source_id:int,db:session):
        dbuser = db.query(Sources).filter(Sources.Source_ID==source_id).first()
        if not dbuser:
               raise HTTPException(status_code=404,detail="User not Found!!")
