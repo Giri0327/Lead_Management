@@ -2,6 +2,7 @@ from abc import ABC,abstractmethod
 from fastapi import HTTPException,status
 import random
 from datetime import datetime,timedelta,timezone
+import jwt
 from sqlalchemy import or_
 from app.models import User,Token
 from app.schema import Tokens,Update_User,ForgotPass,ResetPass,ChangePass
@@ -66,7 +67,7 @@ class Verify_user(Userabs):
              self.user_data=user_data
 
         def verify_user(self):
-             user = self.db.query(User).filter(User.Username == self.user_data.username).first()  
+             user = self.db.query(User).filter(or_(User.Username == self.user_data.username,User.Email==self.user_data.username)).first()  
              if not user:
                  raise HTTPException(status_code=404,
                                      detail="User not found")
@@ -155,6 +156,8 @@ def forgot_password(user:ForgotPass,db:session):
 
     dbuser = db.query(User).filter(User.Email == user.email).first()
 
+
+
     if not dbuser:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
                             detail = "User not Found!")
@@ -202,8 +205,16 @@ def reset_password(user: ResetPass, otp: int, reset_key: str, db: session):
     }
 
 #USER CHANGE PASSWORD
-def change_password(user:ChangePass,db:session):
+def change_password(user:ChangePass,token:str,db:session):
 
+
+
+
+    dbtoken = db.query(Token).filter(Token.Token == token).first()
+    if not dbtoken:
+        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
+                            detail = "Invalid Token!")
+                            
     dbuser = db.query(User).filter(User.Email == user.email).first()
     if not dbuser:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,

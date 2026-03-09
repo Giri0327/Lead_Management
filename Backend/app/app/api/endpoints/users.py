@@ -38,8 +38,8 @@ async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,db:session = Depends(g
     return reset_password(user,otp,reset_key,db)
 
 @router.post("/change_password")
-async def Change_Pass(user:ChangePass,db:session = Depends(get_db)):
-    return change_password(user,db)
+async def Change_Pass(user:ChangePass,token:str=Depends(oauth2_scheme),db:session = Depends(get_db)):
+    return change_password(user,token,db)
 
 # oauth2_scheme = OAuth2PasswordRequestForm(token_url)
 @router.post("/Login")
@@ -50,7 +50,7 @@ async def UserLogin(form_data: OAuth2PasswordRequestForm = Depends(),db:session=
 
 @router.post("/Otpverify")
 async def Otpverify(user: OTPVerify, db: session = Depends(get_db)):
-    x = OTPTokenVerify(db, user.email, user.otp, user.otp)
+    x = OTPTokenVerify(db, user.email, user.otp, user.token)
     result = x.otp_verify()
     return result
 

@@ -41,7 +41,7 @@ class ResetPass(BaseModel):
     new_password:str
 
 class ChangePass(BaseModel):
-    email:EmailStr
+    # token:str
     Current_Password:str
     New_Password:str
-    Confirm_Password:str
+    # Confirm_Password:str
