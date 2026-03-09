@@ -1,22 +1,19 @@
 from abc import ABC,abstractmethod
 from fastapi import HTTPException,status
-from sqlalchemy.orm import Session
 import random
 from datetime import datetime,timedelta,timezone
-from sqlalchemy.orm import Session
 from sqlalchemy import or_
 from app.models import *
 #from app.schema import *
 from app.models import User,Token
 from app.schema import Tokens,Update_User,ForgotPass,ResetPass,ChangePass
-from app.db import *
-from app.core import *
-
+from app.core import get_password_hash,verify_password,create_token,get_otp,emailOTP,reset_key,pwd_context
+from app.db import session,get_db
 from fastapi.security import OAuth2PasswordRequestForm
 
 #CREATE USER
 class ADDUser:
-    def __init__(self,user,db:Session):
+    def __init__(self,user,db:session):
         self.user = user
         self.db = db
         
@@ -66,7 +63,7 @@ class Userabs(ABC):
 
 
 class Verify_user(Userabs):
-        def __init__(self,db:Session,user_data):
+        def __init__(self,db:session,user_data):
              self.db=db
              self.user_data=user_data
 
@@ -127,7 +124,7 @@ class OTPToken(ABC):
 
 
 class OTPTokenVerify(OTPToken):
-    def __init__(self, db: Session, otp: int ,resetkey : str):
+    def __init__(self, db: session, otp: int ,resetkey : str,token : str):
         self.db = db
         self.OTP = otp
         self.resetkey = resetkey
@@ -160,7 +157,7 @@ class OTPTokenVerify(OTPToken):
 
     
 #FORGET PASSWORD
-def forgot_password(user,db:Session):
+def forgot_password(user:ForgotPass,db:session):
 
     dbuser = db.query(User).filter(User.Email == user.email).first()
 
@@ -187,8 +184,8 @@ def forgot_password(user,db:Session):
                 "resetkey":resetkey}
 
 #USER RESET PASSWORD
-def reset_password(user,otp:int,reset_key:str,db:Session):
-    dbuser = db.query(User).filter (User.Reset_Key == reset_key).first()
+def reset_password(user: ResetPass, otp: int, reset_key: str, db: session):
+    dbuser = db.query(User).filter(User.Reset_Key == reset_key).first()
 
     if not dbuser:
         raise HTTPException(status_code=400, detail="Invalid reset key")
@@ -211,7 +208,7 @@ def reset_password(user,otp:int,reset_key:str,db:Session):
     }
 
 #USER CHANGE PASSWORD
-def change_password(user,db:Session):
+def change_password(user:ChangePass,db:session):
 
     dbuser = db.query(User).filter(User.Email == user.email).first()
     if not dbuser:
