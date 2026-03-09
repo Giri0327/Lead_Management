@@ -28,22 +28,21 @@ async def ViewUser(token:str=Depends(oauth2_scheme),db:session=Depends(get_db)):
 # view_users(db: session = Depends(get_db)):
 
 @router.post("/forgot_password")
-async def forgot_pass(user: ForgotPass, db: session = Depends(get_db)):
-    print("Received:", user)
-    return forgot_password(user, db)
+async def forgot_pass(user: ForgotPass, background_tasks:BackgroundTasks,db: session = Depends(get_db)):
+    return forgot_password(user, db,background_tasks)
 
 @router.post("/reset_password")
 async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,db:session = Depends(get_db)):
     return reset_password(user,otp,reset_key,db)
 
 @router.post("/change_password")
-async def Change_Pass(user:ChangePass,db:session = Depends(get_db)):
-    return change_password(user,db)
+async def Change_Pass(user:ChangePass,token:str,db:session = Depends(get_db)):
+    return change_password(user,token,db)
 
 # oauth2_scheme = OAuth2PasswordRequestForm(token_url)
 @router.post("/Login")
-async def UserLogin(backgrounndtask:BackgroundTasks,user:UserLogin,db:session=Depends(get_db)):
-    login= Verify_user(db,user)
+async def UserLogin(background_tasks:BackgroundTasks,user:UserLogin,db:session=Depends(get_db)):
+    login= Verify_user(db,user,background_tasks)
     result = login.verify_user()
     return result  
 
