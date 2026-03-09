@@ -168,14 +168,10 @@ def forgot_password(user:ForgotPass,db:session):
                             detail = "User not Found!")
     else:
         otp = get_otp()
-        #print("OTP generated")
         expiry = (datetime.now(timezone.utc)+timedelta(minutes=10))
     
         text = "OTP for forget password"
-
-        resetkey = reset_key()
-
-        # dbuser.add(resetkey)   
+        resetkey = reset_key()  
         dbuser.Reset_Key = resetkey
         dbuser.OTP = otp
         dbuser.OTP_Expiry = expiry

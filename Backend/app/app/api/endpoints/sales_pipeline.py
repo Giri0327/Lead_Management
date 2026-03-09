@@ -9,8 +9,14 @@
 # @router.post("/count")
 # def salespipeline(db: Session = Depends(get_db)):
 #     try:
-#         count=salespipeline(db)
-#         return count.salespipeline_count()
-        
+#         data=Salespipeline(db)
+#         return data.salespipeline_count()
 #     except Exception as e:
 #         raise HTTPException(status_code=400, detail=str(e))
+    
+# @router.post("/view")
+# def sale(db: Session = Depends(get_db)):
+#     data=Salespipeline(db)
+#     return data.pipe()
+
+    
