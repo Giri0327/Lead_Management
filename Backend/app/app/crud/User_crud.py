@@ -70,39 +70,43 @@ class Verify_user(Userabs):
              self.user_data=user_data
 
         def verify_user(self):
-             user = self.db.query(User).filter(
-                or_(
-                User.Username == self.user_data.username_or_email,User.Email == self.user_data.username_or_email)
-                ).first()  
-             if not user:
-                 raise HTTPException(status_code=404,
-                                     detail="User not found")
-             
-             verify_user_password = verify_password(self.user_data.password,user.Password)
+             try:
+                user = self.db.query(User).filter(
+                    or_(
+                    User.Username == self.user_data.username_or_email,User.Email == self.user_data.username_or_email)
+                    ).first()  
+                if not user:
+                    raise HTTPException(status_code=404,
+                                        detail="User not found")
+                
+                verify_user_password = verify_password(self.user_data.password,user.Password)
 
-             if not verify_user_password:
-                  raise HTTPException(status_code=404,
-                                     detail="Invalid Password")
-             
-             token_gen = create_token(data = {"sub": user.User_ID})
-             self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
-             new_token = Token(User_Id = user.User_ID,
-                              Token = token_gen)
-             self.db.add(new_token)
-             self.db.commit()
-             print("Login")
-             if user.Is_two_fath:
-                otp =get_otp()
-                print("OTP generated")
-                expiry = datetime.now(timezone.utc) + timedelta(minutes=10)
-
-
-                text = "OTP for your Login verification"
-                user.OTP = otp
-                user.OTP_Expiry = expiry
+                if not verify_user_password:
+                    raise HTTPException(status_code=404,
+                                        detail="Invalid Password")
+                
+                token_gen = create_token(data = {"sub": user.User_ID})
+                self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
+                new_token = Token(User_Id = user.User_ID,
+                                Token = token_gen)
+                self.db.add(new_token)
                 self.db.commit()
-                self.db.refresh(user)
-                emailOTP(user.Email,otp,text)
+                print("Login")
+                if user.Is_two_fath:
+                    otp =get_otp()
+                    print("OTP generated")
+                    expiry = datetime.now(timezone.utc) + timedelta(minutes=10)
+
+
+                    text = "OTP for your Login verification"
+                    user.OTP = otp
+                    user.OTP_Expiry = expiry
+                    self.db.commit()
+                    self.db.refresh(user)
+                    emailOTP(user.Email,otp,text)
+
+             except Exception as e:
+                 return {"Error:", e}
 
 #OTP and TOKEN VERIFICATION for USER          
 class OTPToken(ABC):
