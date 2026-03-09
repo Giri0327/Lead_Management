@@ -1,12 +1,13 @@
-from pydantic import BaseModel,EmailStr,Field
+from pydantic import BaseModel,EmailStr,Field,ConfigDict
+
 
 class UserInfo(BaseModel):
     username: str
     first_name:str
     last_name: str
     email: EmailStr
-    #phone:int
-    password:str
+    #phone:str
+    password: str = Field(min_length=6)
     #role_id:int
     #is_active:bool
 
@@ -16,32 +17,35 @@ class Update_User(BaseModel):
     first_name:str
     last_name: str
     email: EmailStr
-    phone:int
+    phone: str
     role_id:str = Field(example="Admin/User")
     profile_pic_URL:str
     Is_two_fath:bool   
 
 class UserLogin(BaseModel):
     username_or_email:str
-    password:str
+    password: str = Field(min_length=6)
+
 
 class UserVerify(BaseModel):
-    otp: str
-    token: str
+    otp: int 
+    resetkey: str
 
-class OTPVerify(BaseModel):
-    email: str
-    otp: int
-    token : str
-    
+# class OTPVerify(BaseModel):
+#     resetkey : str
+#     otp: int
+
+
 class ForgotPass(BaseModel):
     email:EmailStr
 
 class ResetPass(BaseModel):
-    new_password:str
+    otp : int 
+    resetkey : str 
+    new_password:str = Field(min_length=6)
 
 class ChangePass(BaseModel):
     email:EmailStr
-    Current_Password:str
-    New_Password:str
-    Confirm_Password:str
+    Current_Password:str 
+    New_Password:str = Field(min_length=6)
+    Confirm_Password:str = Field(min_length=6)

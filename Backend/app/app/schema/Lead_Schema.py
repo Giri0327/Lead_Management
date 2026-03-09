@@ -51,5 +51,5 @@ class LeadResponse(BaseModel):
     Created_At: datetime
     Updated_At: datetime
 
-    class Config:
-        orm_mode = True
+    # class Config:
+    #     orm_mode = True
