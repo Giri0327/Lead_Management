@@ -23,6 +23,6 @@ def view_lead(db: session = Depends(get_db)):
     return all_leads.view_lead()
 
 @router.put("/Update Lead")
-def update_lead(leadupdate:Updatelead):
+def update_lead(leadupdate:Updatelead,db:session = Depends(get_db)):
     data=Updateleadd(db,leadupdate)
     return data.update_lead()

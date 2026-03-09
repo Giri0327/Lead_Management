@@ -7,8 +7,7 @@ class Create:
         self.db = db
 
     def create_lead(self):
-        new_lead = Lead(
-            Lead_Name=self.lead.Lead_Name,
+        new_lead = Lead(Lead_Name=self.lead.Lead_Name,
             Phone=self.lead.Phone,
             Email=self.lead.Email,
             #Owner_ID=self.lead.owner_id,
@@ -40,10 +39,13 @@ class Updateleadd:
         self.lead=lead
     
     def update_lead(self):
-        self.db.query(Lead).filter(Lead.Lead_ID==lead.lead_id).update({
-            "Status_ID":lead.status_id,
-            "Stage_ID":lead.stage_id,
-            "Priority_ID":lead.priority_id
+        self.db.query(Lead).filter(Lead.Lead_ID==self.lead.lead_id).update({
+            "Status_ID":self.lead.status_id,
+            "Stage_ID":self.lead.stage_id,
+            "Priority_ID":self.lead.priority_id
         })
+        self.db.commit()
+        return "updated successfully"
+
 
 

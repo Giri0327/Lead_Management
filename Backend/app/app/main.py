@@ -23,7 +23,7 @@ app.include_router(stage.router)
 app.include_router(statuses.router)
 app.include_router(priority.router)
 app.include_router(sources.router)
-#app.include_router(sales_pipeline.router)
+app.include_router(sales_pipeline.router)
 
 
 
