@@ -31,8 +31,8 @@ class Create:
                 "Lead_ID": new_lead.Lead_ID
             } 
         
-    def view_lead(self):
-        lead=self.db.query(Lead).all()
+    def view_lead(self, limit, offset):
+        lead=self.db.query(Lead).offset(offset).limit(limit).all()
         return lead
 
 class Updateleadd:
