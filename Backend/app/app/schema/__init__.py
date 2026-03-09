@@ -1,5 +1,5 @@
-from app.schema.User_Schema import *
-from app.schema.Tokens_Schema import Token
+from app.schema.User_Schema import Update_User,ChangePass,ResetPass,UserLogin,UserInfo,UserVerify,ForgotPass
+from app.schema.Tokens_Schema import Tokens
 from app.schema.Status_Schema import Status
 from app.schema.Stage_Schema import Stage
 from app.schema.Roles_Schema import Roles

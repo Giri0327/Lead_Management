@@ -12,7 +12,7 @@ class Follow_Up(Base):
     User_ID  = Column(Integer,ForeignKey("user.User_ID",ondelete = "CASCADE")) #FK
     user = relationship("User",back_populates = "follow_ups")
 
-    Lead_ID = Column(Integer,ForeignKey("lead.Lead_ID"))
+    Lead_ID = Column(Integer,ForeignKey("lead_data.Lead_ID"))
     lead_id = relationship("Lead",back_populates = "lead")
 
     Contact_Type = Column(String(255),nullable = False)

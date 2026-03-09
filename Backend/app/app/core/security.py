@@ -11,7 +11,12 @@ import smtplib
 from email.mime.text import MIMEText
 from app.models import User
 import os
+
 load_dotenv()
+
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme= OAuth2PasswordBearer(tokenUrl="/user/Login")
 
 pwd_context = CryptContext(schemes = ["bcrypt"], deprecated = "auto")
 
@@ -27,10 +32,9 @@ EXPIRE_MINUTES = 5
 
 def create_token(user:User):
     payload={
-        "user_id":user.User_ID,
         "username":user.Username,
         "role":user.Role_ID,
-        "exp":dt.now()+timedelta(minutes=EXPIRE_MINUTES)
+        "exp":dt.utcnow()+timedelta(minutes=EXPIRE_MINUTES)
     }
 
     token = jwt.encode(payload,SECRET_KEY,algorithm=ALGORITHM)
@@ -80,4 +84,14 @@ def emailOTP(to:str,otp:int,text:str):
     server.login(myemail,mypass)
     server.send_message(msg)
     server.quit()
+
+def reset_key():
+    s = os.getenv("resetkey")
+    reset_key = ""
+
+    for i in range(30):
+        reset_key += random.choice(s)
+
+    print("Generated reset_key:", reset_key)
+    return reset_key
 
