@@ -71,8 +71,8 @@ class Verify_user(Userabs):
              try:
                 user = self.db.query(User).filter(
                         or_(
-                        User.Username == self.user_data.username,
-                        User.Email == self.user_data.username
+                        User.Username == self.user_data.username_or_email,
+                        User.Email == self.user_data.username_or_email
                         )
                     ).first()
                 if not user:
@@ -97,7 +97,7 @@ class Verify_user(Userabs):
                 else:
                     otp = get_otp()
                     text = "OTP for your login "
-                    expiry = datetime.utcnow()+ timedelta(minutes=10)
+                    expiry = datetime.utcnow()+ timedelta(minutes=15)
                     resetkey = reset_key()
 
                     user.OTP = otp
@@ -124,7 +124,7 @@ class OTPToken(ABC):
 
 
 class OTPTokenVerify(OTPToken):
-    def __init__(self, db: session, otp: int ,resetkey : str,token : str):
+    def __init__(self, db: session, otp: int ,resetkey : str):
         self.db = db
         self.OTP = otp
         self.resetkey = resetkey
@@ -153,7 +153,9 @@ class OTPTokenVerify(OTPToken):
             self.db.add(new_token)
             self.db.commit()
 
-            return {"message": "OTP Verified Successfully"}   
+            return {"message": "OTP Verified Successfully",
+                    "messgae2": "Login Success",
+                    "token": token_gen }   
 
     
 #FORGET PASSWORD
