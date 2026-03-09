@@ -4,10 +4,12 @@ import random
 from datetime import datetime,timedelta,timezone
 from sqlalchemy import or_
 from app.models import *
+from starlette import status
 #from app.schema import *
 from app.models import User,Token
 from app.schema import Tokens,Update_User,ForgotPass,ResetPass,ChangePass
 from app.core import get_password_hash,verify_password,create_token,get_otp,emailOTP,reset_key,pwd_context
+from app.core.security import decode_token
 from app.db import session,get_db
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -63,9 +65,10 @@ class Userabs(ABC):
 
 
 class Verify_user(Userabs):
-        def __init__(self,db:session,user_data):
+        def __init__(self,db:session,user_data,background_tasks):
              self.db=db
              self.user_data=user_data
+             self.background_tasks = background_tasks
 
         def verify_user(self):
              try:
@@ -106,7 +109,8 @@ class Verify_user(Userabs):
 
                     self.db.commit()
 
-                    emailOTP(user.Email, otp, text)
+                    self.background_tasks.add_task(emailOTP,user.Email,otp,text)
+                    #emailOTP(user.Email, otp, text)
                     return {"message":"OTP sent to your email for verification","resetkey":resetkey}
                   
              except HTTPException:
@@ -159,7 +163,7 @@ class OTPTokenVerify(OTPToken):
 
     
 #FORGET PASSWORD
-def forgot_password(user:ForgotPass,db:session):
+def forgot_password(user:ForgotPass,db:session,background_tasks):
 
     dbuser = db.query(User).filter(User.Email == user.email).first()
 
@@ -176,8 +180,8 @@ def forgot_password(user:ForgotPass,db:session):
         dbuser.OTP = otp
         dbuser.OTP_Expiry = expiry
         db.commit()
-
-        emailOTP(dbuser.Email,otp,text)
+        background_tasks.add_task(emailOTP,dbuser.Email,otp,text)
+        #emailOTP(dbuser.Email,otp,text)
         return {"message":"OTP sent succesfully!",
                 "resetkey":resetkey}
 
@@ -206,22 +210,28 @@ def reset_password(user: ResetPass, otp: int, reset_key: str, db: session):
     }
 
 #USER CHANGE PASSWORD
-def change_password(user:ChangePass,db:session):
+def change_password(user,token,db:session):
+    username=decode_token(token)
+    #username=payload.get("username")
 
-    dbuser = db.query(User).filter(User.Email == user.email).first()
-    if not dbuser:
-        raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
-                            detail = "User not Found!")
-    
-    if not verify_password(user.Current_Password,dbuser.Password):
-        return {"Current password is incorrect"}
-    if user.New_Password != user.Confirm_Password:
-        return {"Passwords dont match"}
-    
-    dbuser.Password = pwd_context.hash(user.New_Password)
+    new=db.query(User).filter(User.Username == username).first()
+    if not new:
+         raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="User not found")
+    if not verify_password(user.Current_Password,new.Password):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Current password is incorrect")
+    if not user.New_Password==user.Confirm_Password:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            details = "Password doesn't match"
+        )
+    new.Password = pwd_context.hash(user.New_Password)
+
     db.commit()
-    return {"Password changed succesfully"}
-    
-            
 
-                           
+    return {"message":"Password changed Succesfully"}
+
+
