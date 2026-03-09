@@ -1,18 +1,14 @@
-from app.core.security import get_password_hash
-from sqlalchemy.orm import Session
-from sqlalchemy import or_
-from app.models.User_Table import User
-from app.models.Tokens_Table import Token
 from abc import ABC,abstractmethod
-from app.schema import *
+from fastapi import HTTPException,status
 from sqlalchemy.orm import Session
-from app.models import *
-from app.db import *
 import random
 from datetime import datetime,timedelta,timezone
-from app.core import pwd_context,verify_password
-from app.core.security import create_token,emailOTP,get_otp
-from fastapi import HTTPException,status
+from sqlalchemy.orm import Session
+from sqlalchemy import or_
+from app.models import *
+from app.schema import *
+from app.db import *
+from app.core import *
 
 #CREATE USER
 class ADDUser:
@@ -54,9 +50,9 @@ class ADDUser:
 
         return "User updated successfully"
 
-def view_users(db:Session):
-    users = db.query(User).all()
-    return users
+    def view_users(self):
+        users = self.db.query(User).all()
+        return users
 
 #USER LOGIN and OTP Generation
 class Userabs(ABC):

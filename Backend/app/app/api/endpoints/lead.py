@@ -1,10 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
-from app.db.session import get_db
-from app.crud.Lead_crud import Create,View
-from app.schema.Lead_Schema import Leads
-from app.crud.Status_crud import create_status
-from app.schema.Status_Schema import Status
+from app.db import get_db
+from app.crud import *
+from app.schema import *
 
 router = APIRouter(prefix="/lead", tags=["Lead"])
 
@@ -16,11 +14,19 @@ def add_lead(lead: Leads, db: Session = Depends(get_db)):
         return new_lead
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
-    
-@router.post("/create_status")
-def status_create(user:Status,db:Session=Depends(get_db)):
-    return create_status(user,db)
+
 @router.get("/view_leads")
 def view_lead(db: Session = Depends(get_db)):
-    view = View(db)
-    return view.view_lead()
+    all_leads = Create(None, db)
+    return all_leads.view_lead()
+
+# @router.put("/update_lead")
+# def update_lead_endpoint(lead_id: int, lead: Leads, db: Session = Depends(get_db)):
+#     lead_service = Create(None, db) 
+#     return lead_service.update_lead(lead_id, lead)
+
+# @router.put("/update_lead")
+# def update_lead_endpoint(lead_id: int, lead: Leads, db: Session = Depends(get_db),response_model =):
+#     lead_service = Create(None, db) 
+#     updated_lead = lead_service.update_lead(lead_id, lead)
+#     return updated_lead
