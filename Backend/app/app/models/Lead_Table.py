@@ -16,9 +16,9 @@ class Lead(Base):
     Email = Column(String(255))
     Company_Name=Column(String(255))
 
+
     Owner_ID = Column(Integer,ForeignKey("user.User_ID"))
     leads = relationship("User",back_populates="owner")
-    Company = Column(String(255))
     Value = Column(DECIMAL)
     Notes=Column(Text)
     Source_ID = Column(Integer,ForeignKey("sources.Source_ID"))

@@ -31,6 +31,7 @@ class Leads(BaseModel):
     Status_ID: Optional[int]=None
     Stage_ID: Optional[int]=None
     Priority_ID: Optional[int]=None
+    Company_Name: Optional[str]=None
     # created_at: datetime
     # updated_at: datetime
     # last_contacted: Optional[datetime]
