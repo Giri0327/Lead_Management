@@ -10,7 +10,12 @@ from dotenv import load_dotenv
 import smtplib
 from email.mime.text import MIMEText
 import os
+
 load_dotenv()
+
+from fastapi.security import OAuth2PasswordBearer
+
+oauth2_scheme= OAuth2PasswordBearer(tokenUrl="/user/Login")
 
 pwd_context = CryptContext(schemes = ["bcrypt"], deprecated = "auto")
 
@@ -58,4 +63,14 @@ def emailOTP(to:str,otp:int,text:str):
     server.login(myemail,mypass)
     server.send_message(msg)
     server.quit()
+
+def reset_key():
+    s = os.getenv("resetkey")
+    reset_key = ""
+
+    for i in range(30):
+        reset_key += random.choice(s)
+
+    print("Generated reset_key:", reset_key)
+    return reset_key
 

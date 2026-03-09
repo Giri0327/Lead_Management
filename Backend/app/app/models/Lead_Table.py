@@ -5,7 +5,7 @@ from sqlalchemy.orm import relationship
 
 class Lead(Base):
 
-    __tablename__ = "lead"
+    __tablename__ = "lead_data"
 
     Lead_ID = Column(Integer,primary_key=True) 
     lead= relationship("Follow_Up",back_populates="lead_id")
