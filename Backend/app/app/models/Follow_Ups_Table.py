@@ -18,6 +18,7 @@ class Follow_Up(Base):
     Contact_Type = Column(String(255),nullable = False)
     Notes = Column(Text)
     Contacted_On = Column(DateTime)
+    Status = Column(Boolean)
 
     Created_At= Column(DateTime,server_default = func.now())
 

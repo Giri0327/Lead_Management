@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.db import get_db,session
 from app.crud import Create
 from app.crud.Lead_crud import Updateleadd, ViewLeadByID
+from app.crud.Follow_up_crud import Create
 from app.schema import *
 from app.schema.Lead_Schema import Updatelead
 
@@ -36,3 +37,11 @@ def update_lead(leadupdate:Updatelead,db:session = Depends(get_db)):
 def view_lead_by_id(lead_id: int, db: session = Depends(get_db)):
     lead=ViewLeadByID(db, lead_id)
     return lead.view_lead_by_id()
+
+
+@router.post("/schedule-followup")
+
+def followup_schedule(followup:Follow_up_schedule,db:session=Depends(get_db)):
+        creator = Create(followup, db)
+        new_followup = creator.schedule_followup()
+        return new_followup
