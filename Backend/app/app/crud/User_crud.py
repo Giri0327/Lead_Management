@@ -73,9 +73,9 @@ class Verify_user(Userabs):
              self.background_tasks = background_tasks
 
         def verify_user(self):
-             try:
+            try:
                 user = self.db.query(User).filter(
-                        or_(
+                    or_(
                         User.Username == self.user_data.username_or_email,
                         User.Email == self.user_data.username_or_email
                         )
@@ -115,10 +115,10 @@ class Verify_user(Userabs):
                     #emailOTP(user.Email, otp, text)
                     return {"message":"OTP sent to your email for verification","resetkey":resetkey}
                   
-             except HTTPException:
+            except HTTPException:
                 raise
-             except Exception as e:
-                print(e)   # show real error in terminal
+            except Exception as e:
+                #print(e)   # show real error in terminal
                 raise HTTPException(status_code=500, detail="Internal Server Error")
                         
 
