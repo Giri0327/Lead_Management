@@ -3,6 +3,7 @@ from fastapi import APIRouter, Depends, HTTPException
 from app.db import get_db,session
 from app.crud import Create
 from app.crud.Lead_crud import Updateleadd, ViewLeadByID
+from app.crud.Follow_up_crud import Create
 from app.schema import *
 from app.schema.Lead_Schema import Updatelead
 
@@ -36,3 +37,38 @@ def update_lead(leadupdate:Updatelead,db:session = Depends(get_db)):
 def view_lead_by_id(lead_id: int, db: session = Depends(get_db)):
     lead=ViewLeadByID(db, lead_id)
     return lead.view_lead_by_id()
+
+
+@router.post("/schedule-followup")
+
+def followup_schedule(followup:Follow_up_schedule,db:session=Depends(get_db)):
+        creator = Create(None,followup, db)
+        new_followup = creator.schedule_followup()
+        return new_followup
+
+@router.get("/upcoming_followups")
+
+def upcoming_followups(db:session=Depends(get_db)):
+        creator = Create(None,None,db)
+        upcoming_followup = creator.view_upcoming_followups()
+        return upcoming_followup
+    
+
+@router.get("/this_week_followups")
+def this_week_followups(db:session=Depends(get_db)):
+        creator = Create(None,None,db)
+        this_week_followup = creator.view_this_week_followups()
+        return this_week_followup
+    
+
+@router.post("/updating_followups")
+def update_followups(followup_id:int,followup:Follow_up_schedule,db:session=Depends(get_db)):
+        creator = Create(followup_id,followup,db)
+        update_followup = creator.update_followup(followup_id)
+        return update_followup
+    
+@router.get("/track_followups")
+def trackfollowup(db:session=Depends(get_db)):
+     creator = Create(None,None,db)
+     track = creator.track_followups()
+     return track

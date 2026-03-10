@@ -2,8 +2,10 @@ from abc import ABC,abstractmethod
 from fastapi import HTTPException,status
 import random
 from datetime import datetime,timedelta,timezone
+import jwt
 from sqlalchemy import or_
 from app.models import *
+from sqlalchemy.orm import Session
 from starlette import status
 from sqlalchemy.orm import Session
 from app.models import User,Token
@@ -193,6 +195,8 @@ def Resend_OTP(reset_key,db:Session,background_tasks):
 def forgot_password(user:ForgotPass,db:Session,background_tasks):
 
     dbuser = db.query(User).filter(User.Email == user.email).first()
+
+
 
     if not dbuser:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
