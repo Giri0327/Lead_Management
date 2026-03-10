@@ -59,10 +59,6 @@ async def ResendOTP(user:resend_otp,background_task:BackgroundTasks,db:Session=D
     return Resend_OTP(user.reset_key,db,background_task)
 
 
-
-
-
-
 """@router.post("/createDB")
 async def db():
     return Base.metadata.create_all(bind=engine)"""
