@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Depends,BackgroundTasks
+from sqlalchemy.orm import Session
 from fastapi.security import OAuth2PasswordRequestForm
 from app.db import session,get_db
 from sqlalchemy.orm import Session
@@ -42,8 +43,8 @@ async def Change_Pass(user:ChangePass,token:str,db:session = Depends(get_db)):
 
 # oauth2_scheme = OAuth2PasswordRequestForm(token_url)
 @router.post("/Login")
-async def UserLogin(background_tasks:BackgroundTasks,user:UserLogin,db:Session=Depends(get_db)):
-    login= Verify_user(db,user,background_tasks)
+async def UserLogin(background_tasks:BackgroundTasks,user_data:UserLogin,db:Session=Depends(get_db)):
+    login= Verify_user(db,user_data,background_tasks)
     result = login.verify_user()
     return result  
 
