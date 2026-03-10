@@ -5,7 +5,9 @@ from datetime import datetime,timedelta,timezone
 import jwt
 from sqlalchemy import or_
 from app.models import *
+from sqlalchemy.orm import Session
 from starlette import status
+from sqlalchemy.orm import Session
 #from app.schema import *
 from app.models import User,Token
 from app.schema import Tokens,Update_User,ForgotPass,ResetPass,ChangePass
@@ -66,7 +68,7 @@ class Userabs(ABC):
 
 
 class Verify_user(Userabs):
-        def __init__(self,db:session,user_data,background_tasks):
+        def __init__(self,db:Session,user_data,background_tasks):
              self.db=db
              self.user_data=user_data
              self.background_tasks = background_tasks
@@ -80,13 +82,13 @@ class Verify_user(Userabs):
                         )
                     ).first()
                 if not user:
-                    raise HTTPException(status_code=404,
+                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
                                         detail="User not found")
                 
                 verify_user_password = verify_password(self.user_data.password,user.Password)
 
                 if not verify_user_password:
-                    raise HTTPException(status_code=401,
+                    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
                                         detail="Invalid Password")
                 if not user.Is_two_fath:
                     token_gen = create_token(user)
