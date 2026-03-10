@@ -16,19 +16,47 @@ class Salespipeline:
                 func.sum(Lead.Value).label("total_value")
             )
             .join(Stage, Lead.Stage_ID == Stage.Stage_ID)
-            .group_by(Lead.Stage_ID).all()
+            .group_by(Lead.Stage_ID).order_by(Stage.Stage_ID.asc()).all()
         )
         return query
     
     def pipe(self):
         results = (
-        self.db.query(Lead.Lead_Name.label("lead_name"),
-            Priority.Priority_Name.label("priority_name"),
-            Lead.Value.label("value"),
-            User.Username.label("owner_name"),
-            Lead.Company_Name.label("company_name"))
-        .join(Stage, Lead.Stage_ID == Stage.Stage_ID)
-        .join(User, Lead.Owner_ID == User.User_ID)
-        .join(Priority, Lead.Priority_ID == Priority.Priority_ID)
-        .all())
-        return results
+            self.db.query(
+                Stage.Stage_ID.label("stage_ID"),
+                Stage.Stage_Name.label("stage_name"),
+                Lead.Lead_ID.label("lead_id"),
+                Lead.Lead_Name.label("lead_name"),
+                Lead.Company_Name.label("company_name"),
+                Lead.Value.label("value"),
+                Priority.Priority_Name.label("priority_name"),
+                User.Username.label("owner_name")
+            )
+            .join(Stage, Lead.Stage_ID == Stage.Stage_ID)
+            .join(User, Lead.Owner_ID == User.User_ID)
+            .join(Priority, Lead.Priority_ID == Priority.Priority_ID).order_by(Stage.Stage_ID.asc())
+            .all())
+        Data = {}
+        for row in results:
+            print(row)
+
+            stage_name = row.stage_name
+
+            if stage_name not in Data:
+                Data[stage_name] = {
+                    "stage": stage_name,
+                    "lead_count": 0,
+                    "leads": []
+                }
+
+            Data[stage_name]["lead_count"] += 1
+
+            Data[stage_name]["leads"].append({
+                #"lead_id": row.lead_id,
+                "lead_name": row.lead_name,
+                "company_name": row.company_name,
+                "value": row.value,
+                "priority": row.priority_name,
+                "owner": row.owner_name
+            })
+        return list(Data.values())
