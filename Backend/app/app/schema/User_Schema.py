@@ -31,9 +31,9 @@ class UserVerify(BaseModel):
     otp: int 
     resetkey: str
 
-# class OTPVerify(BaseModel):
-#     resetkey : str
-#     otp: int
+class OTPVerify(BaseModel):
+    resetkey : str
+    otp: int
 
 
 class ForgotPass(BaseModel):
@@ -45,7 +45,6 @@ class ResetPass(BaseModel):
     new_password:str = Field(min_length=6)
 
 class ChangePass(BaseModel):
-    email:EmailStr
     Current_Password:str 
     New_Password:str = Field(min_length=6)
     Confirm_Password:str = Field(min_length=6)

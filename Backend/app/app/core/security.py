@@ -40,10 +40,11 @@ def create_token(user:User):
     token = jwt.encode(payload,SECRET_KEY,algorithm=ALGORITHM)
     return token
 
-def decode_token(token):
+def decode_token(token:str):
     try:
         payload = jwt.decode(token,SECRET_KEY,algorithms=ALGORITHM)
-        return payload
+        username = payload["username"]
+        return username
     except jwt.ExpiredSignatureError:
         return "Token Expired"
     except jwt.InvalidTokenError:
@@ -85,7 +86,6 @@ def emailOTP(to:str,otp:int,text:str):
     server.send_message(msg)
     server.quit()
 
-# resetkey="abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 def reset_key():
     s = os.getenv("resetkey")
     reset_key = ""
