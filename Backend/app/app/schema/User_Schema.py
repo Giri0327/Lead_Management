@@ -6,10 +6,10 @@ class UserInfo(BaseModel):
     first_name:str
     last_name: str
     email: EmailStr
-    #phone:str
+    phone:str
     password: str = Field(min_length=6)
     #role_id:int
-    #is_active:bool
+    is_active:bool
 
 
 class Update_User(BaseModel):

@@ -26,10 +26,10 @@ class ADDUser:
             First_Name = self.user.first_name,
             Last_Name = self.user.last_name,
             Email = self.user.email,
-            #Phone = self.user.phone,
+            Phone = self.user.phone,
             Password = get_password_hash(self.user.password),
             #Role_ID=self.user.role_id,
-            #Is_Active = self.user.is_active
+            Is_Active = self.user.is_active
             )
         self.db.add(x)
         self.db.commit()
@@ -166,6 +166,8 @@ class OTPTokenVerify(OTPToken):
                     "messgae2": "Login Success",
                     "token": token_gen } 
 
+#RESEND OTP after OTP expiry
+
 def Resend_OTP(reset_key,db:Session,background_tasks):
     user = db.query(User).filter(User.Reset_Key == reset_key).first()
     if not user:
@@ -191,7 +193,8 @@ def Resend_OTP(reset_key,db:Session,background_tasks):
 
 
     
-#FORGET PASSWORD
+#FORGET PASSWORD While login
+
 def forgot_password(user:ForgotPass,db:Session,background_tasks):
 
     dbuser = db.query(User).filter(User.Email == user.email).first()
@@ -216,7 +219,8 @@ def forgot_password(user:ForgotPass,db:Session,background_tasks):
         return {"message":"OTP sent succesfully!",
                 "resetkey":resetkey}
 
-#USER RESET PASSWORD
+#USER RESET PASSWORD after FORGET PASSWORD
+
 def reset_password(user: ResetPass, otp: int, reset_key: str, db: Session):
     dbuser = db.query(User).filter(User.Reset_Key == reset_key).first()
 
@@ -243,7 +247,8 @@ def reset_password(user: ResetPass, otp: int, reset_key: str, db: Session):
         "Message": "Password reset successful"
     }
 
-#USER CHANGE PASSWORD
+#USER CHANGE PASSWORD INSIDE THE PROFILE
+
 def change_password(user,token,db:Session):
     username=decode_token(token)
     #username=payload.get("username")
