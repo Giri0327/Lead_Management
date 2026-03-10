@@ -22,7 +22,7 @@ from datetime import datetime, timedelta
 
 from fastapi import HTTPException
 
-from app.models import Lead,Follow_Up
+from app.models import Lead,Follow_Up,User
 from sqlalchemy import func
 
 class Create:
@@ -52,6 +52,26 @@ class Create:
 
         return {"message":"Follow-up scheduled!"}
     
+    def get_next_followup(self, lead_id:int):
+        
+        followup = (
+            self.db.query(User.Username,
+                          Follow_Up.Contact_Type,
+                          Follow_Up.Contacted_On,
+                          Follow_Up.Notes)
+            .filter(Follow_Up.Lead_ID == lead_id)
+            .filter(Follow_Up.Contacted_On > datetime.now())
+            .filter(Follow_Up.Status == False)
+            .order_by(Follow_Up.Contacted_On.asc())
+            .first()
+        )
+
+        if not followup:
+            return {"message":"No followup scheduled"}
+
+        return followup
+    
+
     def view_upcoming_followups(self):
         view_followups =(
             self.db.query(
@@ -95,7 +115,7 @@ class Create:
         return view_followups
 
     def update_followup(self,followup_id:int):
-        leaduser = self.db.query(Follow_Up).filter(Follow_Up.Follow_Up_ID==followup_id)
+        leaduser = self.db.query(Follow_Up).filter(Follow_Up.Follow_Up_ID==followup_id).first()
     
         if not leaduser:
             raise HTTPException(status_code=404,detail="Lead not Found")

@@ -40,14 +40,19 @@ def view_lead_by_id(lead_id: int, db: session = Depends(get_db)):
 
 
 @router.post("/schedule-followup")
-
 def followup_schedule(followup:Follow_up_schedule,db:session=Depends(get_db)):
         creator = Create(None,followup, db)
         new_followup = creator.schedule_followup()
         return new_followup
 
-@router.get("/upcoming_followups")
+@router.get("/next_followup")
+def next_followup(lead_id:int,db:session=Depends(get_db)):
+        creator = Create(lead_id,None,db)
+        upcoming_followup = creator.get_next_followup(lead_id)
+        return upcoming_followup
+    
 
+@router.get("/upcoming_followups")
 def upcoming_followups(db:session=Depends(get_db)):
         creator = Create(None,None,db)
         upcoming_followup = creator.view_upcoming_followups()
