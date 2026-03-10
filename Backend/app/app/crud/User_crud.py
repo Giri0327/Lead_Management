@@ -4,6 +4,7 @@ import random
 from datetime import datetime,timedelta,timezone
 from sqlalchemy import or_
 from app.models import *
+from sqlalchemy.orm import Session
 from starlette import status
 #from app.schema import *
 from app.models import User,Token
@@ -65,7 +66,7 @@ class Userabs(ABC):
 
 
 class Verify_user(Userabs):
-        def __init__(self,db:session,user_data,background_tasks):
+        def __init__(self,db:Session,user_data,background_tasks):
              self.db=db
              self.user_data=user_data
              self.background_tasks = background_tasks
