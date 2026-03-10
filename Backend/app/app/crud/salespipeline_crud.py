@@ -11,6 +11,7 @@ class Salespipeline:
     def salespipeline_count(self):
         query = (
             self.db.query(
+                Stage.Stage_ID.label("stage_ID"),
                 Stage.Stage_Name.label("stage_name"),
                 func.count(Lead.Stage_ID).label("lead_count"),
                 func.sum(Lead.Value).label("total_value")
@@ -38,12 +39,14 @@ class Salespipeline:
             .all())
         Data = {}
         for row in results:
-            print(row)
+            #print(row)
 
             stage_name = row.stage_name
-
+            stage_ID = row.stage_ID
+            #print(stage_ID)
             if stage_name not in Data:
                 Data[stage_name] = {
+                    "stage_id":row.stage_ID,
                     "stage": stage_name,
                     "lead_count": 0,
                     "leads": []
@@ -52,7 +55,7 @@ class Salespipeline:
             Data[stage_name]["lead_count"] += 1
 
             Data[stage_name]["leads"].append({
-                #"lead_id": row.lead_id,
+                "lead_id": row.lead_id,
                 "lead_name": row.lead_name,
                 "company_name": row.company_name,
                 "value": row.value,

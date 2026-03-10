@@ -4,3 +4,4 @@ from app.api.endpoints.stage import *
 from app.api.endpoints.statuses import *
 from app.api.endpoints.users import *
 from app.api.endpoints.sources import *
+from app.api.endpoints.dashboard import *
