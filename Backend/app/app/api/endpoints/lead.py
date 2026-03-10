@@ -42,39 +42,39 @@ def view_lead_by_id(lead_id: int, db: session = Depends(get_db)):
 
 @router.post("/schedule-followup")
 def followup_schedule(followup:Follow_up_schedule,db:session=Depends(get_db)):
-        creator = Create(None,followup, db)
+        creator = Createfollowup(None,followup, db)
         new_followup = creator.schedule_followup()
         return new_followup
 
 @router.get("/next_followup")
 def next_followup(lead_id:int,db:session=Depends(get_db)):
-        creator = Create(lead_id,None,db)
+        creator = Createfollowup(lead_id,None,db)
         upcoming_followup = creator.get_next_followup(lead_id)
         return upcoming_followup
     
 
 @router.get("/upcoming_followups")
 def upcoming_followups(db:session=Depends(get_db)):
-        creator = Create(None,None,db)
+        creator = Createfollowup(None,None,db)
         upcoming_followup = creator.view_upcoming_followups()
         return upcoming_followup
     
 
 @router.get("/this_week_followups")
 def this_week_followups(db:session=Depends(get_db)):
-        creator = Create(None,None,db)
+        creator = Createfollowup(None,None,db)
         this_week_followup = creator.view_this_week_followups()
         return this_week_followup
     
 
 @router.post("/updating_followups")
 def update_followups(followup_id:int,followup:Follow_up_schedule,db:session=Depends(get_db)):
-        creator = Create(followup_id,followup,db)
+        creator = Createfollowup(followup_id,followup,db)
         update_followup = creator.update_followup(followup_id)
         return update_followup
     
 @router.get("/track_followups")
 def trackfollowup(db:session=Depends(get_db)):
-     creator = Create(None,None,db)
+     creator = Createfollowup(None,None,db)
      track = creator.track_followups()
      return track
