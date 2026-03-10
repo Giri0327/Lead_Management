@@ -8,7 +8,7 @@ from app.models import *
 #from app.schema import *
 from app.models import User,Token
 from app.schema import Tokens,Update_User,ForgotPass,ResetPass,ChangePass
-from app.core import get_password_hash,verify_password,create_token,get_otp,emailOTP,reset_key,pwd_context
+from app.core import get_password_hash,verify_password,create_token,get_otp,emailOTP,reset_key,pwd_context,decode_token
 from app.db import session,get_db
 from fastapi.security import OAuth2PasswordRequestForm
 
@@ -213,7 +213,7 @@ def reset_password(user: ResetPass, otp: int, reset_key: str, db: session):
 #USER CHANGE PASSWORD
 def change_password(user:ChangePass,token:str,db:session):
 
-
+    token = decode_token()
 
 
     dbtoken = db.query(Token).filter(Token.Token == token).first()
