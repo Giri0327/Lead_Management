@@ -6,7 +6,6 @@ from sqlalchemy import or_
 from app.models import *
 from starlette import status
 from sqlalchemy.orm import Session
-#from app.schema import *
 from app.models import User,Token
 from app.schema import Tokens,Update_User,ForgotPass,ResetPass,ChangePass
 from app.core import get_password_hash,verify_password,create_token,get_otp,emailOTP,reset_key,pwd_context
@@ -16,7 +15,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 #CREATE USER
 class ADDUser:
-    def __init__(self,user,db:session):
+    def __init__(self,user,db:Session):
         self.user = user
         self.db = db
         
@@ -71,7 +70,7 @@ class Verify_user(Userabs):
              self.user_data=user_data
              self.background_tasks = background_tasks
 
-        def verify_user(self):
+        def verify_user(self):  
              try:
                 user = self.db.query(User).filter(
                         or_(
@@ -101,7 +100,7 @@ class Verify_user(Userabs):
                 else:
                     otp = get_otp()
                     text = "OTP for your login "
-                    expiry = datetime.utcnow()+ timedelta(minutes=15)
+                    expiry = datetime.utcnow()+ timedelta(seconds=45)
                     resetkey = reset_key()
 
                     user.OTP = otp
@@ -129,7 +128,7 @@ class OTPToken(ABC):
 
 
 class OTPTokenVerify(OTPToken):
-    def __init__(self, db: session, otp: int ,resetkey : str):
+    def __init__(self, db: Session, otp: int ,resetkey : str):
         self.db = db
         self.OTP = otp
         self.resetkey = resetkey
@@ -145,7 +144,10 @@ class OTPTokenVerify(OTPToken):
             raise HTTPException(status_code=400, detail="Invalid OTP")
         else:
             if datetime.utcnow() > user.OTP_Expiry:
+                user.OTP = None
+                user.OTP_Expiry = None
                 raise HTTPException(status_code=400, detail="OTP expired")
+            
             user.OTP = None
             user.OTP_Expiry = None
             user.Reset_Key = None
@@ -160,11 +162,35 @@ class OTPTokenVerify(OTPToken):
 
             return {"message": "OTP Verified Successfully",
                     "messgae2": "Login Success",
-                    "token": token_gen }   
+                    "token": token_gen } 
+
+def Resend_OTP(reset_key,db:Session,background_tasks):
+    user = db.query(User).filter(User.Reset_Key == reset_key).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
+                             detail="User not found")
+    
+    if datetime.utcnow() < user.OTP_Expiry:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="OTP still valid. Please wait before requesting a new OTP")
+    
+    new_otp = get_otp()
+    text = "You have entered a resend otp - OTP for your login is "
+    expiry = datetime.utcnow()+ timedelta(seconds=45)
+
+    user.OTP = new_otp
+    user.OTP_Expiry = expiry
+    db.commit()
+
+    background_tasks.add_task(emailOTP,user.Email,new_otp,text)
+
+    return {"message":"OTP Resent Succesfully"}
+
 
     
 #FORGET PASSWORD
-def forgot_password(user:ForgotPass,db:session,background_tasks):
+def forgot_password(user:ForgotPass,db:Session,background_tasks):
 
     dbuser = db.query(User).filter(User.Email == user.email).first()
 
@@ -182,22 +208,25 @@ def forgot_password(user:ForgotPass,db:session,background_tasks):
         dbuser.OTP_Expiry = expiry
         db.commit()
         background_tasks.add_task(emailOTP,dbuser.Email,otp,text)
-        #emailOTP(dbuser.Email,otp,text)
+        
         return {"message":"OTP sent succesfully!",
                 "resetkey":resetkey}
 
 #USER RESET PASSWORD
-def reset_password(user: ResetPass, otp: int, reset_key: str, db: session):
+def reset_password(user: ResetPass, otp: int, reset_key: str, db: Session):
     dbuser = db.query(User).filter(User.Reset_Key == reset_key).first()
 
     if not dbuser:
-        raise HTTPException(status_code=400, detail="Invalid reset key")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail="Invalid reset key")
 
     if datetime.utcnow() > dbuser.OTP_Expiry:
-        raise HTTPException(status_code=400, detail="OTP expired")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail="OTP expired")
 
     if dbuser.OTP != otp:
-        raise HTTPException(status_code=400, detail="Invalid OTP")
+        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST,
+                             detail="Invalid OTP")
 
     dbuser.Password = pwd_context.hash(user.new_password)
 
@@ -211,7 +240,7 @@ def reset_password(user: ResetPass, otp: int, reset_key: str, db: session):
     }
 
 #USER CHANGE PASSWORD
-def change_password(user,token,db:session):
+def change_password(user,token,db:Session):
     username=decode_token(token)
     #username=payload.get("username")
 

@@ -48,3 +48,7 @@ class ChangePass(BaseModel):
     Current_Password:str 
     New_Password:str = Field(min_length=6)
     Confirm_Password:str = Field(min_length=6)
+
+
+class resend_otp(BaseModel):
+    reset_key : str

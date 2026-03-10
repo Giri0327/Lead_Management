@@ -7,7 +7,7 @@ class Follow_Up(Base):
 
     __tablename__ = "follow_up"
 
-    Follow_Up_ID = Column(Integer,primary_key=True)
+    Follow_Up_ID = Column(Integer,primary_key=True,autoincrement=True)
 
     User_ID  = Column(Integer,ForeignKey("user.User_ID",ondelete = "CASCADE")) #FK
     user = relationship("User",back_populates = "follow_ups")

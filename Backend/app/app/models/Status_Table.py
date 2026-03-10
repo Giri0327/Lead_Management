@@ -7,7 +7,7 @@ class Status(Base):
 
     __tablename__ = "status"
 
-    Status_ID = Column(Integer,primary_key=True)
+    Status_ID = Column(Integer,primary_key=True,autoincrement=True)
     status = relationship("Lead",back_populates="lead_status") 
 
     Status_Name = Column(String(255))

@@ -7,7 +7,7 @@ class Sources(Base):
 
     __tablename__ = "sources"
 
-    Source_ID = Column(Integer,primary_key=True)
+    Source_ID = Column(Integer,primary_key=True,autoincrement=True)
     source = relationship("Lead",back_populates="lead_source") 
 
     Source_Name = Column(String(255))
