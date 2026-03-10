@@ -1,4 +1,4 @@
-from app.schema.User_Schema import Update_User,ChangePass,ResetPass,UserLogin,UserInfo,UserVerify,ForgotPass,OTPVerify
+from app.schema.User_Schema import Update_User,ChangePass,ResetPass,UserLogin,UserInfo,UserVerify,ForgotPass,OTPVerify,resend_otp
 from app.schema.Tokens_Schema import Tokens
 from app.schema.Status_Schema import Status
 from app.schema.Stage_Schema import Stage
@@ -8,4 +8,4 @@ from app.schema.Lead_Source_Schema import Lead_Source
 from app.schema.Lead_Schema import Leads,LeadResponse
 from app.schema.Lead_Notes_Schema import Lead_Notes
 from app.schema.Lead_Activites_Schema import Lead_Activity
-from app.schema.Follow_Ups_Schema import Follow_ups
+from app.schema.Follow_Ups_Schema import Follow_ups,Follow_up_schedule

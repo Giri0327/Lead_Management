@@ -7,7 +7,7 @@ class Follow_Up(Base):
 
     __tablename__ = "follow_up"
 
-    Follow_Up_ID = Column(Integer,primary_key=True)
+    Follow_Up_ID = Column(Integer,primary_key=True,autoincrement=True)
 
     User_ID  = Column(Integer,ForeignKey("user.User_ID",ondelete = "CASCADE")) #FK
     user = relationship("User",back_populates = "follow_ups")
@@ -18,6 +18,7 @@ class Follow_Up(Base):
     Contact_Type = Column(String(255),nullable = False)
     Notes = Column(Text)
     Contacted_On = Column(DateTime)
+    Status = Column(Boolean)
 
     Created_At= Column(DateTime,server_default = func.now())
 

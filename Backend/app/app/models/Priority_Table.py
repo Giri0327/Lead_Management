@@ -7,7 +7,7 @@ class Priority(Base):
 
     __tablename__ = "priority"
 
-    Priority_ID = Column(Integer,primary_key=True)
+    Priority_ID = Column(Integer,primary_key=True,autoincrement=True)
     priority = relationship("Lead",back_populates="lead_priority") 
 
     Priority_Name = Column(String(255))

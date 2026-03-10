@@ -7,7 +7,7 @@ class Token(Base):
 
     __tablename__ = "token"
 
-    Token_ID = Column(Integer,primary_key=True)
+    Token_ID = Column(Integer,primary_key=True,autoincrement=True)
 
     User_Id = Column (Integer,ForeignKey("user.User_ID"))  #FK
     user = relationship("User",back_populates="user_token")

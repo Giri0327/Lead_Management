@@ -7,7 +7,7 @@ class User(Base):
 
     __tablename__ = "user"
 
-    User_ID = Column(Integer,primary_key=True)
+    User_ID = Column(Integer,primary_key=True,autoincrement=True)
     lead_activity  =relationship("Lead_Activity",back_populates="lead_user")
     follow_ups = relationship("Follow_Up",back_populates="user")
 

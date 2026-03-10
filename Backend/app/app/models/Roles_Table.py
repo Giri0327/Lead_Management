@@ -7,7 +7,7 @@ class Roles(Base):
 
     __tablename__ = "roles"
 
-    Role_ID = Column(Integer,primary_key=True)
+    Role_ID = Column(Integer,primary_key=True,autoincrement=True)
 
     Role_Name = Column(String(255))
     roles = relationship("User",back_populates="role_id_user")

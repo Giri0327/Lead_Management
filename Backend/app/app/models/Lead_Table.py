@@ -7,7 +7,7 @@ class Lead(Base):
 
     __tablename__ = "lead_data"
 
-    Lead_ID = Column(Integer,primary_key=True) 
+    Lead_ID = Column(Integer,primary_key=True,autoincrement=True) 
     lead= relationship("Follow_Up",back_populates="lead_id")
     lead_activity = relationship("Lead_Activity",back_populates="lead_")
 

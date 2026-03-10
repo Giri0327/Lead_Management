@@ -7,7 +7,7 @@ class Stage(Base):
 
     __tablename__ = "stage"
 
-    Stage_ID = Column(Integer,primary_key=True)
+    Stage_ID = Column(Integer,primary_key=True,autoincrement=True)
     stage = relationship("Lead",back_populates="lead_stage") 
 
     Stage_Name = Column(String(255))

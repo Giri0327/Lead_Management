@@ -63,15 +63,14 @@ def get_otp():
     return otp  
 
 
-
 def emailOTP(to:str,otp:int,text:str):
 
     myemail = "keerthikk0302@gmail.com"
     mypass ="gmxqefyobsuwwnnl"
     subject = text
-    body=f""" YOur OTP to reset pass is: {otp}
+    body=f""" Your OTP to reset pass is: {otp}
 
-              This otp expires in 15 minutes"""
+              This otp expires in 45 seconds"""
 
     msg=MIMEText(body)
     msg["Subject"] = subject

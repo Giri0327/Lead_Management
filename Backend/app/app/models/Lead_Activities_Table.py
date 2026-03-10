@@ -6,7 +6,7 @@ from sqlalchemy.orm import relationship
 class Lead_Activity(Base):
     __tablename__ = "lead_activity"
 
-    Activity_ID = Column(Integer, primary_key=True)
+    Activity_ID = Column(Integer, primary_key=True,autoincrement=True)
     Lead_ID = Column(Integer, ForeignKey("lead_data.Lead_ID"))
     lead_ = relationship("Lead", back_populates="lead_activity")
 
