@@ -25,7 +25,7 @@ from fastapi import HTTPException
 from app.models import Lead,Follow_Up,User
 from sqlalchemy import func
 
-class Create:
+class Createfollowup:
     def __init__(self,lead_id, followup, db):
         self.lead_id = lead_id
         self.followup = followup

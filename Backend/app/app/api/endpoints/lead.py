@@ -2,8 +2,8 @@ from fastapi import APIRouter, Depends, HTTPException
 #from sqlalchemy.orm import session
 from app.db import get_db,session
 from app.crud import Create
-from app.crud.Lead_crud import Updateleadd, ViewLeadByID
-from app.crud.Follow_up_crud import Create
+from app.crud.Lead_crud import Updateleadd, ViewLeadByID,Create
+from app.crud.Follow_up_crud import Createfollowup
 from app.schema import *
 from app.schema.Lead_Schema import Updatelead
 
@@ -14,6 +14,7 @@ def add_lead(leads: Leads, db: session = Depends(get_db)):
     try:
         creator = Create(leads, db)
         new_lead = creator.create_lead()
+
         return new_lead
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))

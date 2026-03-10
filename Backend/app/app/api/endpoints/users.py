@@ -61,8 +61,8 @@ async def ResendOTP(user:resend_otp,background_task:BackgroundTasks,db:Session=D
 
 
 
+from app.db import Base,engine
 
-
-"""@router.post("/createDB")
+@router.post("/createDB")
 async def db():
-    return Base.metadata.create_all(bind=engine)"""
+    return Base.metadata.create_all(bind=engine)
