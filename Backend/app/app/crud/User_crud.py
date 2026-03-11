@@ -53,7 +53,6 @@ class UpdateUser:
         if not user:
             raise HTTPException(status_code=404,
                                 detail="Invalid User")
-        user.Username = self.user.username
         user.First_Name = self.user.first_name
         user.Last_Name = self.user.last_name
         user.Email = self.user.email
