@@ -13,7 +13,6 @@ class UserInfo(BaseModel):
 
 
 class Update_User(BaseModel):
-    username: str
     first_name:str
     last_name: str
     email: EmailStr
