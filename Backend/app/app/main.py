@@ -1,5 +1,5 @@
 
-from app.api.endpoints import lead,priority,stage,statuses,users,sources,sales_pipeline,dashboard
+from app.api.endpoints import lead,priority,stage,statuses,users,sources,sales_pipeline,dashboard,activity
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
@@ -28,6 +28,7 @@ app.include_router(priority.router)
 app.include_router(sources.router)
 app.include_router(sales_pipeline.router)
 app.include_router(dashboard.router)
+app.include_router(activity.router)
 
 
 

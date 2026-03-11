@@ -34,8 +34,8 @@ def update_lead(leadupdate:Updatelead,db:session = Depends(get_db)):
     return data.update_lead()
 
 
-@router.get(f"/view/{{lead_id}}")
-def view_lead_by_id(lead_id: int, db: session = Depends(get_db)):
+@router.get("/view/{lead_id}")
+async def view_lead_by_id(lead_id: int, db: session = Depends(get_db)):
     lead=ViewLeadByID(db, lead_id)
     return lead.view_lead_by_id()
 
