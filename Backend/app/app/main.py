@@ -5,17 +5,20 @@ from fastapi.middleware.cors import CORSMiddleware
 app = FastAPI()
 
 
-app.add_middleware(CORSMiddleware
-                   ,allow_origins=["*"],allow_credentials=["*"],
-                   allow_methods=["*"],allow_headers=["*"])
+# app.add_middleware(CORSMiddleware
+#                    ,allow_origins=["*"],allow_credentials=["*"],
+#                    allow_methods=["*"],allow_headers=["*"]),
 
 
-origins = ["http://localhost:5173"]
-
+origins = ["http://localhost:5174"]
+#origins = ["*"]
 app.add_middleware(
-    CORSMiddleware,
-    allow_origins=origins,allow_credentials=True,
-    allow_methods=["*"],allow_headers=["*"])
+     CORSMiddleware,
+     allow_origins=origins,
+     allow_credentials=True,
+     #allow_credentials=False,
+     allow_methods=["*"],
+     allow_headers=["*"])
 
 app.include_router(users.router)
 app.include_router(lead.router)

@@ -15,4 +15,18 @@ router = APIRouter(prefix="/Dashboard", tags=["Dashboard"])
 async def dash_board(db:session=Depends(get_db)):
     crud=Dashboard(db)
     return crud.total_lead()
+@router.post("/Recentleads")
+async def recent_lead(db:session=Depends(get_db)):
+    recent=Dashboard(db)
+    return recent.recentlead()
+@router.post("/Pipeline_by_Stage")
+async def pipeline_by_stage(db:session=Depends(get_db)):
+    pipe=Dashboard(db)
+    return pipe.Pipeline_by_stage()
+
+@router.post("/Lead_Distribution")
+async def distribution(db:session=Depends(get_db)):
+    pipe=Dashboard(db)
+    return pipe.Lead_distribution()
+
 

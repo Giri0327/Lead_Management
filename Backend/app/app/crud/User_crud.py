@@ -37,7 +37,8 @@ class ADDUser:
         if x is not None:   
             return "User created successfully"  
         
-    def Update_user(self,user_id):
+    def Update_user(self,token):
+        user_id = token
         user = self.db.query(User).filter(User.User_ID == user_id).first()
         if not user:
             raise HTTPException(status_code=404,
@@ -48,12 +49,23 @@ class ADDUser:
         user.Email = self.user.email
         user.Phone = self.user.phone
         user.Profile_Pic_URL = self.user.profile_pic_URL
-        user.Is_two_fath = self.user.Is_two_fath
 
         self.db.commit()
         self.db.refresh(user)
 
         return "User updated successfully"
+    
+    def Twofath(self,token):
+        user_id = token
+        user = self.db.query(User).filter(User.User_ID == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404,
+                                detail="Invalid User")
+        user.Is_two_fath = self.user.Is_two_fath
+        self.db.commit()
+
+        return {"message":"Two-FactorAuthentication Enabled"}
+
 
     def view_users(self):
         users = self.db.query(User).all()
@@ -96,7 +108,6 @@ class Verify_user(Userabs):
                                     Token = token_gen)
                     self.db.add(new_token)
                     self.db.commit()
-                    print("Login")
                     return {"message":"Login successful",
                         "token": token_gen} 
                 else:

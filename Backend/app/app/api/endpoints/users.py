@@ -24,8 +24,8 @@ async def update_user(user_id: int, user: Update_User, db: Session = Depends(get
     return user_service.Update_user(user_id)
 
 @router.get("/view_Users")
-async def ViewUser(token:str=Depends(oauth2_scheme),db:Session=Depends(get_db)):
-    x=ADDUser(None,db)
+async def ViewUser(token =Depends(get_current_user),db:Session=Depends(get_db)):
+    x=ADDUser(token,db)
     return x.view_users()
 
 # view_users(db: session = Depends(get_db)):
@@ -41,6 +41,13 @@ async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,db:Session = Depends(g
 @router.post("/change_password")
 async def Change_Pass(user:ChangePass,token = Depends(get_current_user),db:Session = Depends(get_db)):
     return change_password(user,token,db)
+
+
+@router.put("/Twofath")
+async def TwoFATH(token = Depends(get_current_user),db:Session = Depends(get_db)):
+    x=ADDUser(token,db)
+    return x.Twofath()
+
 
 # oauth2_scheme = OAuth2PasswordRequestForm(token_url)
 @router.post("/Login")
@@ -58,8 +65,6 @@ async def Otpverify(user: UserVerify, db: Session = Depends(get_db)):
 @router.post("/resendOTP")
 async def ResendOTP(user:resend_otp,background_task:BackgroundTasks,db:Session=Depends(get_db)):
     return Resend_OTP(user.reset_key,db,background_task)
-
-
 
 
 from app.db import Base,engine

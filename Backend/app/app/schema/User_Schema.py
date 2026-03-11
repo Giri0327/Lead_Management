@@ -19,8 +19,7 @@ class Update_User(BaseModel):
     email: EmailStr
     phone: str
     role_id:str = Field(example="Admin/User")
-    profile_pic_URL:str
-    Is_two_fath:bool   
+    profile_pic_URL:str  
 
 class UserLogin(BaseModel):
     username_or_email:str
