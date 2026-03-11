@@ -47,8 +47,8 @@ class UpdateUser:
         self.user = user
         self.db = db
         
-    def Update_user(self,token):
-        user_id = token
+    def Update_user(self,current_user):
+        user_id = current_user
         user = self.db.query(User).filter(User.User_ID == user_id).first()
         if not user:
             raise HTTPException(status_code=404,
@@ -64,8 +64,8 @@ class UpdateUser:
 
         return "User updated successfully"
     
-    def Twofath(self,token):
-        user_id = token
+    def Twofath(self,current_user):
+        user_id = current_user
         user = self.db.query(User).filter(User.User_ID == user_id).first()
 
         if not user:
@@ -144,7 +144,7 @@ class Verify_user(Userabs):
                 else:
                     otp = get_otp()
                     text = "OTP for your login "
-                    expiry = datetime.utcnow()+ timedelta(seconds=45)
+                    expiry = datetime.utcnow()+ timedelta(minutes=2)
                     resetkey = reset_key()
 
                     user.OTP = otp

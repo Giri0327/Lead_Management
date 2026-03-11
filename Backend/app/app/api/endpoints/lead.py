@@ -6,12 +6,12 @@ from app.crud.Lead_crud import Updateleadd, ViewLeadByID,Create
 from app.crud.Follow_up_crud import Createfollowup
 from app.schema import *
 from app.schema.Lead_Schema import Updatelead
-from app.api.endpoints.deps import get_current_user
+from app.api.deps import role_required
 
 router = APIRouter(prefix="/lead", tags=["Lead"])
 
 @router.post("/create")
-def add_lead(leads: Leads,token = Depends(get_current_user), db: session = Depends(get_db)):
+def add_lead(leads: Leads,current_user = Depends(role_required([2])), db: session = Depends(get_db)):
     try:
         creator = Create(leads, db)
         new_lead = creator.create_lead()
@@ -21,7 +21,7 @@ def add_lead(leads: Leads,token = Depends(get_current_user), db: session = Depen
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/show")
-def view_lead(page:int, size: int,token = Depends(get_current_user),db: session = Depends(get_db)):
+def view_lead(page:int, size: int,current_user = Depends(role_required([1,2])),db: session = Depends(get_db)):
     try:
         all_leads = Create(None, db)
         offset = (page - 1) * size
@@ -30,52 +30,52 @@ def view_lead(page:int, size: int,token = Depends(get_current_user),db: session 
         return e
 
 @router.put("/update")
-def update_lead(leadupdate:Updatelead,token = Depends(get_current_user),db:session = Depends(get_db)):
+def update_lead(leadupdate:Updatelead,current_user = Depends(role_required([2])),db:session = Depends(get_db)):
     data=Updateleadd(db,leadupdate)
     return data.update_lead()
 
 
 @router.get("/view/{lead_id}")
-async def view_lead_by_id(lead_id: int,token = Depends(get_current_user), db: session = Depends(get_db)):
+async def view_lead_by_id(lead_id: int,current_user = Depends(role_required([1,2])), db: session = Depends(get_db)):
     lead=ViewLeadByID(db, lead_id)
     return lead.view_lead_by_id()
 
 
 @router.post("/schedule-followup")
-def followup_schedule(followup:Follow_up_schedule,token = Depends(get_current_user),db:session=Depends(get_db)):
+def followup_schedule(followup:Follow_up_schedule,current_user = Depends(role_required([2])),db:session=Depends(get_db)):
         creator = Createfollowup(None,followup, db)
         new_followup = creator.schedule_followup()
         return new_followup
 
 @router.get("/next_followup")
-def next_followup(lead_id:int,token = Depends(get_current_user),db:session=Depends(get_db)):
+def next_followup(lead_id:int,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
         creator = Createfollowup(lead_id,None,db)
         upcoming_followup = creator.get_next_followup(lead_id)
         return upcoming_followup
     
 
 @router.get("/upcoming_followups")
-def upcoming_followups(token = Depends(get_current_user),db:session=Depends(get_db)):
+def upcoming_followups(current_user = Depends(role_required([2])),db:session=Depends(get_db)):
         creator = Createfollowup(None,None,db)
         upcoming_followup = creator.view_upcoming_followups()
         return upcoming_followup
     
 
 @router.get("/this_week_followups")
-def this_week_followups(token = Depends(get_current_user),db:session=Depends(get_db)):
+def this_week_followups(current_user = Depends(role_required([2])),db:session=Depends(get_db)):
         creator = Createfollowup(None,None,db)
         this_week_followup = creator.view_this_week_followups()
         return this_week_followup
     
 
 @router.post("/updating_followups")
-def update_followups(followup_id:int,followup:Follow_up_schedule,current_user = Depends(get_current_user),db:session=Depends(get_db)):
+def update_followups(followup_id:int,followup:Follow_up_schedule,current_user = Depends(role_required([2])),db:session=Depends(get_db)):
         creator = Createfollowup(followup_id,followup,db)
         update_followup = creator.update_followup(followup_id)
         return update_followup
     
 @router.get("/track_followups")
-def trackfollowup(current_user = Depends(get_current_user),db:session=Depends(get_db)):
+def trackfollowup(current_user = Depends(role_required([2])),db:session=Depends(get_db)):
      creator = Createfollowup(None,None,db)
      track = creator.track_followups()
      return track
