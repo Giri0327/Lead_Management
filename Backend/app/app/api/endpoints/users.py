@@ -55,19 +55,19 @@ async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,current_user = Depends
 #LOGIN FUNCTIONS
 
 @router.post("/Login")
-async def UserLogin(background_tasks:BackgroundTasks,user_data:UserLogin,current_user = Depends(role_required([1,2])),db:Session=Depends(get_db)):
+async def UserLogin(background_tasks:BackgroundTasks,user_data:UserLogin,db:Session=Depends(get_db)):
     login= Verify_user(db,user_data,background_tasks)
     result = login.verify_user()
     return result  
 
 @router.post("/Otpverify")
-async def Otpverify(user: UserVerify,current_user = Depends(role_required([1,2])), db: Session = Depends(get_db)):
+async def Otpverify(user: UserVerify, db: Session = Depends(get_db)):
     x = OTPTokenVerify(db,  user.otp, user.resetkey)
     result = x.otp_verify()
     return result 
 
 @router.post("/resendOTP")
-async def ResendOTP(user:resend_otp,background_task:BackgroundTasks,current_user = Depends(role_required([1,2])),db:Session=Depends(get_db)):
+async def ResendOTP(user:resend_otp,background_task:BackgroundTasks,db:Session=Depends(get_db)):
     return Resend_OTP(user.reset_key,db,background_task)
 
 
