@@ -10,7 +10,8 @@ app.add_middleware(CORSMiddleware
                    allow_methods=["*"],allow_headers=["*"])
 
 
-origins = ["http://localhost:5173"]
+origins = ["http://localhost:5174"]
+#origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
