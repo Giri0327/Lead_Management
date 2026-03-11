@@ -1,5 +1,10 @@
+from datetime import datetime
+
 from pydantic import BaseModel
 
 class Lead_Activity(BaseModel):
+    lead_id:int
     user_id:int
-    note:str
+
+    notes:str
+    scheduled_on:datetime

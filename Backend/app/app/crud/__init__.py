@@ -6,3 +6,4 @@ from app.crud.Status_crud import *
 from app.crud.Priority_crud import *
 from app.crud.Source_crud import *
 from app.crud.Follow_up_crud import *
+from app.crud.activity_crud import *
