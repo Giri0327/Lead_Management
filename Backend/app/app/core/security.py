@@ -26,11 +26,11 @@ def get_password_hash(password:str):
 def verify_password(plain_password: str, password: str):
     return pwd_context.verify(plain_password, password)
 
-SECRET_KEY = "kscubauekasdbcusebfvisuboa58utsjkndc"
+SECRET_KEY = "kscubauekvisubojnafwuerua58utsjkndc"
 ALGORITHM = "HS256"
 EXPIRE_MINUTES = 5
 
-def create_token(user:User):
+def create_token(user):
     payload={
         "user_id":user.User_ID,
         "username":user.Username,
@@ -45,11 +45,15 @@ def decode_token(token:str):
     try:
         payload = jwt.decode(token,SECRET_KEY,algorithms=ALGORITHM)
         user_id = payload["user_id"]
-        return user_id
+        role_id = payload["role"]
+        return {"user_id":user_id,
+                "role":role_id}
     except jwt.ExpiredSignatureError:
         return "Token Expired"
     except jwt.InvalidTokenError:
         return "Invalid Token"
+    
+ 
 
 #Get User Information    
 '''

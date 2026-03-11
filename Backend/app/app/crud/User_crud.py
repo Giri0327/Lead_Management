@@ -28,7 +28,7 @@ class ADDUser:
             Email = self.user.email,
             Phone = self.user.phone,
             Password = get_password_hash(self.user.password),
-            #Role_ID=self.user.role_id,
+            Role_ID=self.user.role_id,
             Is_Active = self.user.is_active
             )
         self.db.add(x)
@@ -125,13 +125,13 @@ class Verify_user(Userabs):
                     ).first()
                 if not user:
                     raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                        detail="User not found")
+                                        detail="Invalid Credientials")
                 
                 verify_user_password = verify_password(self.user_data.password,user.Password)
 
                 if not verify_user_password:
                     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                        detail="Invalid Password")
+                                        detail="Invalid Credientials")
                 if not user.Is_two_fath:
                     token_gen = create_token(user)
                     self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
