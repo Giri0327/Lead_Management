@@ -50,14 +50,15 @@ class Dashboard:
             )
             .scalar()
         )"""
+        #return totallead,high_priority,total_pipeline_value,Active_opportunities,Conversion_rate,New_leads_today
 
-        return {"total_leads": totallead,
-                "Active_opportunities":Active_opportunities.Active_opportunities,
-                "Conversion_rate":f"{percentage}%",
-                "New_leads_today":New_leads_today,
-                "high_priority_leads": high_priority.Lead_count,
-                "total_pipeline_value": total_pipeline_value.Total_Pipeline_Value,
-                }
+        return {"Title":"Total Leads","total_leads": totallead},{
+            "Title":"Leads in Pipeline","Active_opportunities":Active_opportunities.Active_opportunities},{
+                "Title":"Conversion Rate","Conversion_rate":f"{percentage}%"},{
+                         "Title":"New Leads Today","New_leads_today":New_leads_today},{
+                         "Title":"High Priority","high_priority_leads": high_priority.Lead_count},{
+                        "Title":"Total Pipeline Value","total_pipeline_value": total_pipeline_value.Total_Pipeline_Value},
+                  
     
     def recentlead(self):
         recentleads=(self.db.query(Lead.Lead_ID,

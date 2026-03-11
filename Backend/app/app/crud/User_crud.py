@@ -96,7 +96,6 @@ class Verify_user(Userabs):
                                     Token = token_gen)
                     self.db.add(new_token)
                     self.db.commit()
-                    print("Login")
                     return {"message":"Login successful",
                         "token": token_gen} 
                 else:
