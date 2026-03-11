@@ -6,7 +6,7 @@ from sqlalchemy.orm import Session
 from app.crud import ADDUser,forgot_password,reset_password,verify_password,OTPTokenVerify,Verify_user,Resend_OTP,UpdateUser
 from app.schema import UserInfo,Update_User,ForgotPass,ResetPass,ChangePass,UserVerify,UserLogin,resend_otp
 from app.core import oauth2_scheme
-from app.api.endpoints.deps import get_current_user
+from app.api.endpoints.deps import get_current_user,role_required
 
 
 #router
@@ -27,9 +27,9 @@ async def ViewUser(db:Session=Depends(get_db)):
 #Updating User Values 
 
 @router.put("/UpdateUser/{user_id}")
-async def update_user(user: Update_User,token = Depends(get_current_user), db: Session = Depends(get_db)):
+async def update_user(user: Update_User,current_user = Depends(role_required([1])), db: Session = Depends(get_db)):
     x = UpdateUser(user, db)
-    return x.Update_user(token)
+    return x.Update_user(current_user["user_id"])
 
 @router.put("/Twofath")
 async def TwoFATH(token = Depends(get_current_user),db:Session = Depends(get_db)):
@@ -49,7 +49,7 @@ async def forgot_pass(user: ForgotPass, background_tasks:BackgroundTasks,db: Ses
 
 @router.post("/reset_password")
 async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,db:Session = Depends(get_db)):
-    return reset_password(user,otp,reset_key,db)
+    return reset_password(user,db)
 
 
 #LOGIN FUNCTIONS
@@ -76,3 +76,4 @@ async def ResendOTP(user:resend_otp,background_task:BackgroundTasks,db:Session=D
 @router.post("/createDB")
 async def db():
     return Base.metadata.create_all(bind=engine)'''
+
