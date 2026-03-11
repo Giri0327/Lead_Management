@@ -37,6 +37,16 @@ class ADDUser:
         if x is not None:   
             return "User created successfully"  
         
+    def view_users(self):
+        users = self.db.query(User).all()
+        return users
+    
+        
+class UpdateUser:
+    def __init__(self, user, db: Session):
+        self.user = user
+        self.db = db
+        
     def Update_user(self,token):
         user_id = token
         user = self.db.query(User).filter(User.User_ID == user_id).first()
@@ -58,19 +68,40 @@ class ADDUser:
     def Twofath(self,token):
         user_id = token
         user = self.db.query(User).filter(User.User_ID == user_id).first()
+
         if not user:
             raise HTTPException(status_code=404,
                                 detail="Invalid User")
-        user.Is_two_fath = self.user.Is_two_fath
+        user.Is_two_fath = True
         self.db.commit()
 
         return {"message":"Two-FactorAuthentication Enabled"}
+    
+    def change_password(self,token):
+        user_id = token
+
+        new=self.db.query(User).filter(User.User_ID == user_id).first()
+        if not new:
+            raise HTTPException(
+                status_code=status.HTTP_404_NOT_FOUND,
+                detail="User not found")
+        if not verify_password(self.user.Current_Password,new.Password):
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                detail="Current password is incorrect")
+        if not self.user.New_Password==self.user.Confirm_Password:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST,
+                details = "Password doesn't match"
+            )
+        new.Password = pwd_context.hash(self.user.New_Password)
+
+        self.db.commit()
+
+        return {"message":"Password changed Succesfully"}
 
 
-    def view_users(self):
-        users = self.db.query(User).all()
-        return users
-
+   
 #USER LOGIN and OTP Generation
 class Userabs(ABC):
     @abstractmethod
@@ -257,29 +288,3 @@ def reset_password(user: ResetPass, otp: int, reset_key: str, db: Session):
     return {
         "Message": "Password reset successful"
     }
-
-#USER CHANGE PASSWORD INSIDE THE PROFILE
-
-def change_password(user,token,db:Session):
-    user_id = token
-    #username=payload.get("username")
-
-    new=db.query(User).filter(User.User_ID == user_id).first()
-    if not new:
-         raise HTTPException(
-            status_code=status.HTTP_404_NOT_FOUND,
-            detail="User not found")
-    if not verify_password(user.Current_Password,new.Password):
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            detail="Current password is incorrect")
-    if not user.New_Password==user.Confirm_Password:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST,
-            details = "Password doesn't match"
-        )
-    new.Password = pwd_context.hash(user.New_Password)
-
-    db.commit()
-
-    return {"message":"Password changed Succesfully"}
