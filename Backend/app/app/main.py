@@ -1,7 +1,17 @@
-
-from app.api.endpoints import lead,priority,stage,statuses,users,sources,sales_pipeline,dashboard,activity
+from app.api.endpoints import (
+    lead,
+    priority,
+    stage,
+    statuses,
+    users,
+    sources,
+    sales_pipeline,
+    dashboard,
+    activity,
+)
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI()
 
 
@@ -10,15 +20,16 @@ app = FastAPI()
 #                    allow_methods=["*"],allow_headers=["*"]),
 
 
-origins = ["http://localhost:5174"]
-#origins = ["*"]
+# origins = ["http://localhost:5174"]
+origins = ["*"]
 app.add_middleware(
-     CORSMiddleware,
-     allow_origins=origins,
-     allow_credentials=True,
-     #allow_credentials=False,
-     allow_methods=["*"],
-     allow_headers=["*"])
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=False,
+    # allow_credentials=False,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 app.include_router(users.router)
 app.include_router(lead.router)
@@ -29,8 +40,3 @@ app.include_router(sources.router)
 app.include_router(sales_pipeline.router)
 app.include_router(dashboard.router)
 app.include_router(activity.router)
-
-
-
-
-
