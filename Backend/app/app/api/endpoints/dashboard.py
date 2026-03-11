@@ -30,3 +30,10 @@ async def distribution(db:session=Depends(get_db)):
     return pipe.Lead_distribution()
 
 
+
+@router.post("/graph")
+async def graph_(db:session=Depends(get_db)):
+    pipe=Dashboard(db)
+    return pipe.graph()
+
+
