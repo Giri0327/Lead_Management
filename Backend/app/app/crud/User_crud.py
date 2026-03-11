@@ -250,10 +250,10 @@ def reset_password(user: ResetPass, otp: int, reset_key: str, db: Session):
 #USER CHANGE PASSWORD INSIDE THE PROFILE
 
 def change_password(user,token,db:Session):
-    username=decode_token(token)
+    user_id = token
     #username=payload.get("username")
 
-    new=db.query(User).filter(User.Username == username).first()
+    new=db.query(User).filter(User.User_ID == user_id).first()
     if not new:
          raise HTTPException(
             status_code=status.HTTP_404_NOT_FOUND,
@@ -272,5 +272,3 @@ def change_password(user,token,db:Session):
     db.commit()
 
     return {"message":"Password changed Succesfully"}
-
-

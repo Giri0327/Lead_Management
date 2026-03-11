@@ -6,6 +6,7 @@ from sqlalchemy.orm import Session
 from app.crud import ADDUser,forgot_password,reset_password,change_password,verify_password,OTPTokenVerify,Verify_user,Resend_OTP
 from app.schema import UserInfo,Update_User,ForgotPass,ResetPass,ChangePass,UserVerify,UserLogin,resend_otp
 from app.core import oauth2_scheme
+from app.api.endpoints.deps import get_current_user
 
 
 #router
@@ -38,7 +39,7 @@ async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,db:Session = Depends(g
     return reset_password(user,otp,reset_key,db)
 
 @router.post("/change_password")
-async def Change_Pass(user:ChangePass,token:str,db:Session = Depends(get_db)):
+async def Change_Pass(user:ChangePass,token = Depends(get_current_user),db:Session = Depends(get_db)):
     return change_password(user,token,db)
 
 # oauth2_scheme = OAuth2PasswordRequestForm(token_url)
