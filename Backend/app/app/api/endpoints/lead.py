@@ -19,7 +19,7 @@ def add_lead(leads: Leads, db: session = Depends(get_db)):
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
 
-@router.get("/show")
+@router.post("/show")
 def view_lead(page:int, size: int,db: session = Depends(get_db)):
     try:
         all_leads = Create(None, db)

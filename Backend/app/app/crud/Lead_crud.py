@@ -37,7 +37,25 @@ class Create:
             } 
         
     def view_lead(self, limit, offset):
-        lead=self.db.query(Lead).order_by(Lead.Lead_ID.asc()).offset(offset).limit(limit).all()
+
+        lead=(self.db.query(
+                Lead.Lead_Name.label("lead_name"),
+                Lead.Company_Name.label("company"),
+                Lead.Email,
+                Lead.Phone,
+                User.Username.label("owner"),
+                Lead.Value,
+                Sources.Source_Name,
+                Stage.Stage_Name,
+                Status.Status_Name,
+                Priority.Priority_Name)
+                .join(Stage, Lead.Stage_ID == Stage.Stage_ID)
+                .join(Priority, Lead.Priority_ID == Priority.Priority_ID)
+                .join(Status, Lead.Status_ID == Status.Status_ID)
+                .join(User, Lead.Owner_ID == User.User_ID)
+                .join(Sources, Lead.Source_ID == Sources.Source_ID)
+                .order_by(Lead.Lead_ID.asc()).offset(offset).limit(limit).all())
+
         return lead
 
 class Updateleadd:
