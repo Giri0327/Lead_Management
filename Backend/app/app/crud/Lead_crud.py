@@ -38,7 +38,7 @@ class Create:
         
     def view_lead(self, limit, offset):
 
-        lead=(self.db.query(
+        lead=(self.db.query(Lead.Lead_ID,
                 Lead.Lead_Name.label("lead_name"),
                 Lead.Company_Name.label("company"),
                 Lead.Email,
