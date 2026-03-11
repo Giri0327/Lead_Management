@@ -73,10 +73,10 @@ class UpdateUser:
             raise HTTPException(status_code=404,
                                 detail="Invalid User")
         user.Is_two_fath = not user.Is_two_fath
-           
+
         self.db.commit()
 
-        return {"message":"Two-FactorAuthentication Enabled"}
+        return {"message":"Two-Factor Authentication Updated"}
     
     def change_password(self,token):
         user_id = token
