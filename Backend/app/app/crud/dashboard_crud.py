@@ -1,5 +1,6 @@
 #from token import PERCENT
 
+import calendar
 import re
 
 from app.models.Lead_Table import Lead
@@ -109,3 +110,47 @@ class Dashboard:
 
         return result
 
+
+    def graph(self):
+        year = datetime.now().year
+        start = datetime(year, 1, 1, 0, 0, 0)
+        end = datetime(year, 12, 31, 23, 59, 59)
+
+        query = (
+            self.db.query(
+                func.month(Lead.Created_At).label("month"),
+                func.count(Lead.Lead_ID).label("total_leads")
+            )
+            .filter(Lead.Created_At.between(start, end))
+            .group_by(func.month(Lead.Created_At))
+            .order_by(func.month(Lead.Created_At))
+            .all()
+        )
+
+        data =[]
+
+        for i in query:
+            data.append(
+                        {"month": calendar.month_name[i[0]],
+                         "Total_Count":i[1]})
+        
+
+        dbquery = (self.db.query(
+            func.month(Lead.Updated_At).label("month"),
+            func.count(Lead.Lead_ID)
+        )
+        .filter(and_ (Lead.Stage_ID==5,Lead.Updated_At.between(start, end) ))
+        .group_by(func.month(Lead.Updated_At))
+        .order_by(func.month(Lead.Updated_At))
+        .all())
+        # return data,dbquery
+        won_Data =[]
+
+        for i in dbquery:
+            won_Data.append(
+                        {"month": calendar.month_name[i[0]],
+                         "Total_Count":i[1]})
+            
+        return {"Total Leads per Month":data,
+                "Won Leads per month":won_Data}
+    
