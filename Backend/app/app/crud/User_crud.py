@@ -1,19 +1,14 @@
 from abc import ABC,abstractmethod
 from fastapi import HTTPException,status
-import random
 from datetime import datetime,timedelta,timezone
-import jwt
 from sqlalchemy import or_
 from app.models import *
 from sqlalchemy.orm import Session
 from starlette import status
 from sqlalchemy.orm import Session
 from app.models import User,Token
-from app.schema import Tokens,Update_User,ForgotPass,ResetPass,ChangePass
+from app.schema import ForgotPass,ResetPass
 from app.core import get_password_hash,verify_password,create_token,get_otp,emailOTP,reset_key,pwd_context
-from app.core.security import decode_token
-from app.db import session,get_db
-from fastapi.security import OAuth2PasswordRequestForm
 
 #CREATE USER
 class ADDUser:
@@ -36,6 +31,21 @@ class ADDUser:
         self.db.refresh(x)
         if x is not None:   
             return "User created successfully"  
+
+    def view_userby_id(self,current_user):
+        userid = current_user["user_id"]
+        #print(type(userid))
+        user=(self.db.query(User.First_Name,
+                           User.Last_Name,
+                           User.Email,
+                           Roles.Role_Name,
+                           User.Phone,).join(Roles, User.Role_ID == Roles.Role_ID)
+                           .filter(User.User_ID == userid)
+                           .first())  
+        if user:
+            return user._asdict()
+
+        return None 
         
     def view_users(self):
         users = self.db.query(User).all()

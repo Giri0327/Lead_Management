@@ -41,6 +41,11 @@ async def Change_Pass(user:ChangePass,current_user = Depends(role_required([2]))
     x=UpdateUser(user,db)
     return x.change_password(current_user["user_id"])
 
+@router.post("View_UserBy_id")
+async def view_by_id(current_user = Depends(role_required([2])),db:Session=Depends(get_db)):
+    x=ADDUser(None,db)
+    return x.view_userby_id(current_user)
+
 #RESET PASSWORD USING FORGT PASSWORD
 
 @router.post("/forgot_password")
