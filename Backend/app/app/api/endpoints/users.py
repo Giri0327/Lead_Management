@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends,BackgroundTasks
 from sqlalchemy.orm import Session
-from app.db import get_db
+from app.db import session,get_db
 from sqlalchemy.orm import Session
 from app.crud import ADDUser,forgot_password,reset_password,OTPTokenVerify,Verify_user,Resend_OTP,UpdateUser
 from app.schema import UserInfo,Update_User,ForgotPass,ResetPass,ChangePass,UserVerify,UserLogin,resend_otp
@@ -57,6 +57,11 @@ async def TwoFATH(current_user = Depends(role_required([2])),db:Session = Depend
 async def Change_Pass(user:ChangePass,current_user = Depends(role_required([2])),db:Session = Depends(get_db)):
     x=UpdateUser(user,db)
     return x.change_password(current_user["user_id"])
+
+@router.post("View_UserBy_id")
+async def view_by_id(current_user = Depends(role_required([2])),db:Session=Depends(get_db)):
+    x=ADDUser(None,db)
+    return x.view_userby_id(current_user)
 
 #RESET PASSWORD USING FORGT PASSWORD
 
