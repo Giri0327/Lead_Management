@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
 from app.db import get_db,session
 from app.crud import Activity,Details,Files
 from app.schema.Lead_Activites_Schema import Lead_Activity
@@ -9,32 +9,32 @@ router = APIRouter(prefix="/lead", tags=["Activity"])
 
 
 @router.post("/add_Activity")
-def create_activity(activity:Lead_Activity,current_user = Depends(role_required([2])),db:session=Depends(get_db)):
+async def create_activity(activity:Lead_Activity,current_user = Depends(role_required([2])),db:session=Depends(get_db)):
     creator = Activity(activity, db)
     new_lead = creator.add_activity()
     return new_lead
 
 @router.get("/view_Activity")
-def get_activity(lead_id:int,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
+async def get_activity(lead_id:int,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
     creator = Activity(lead_id, db)
     view_lead = creator.view_activity()
     return view_lead
 
 
 @router.get("/activity_Details")
-def activity_Details(lead_id:int,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
+async def activity_Details(lead_id:int,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
     creator = Details(lead_id, db)
     view_details = creator.show_details(lead_id)
     return view_details
 
 @router.post("/add_File")
-def create_File(activity_id:int,activity:File_Activity,current_user = Depends(role_required([2])),db:session=Depends(get_db)):
-    creator = Files(activity_id,None,activity,db)
-    new_lead = creator.add_file()
+async def create_File(activity_id:int,current_user = Depends(role_required([2])),db:session=Depends(get_db),file: UploadFile = File(...)):
+    creator = Files(activity_id,None,None,db)
+    new_lead = creator.add_file(file)
     return new_lead
 
 @router.get("/view_Files")
-def view_Files(activity_id:int,current_user = Depends(role_required([2])),db:session=Depends(get_db)):
+async def view_Files(activity_id:int,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
     creator = Files(activity_id,None,None, db)
     view_file = creator.view_file()
     return view_file
@@ -46,6 +46,6 @@ def view_Files(activity_id:int,current_user = Depends(role_required([2])),db:ses
 #     return view_all_file
 
 @router.get("/view_all_lead_notes")
-def view_all_notes(user_id: int,current_user = Depends(role_required([2])), db: session = Depends(get_db)):
+async def view_all_notes(user_id: int,current_user = Depends(role_required([1,2])), db: session = Depends(get_db)):
     creator = Files(None, user_id, None, db)
     return creator.view_recent_files()
