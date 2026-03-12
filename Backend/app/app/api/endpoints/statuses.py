@@ -10,7 +10,6 @@ router = APIRouter(prefix="/lead", tags=["Status"])
 @router.post("/create_Status")
 async def status_create(user:Status,current_user = Depends(role_required([1])),db:session=Depends(get_db)):
     return create_status(user,db)
-
 @router.get("/view_Status")
 async def view_status(current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
     return view_all_status(db)
