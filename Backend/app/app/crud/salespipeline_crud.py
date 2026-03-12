@@ -3,6 +3,8 @@ from app.models.Lead_Table import Lead
 from app.models.Priority_Table import Priority
 from app.models.User_Table import User
 from sqlalchemy import func
+
+
 class Salespipeline:
     def __init__(self,db):
         self.db=db
