@@ -11,6 +11,7 @@ import smtplib
 from email.mime.text import MIMEText
 from app.models import User
 import os
+from zoneinfo import ZoneInfo
 
 load_dotenv()
 
@@ -28,14 +29,19 @@ def verify_password(plain_password: str, password: str):
 
 SECRET_KEY = "kscubauekvisubojnafwuerua58utsjkndc"
 ALGORITHM = "HS256"
-EXPIRE_MINUTES = 5
 
 def create_token(user):
+    
+    now = dt.now(ZoneInfo("Asia/Kolkata"))
+    expire = now.replace(hour=23, minute=59, second=59, microsecond=0)
+    #if login time is alomst to expire time reset to sext day
+    if expire <= now:
+        expire = expire.replace(day=expire.day + 1)
     payload={
         "user_id":user.User_ID,
         "username":user.Username,
         "role":user.Role_ID,
-        "exp":dt.now()+timedelta(minutes=EXPIRE_MINUTES)
+        "exp":expire
     }
 
     token = jwt.encode(payload,SECRET_KEY,algorithm=ALGORITHM)
@@ -75,7 +81,7 @@ def emailOTP(to:str,otp:int,text:str):
     subject = text
     body=f""" Your OTP to reset pass is: {otp}
 
-              This otp expires in 45 seconds"""
+              This otp expires in 2 minutes"""
 
     msg=MIMEText(body)
     msg["Subject"] = subject

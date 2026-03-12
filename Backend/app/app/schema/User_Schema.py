@@ -7,7 +7,7 @@ class UserInfo(BaseModel):
     last_name: str
     email: EmailStr
     phone:str
-    password: str = Field(min_length=6)
+    password: str = Field(min_length=3)
     role_id:int
     is_active:bool
 
@@ -22,7 +22,7 @@ class Update_User(BaseModel):
 
 class UserLogin(BaseModel):
     username_or_email:str
-    password: str = Field(min_length=6)
+    password: str = Field(min_length=3)
 
 
 class UserVerify(BaseModel):
@@ -40,7 +40,7 @@ class ForgotPass(BaseModel):
 class ResetPass(BaseModel):
     otp : int 
     resetkey : str 
-    new_password:str = Field(min_length=6)
+    new_password:str = Field(min_length=3)
 
 class ChangePass(BaseModel):
     Current_Password:str 
