@@ -21,7 +21,7 @@ def add_lead(leads: Leads,token = Depends(get_current_user), db: session = Depen
         raise HTTPException(status_code=400, detail=str(e))
 
 @router.get("/show")
-def view_lead(page:int, size: int,token = Depends(get_current_user),db: session = Depends(get_db)):
+def view_lead(page:int, size: int,db: session = Depends(get_db)):
     try:
         all_leads = Create(None, db)
         offset = (page - 1) * size
