@@ -2,13 +2,11 @@ from fastapi import APIRouter, Depends,BackgroundTasks
 from sqlalchemy.orm import Session
 from app.db import session,get_db
 from sqlalchemy.orm import Session
-from app.crud import ADDUser,forgot_password,reset_password,verify_password,OTPTokenVerify,Verify_user,Resend_OTP,UpdateUser
-from app.schema import UserInfo,Update_User,ForgotPass,ResetPass,ChangePass,UserVerify,UserLogin,resend_otp
+from app.crud import ADDUser,forgot_password,reset_password,OTPTokenVerify,Verify_user,Resend_OTP,UpdateUser
+from app.schema import UserInfo,ForgotPass,ResetPass,ChangePass,UserVerify,UserLogin,resend_otp
 from app.core import oauth2_scheme    
 from app.api.deps import role_required 
 from fastapi import APIRouter, UploadFile, File, Depends
-import cloudinary.uploader
-from app.core.security import cloudinary
 from fastapi import Form
 
 #router
@@ -33,6 +31,7 @@ async def update_user(
     email: str = Form(...),
     phone: str = Form(...),
     file: UploadFile = File(...),
+
     current_user = Depends(role_required([2])),
     db: Session = Depends(get_db)
 ):
@@ -53,8 +52,14 @@ async def TwoFATH(current_user = Depends(role_required([2])),db:Session = Depend
     x=UpdateUser(current_user,db)
     return x.Twofath(current_user["user_id"])
 
+@router.put("/Logout")
+async def Logout(current_user = Depends(role_required([2])),db:Session = Depends(get_db)):
+    x=UpdateUser(current_user,db)
+    return x.Logout(current_user["user_id"])
+
 @router.post("/change_password")
-async def Change_Pass(user:ChangePass,current_user = Depends(role_required([2])),db:Session = Depends(get_db)):
+async def Change_Pass(user:ChangePass,current_user = Depends(role_required([2])),
+                      db:Session = Depends(get_db)):
     x=UpdateUser(user,db)
     return x.change_password(current_user["user_id"])
 
@@ -66,11 +71,15 @@ async def view_by_id(current_user = Depends(role_required([2])),db:Session=Depen
 #RESET PASSWORD USING FORGT PASSWORD
 
 @router.post("/forgot_password")
-async def forgot_pass(user: ForgotPass, background_tasks:BackgroundTasks,current_user = Depends(role_required([1,2])),db: Session = Depends(get_db)):
+async def forgot_pass(user: ForgotPass, background_tasks:BackgroundTasks,
+                      current_user = Depends(role_required([1,2])),
+                      db: Session = Depends(get_db)):
+    
     return forgot_password(user, db,background_tasks)
 
 @router.post("/reset_password")
-async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,current_user = Depends(role_required([1,2])),db:Session = Depends(get_db)):
+async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,current_user = Depends(role_required([1,2])),
+                     db:Session = Depends(get_db)):
     return reset_password(user,db)
 
 
@@ -91,20 +100,6 @@ async def Otpverify(user: UserVerify, db: Session = Depends(get_db)):
 @router.post("/resendOTP")
 async def ResendOTP(user:resend_otp,background_task:BackgroundTasks,db:Session=Depends(get_db)):
     return Resend_OTP(user.reset_key,db,background_task)
-
-# @router.put("/update_profile_pic/{user_id}")
-# async def update_profile_pic(
-#     user_id: int,
-#     file: UploadFile = File(...),
-#     db: Session = Depends(get_db)
-# ):
-    
-#     service = UpdateUser(None,db)
-#     return service.upload_profile_pic(user_id, file)
-
-
-
-
 
 
 

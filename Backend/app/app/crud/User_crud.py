@@ -9,11 +9,6 @@ from sqlalchemy.orm import Session
 from app.models import User,Token
 from app.schema import ForgotPass,ResetPass
 from app.core import get_password_hash,verify_password,create_token,get_otp,emailOTP,reset_key,pwd_context
-from app.core.security import decode_token
-from app.db import session,get_db
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, UploadFile, File, Depends
-import cloudinary.uploader
 from app.core.security import cloudinary
 
 #CREATE USER
@@ -105,6 +100,18 @@ class UpdateUser:
     #      self.db.refresh(user)
     #      return "User Profile Photo updated successfully"
 
+
+    def Logout(self,current_user):
+        user_id = current_user
+        user = self.db.query(Token).filter(Token.User_ID == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404,
+                                detail="Invalid User")
+        
+        user.Token = None 
+        self.db.commit()
+
+        return {"message":"Logout Success"}
     
     def Twofath(self,current_user):
         user_id = current_user

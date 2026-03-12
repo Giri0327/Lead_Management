@@ -1,10 +1,9 @@
 #from token import PERCENT
 import calendar
-import re
 from app.models.Lead_Table import Lead
 from app.models.Stage_Table import Stage
 from app.models.Priority_Table import Priority
-from sqlalchemy import case, func,or_,and_
+from sqlalchemy import func,and_
 from datetime import date, datetime,timedelta
 
 today = date.today()

@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File,  UploadFile
 from app.db import get_db,session
 from app.crud import Activity,Details,Files
 from app.schema.Lead_Activites_Schema import Lead_Activity
-from app.schema.File_Activity_Schema import File_Activity
 from app.api.deps import role_required
 
 router = APIRouter(prefix="/lead", tags=["Activity"])
@@ -30,7 +29,7 @@ async def activity_Details(lead_id:int,current_user = Depends(role_required([1,2
 @router.post("/add_File")
 async def create_File(activity_id:int,current_user = Depends(role_required([2])),db:session=Depends(get_db),file: UploadFile = File(...)):
     creator = Files(activity_id,None,None,db)
-    new_lead = creator.add_file(file)
+    new_lead = creator.add_file(current_user["user_id"],file)
     return new_lead
 
 @router.get("/view_Files")
