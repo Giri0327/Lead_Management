@@ -5,6 +5,9 @@ from app.models.Lead_Table import Lead
 from app.models.User_Table import User
 from app.models.Lead_Sources_Table import Sources
 from app.models.File_Activity_Table import Activity_file
+from fastapi import APIRouter, UploadFile, File, Depends
+import cloudinary.uploader
+from app.core.security import cloudinary
 
 from sqlalchemy import func
 
@@ -114,7 +117,7 @@ class Files:
         self.user_id = user_id
         self.activity = activity
 
-    def add_file(self):
+    def add_file(self,file: UploadFile = File(...)):
 
         activity = self.db.query(Lead_Activity).filter(
             Lead_Activity.Activity_ID == self.activity_id
@@ -122,10 +125,22 @@ class Files:
 
         if not activity:
             return {"error": "Activity not found"}
+        filename = file.filename.lower()
+
+        if not filename.endswith((".pdf", ".jpg", ".jpeg",".png",".pptx",".xlsx")):
+            raise HTTPException(
+                status_code=400,
+                detail="Only PNG and JPEG images are allowed"
+            )
+        
+        
+        result = cloudinary.uploader.upload(file.file)
+        print(result)
+        file_url = result["secure_url"]
 
         file = Activity_file(
             Activity_ID = self.activity_id,
-            File_url = self.activity.file_url
+            File_url = file_url
         )
 
         self.db.add(file)

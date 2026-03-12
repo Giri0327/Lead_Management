@@ -12,6 +12,9 @@ from email.mime.text import MIMEText
 from app.models import User
 import os
 from zoneinfo import ZoneInfo
+import cloudinary
+import cloudinary.uploader
+from cloudinary.utils import cloudinary_url
 
 load_dotenv()
 
@@ -32,7 +35,7 @@ ALGORITHM = "HS256"
 
 def create_token(user):
     
-    now = dt.now(ZoneInfo("Asia/Kolkata"))
+    now = dt.now()
     expire = now.replace(hour=23, minute=59, second=59, microsecond=0)
     #if login time is alomst to expire time reset to sext day
     if expire <= now:
@@ -106,3 +109,16 @@ def reset_key():
     print("Generated reset_key:", reset_key)
     return reset_key
 
+
+# Configuration       
+cloudinary.config( 
+    cloud_name = os.getenv("cloud_name"),
+    api_key = os.getenv("api_key"), 
+    api_secret = os.getenv("api_secret"), # Click 'View API Keys' above to copy your API secret
+    secure=True
+)
+
+# cloud_name=dedavidqu
+# api_key=444542291171161
+
+# api_secret=hjpewQPZilRXNVpZf9GHmIJj_cI
