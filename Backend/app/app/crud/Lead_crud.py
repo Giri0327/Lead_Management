@@ -55,8 +55,9 @@ class Create:
                 .join(User, Lead.Owner_ID == User.User_ID)
                 .join(Sources, Lead.Source_ID == Sources.Source_ID)
                 .order_by(Lead.Lead_ID.asc()).offset(offset).limit(limit).all())
+        #print(lead)
 
-        return lead
+        return [row._asdict() for row in lead]
 
 class Updateleadd:
     def __init__(self,db,lead):
