@@ -23,7 +23,7 @@ async def add_lead(leads: Leads,current_user = Depends(role_required([2])), db: 
 @router.get("/show")
 async def view_lead(page:int, size: int,current_user = Depends(role_required([1,2])),db: session = Depends(get_db)):
     try:
-        all_leads = Create(None, db)
+        all_leads = Create(None,db)
         offset = (page - 1) * size
         return all_leads.view_lead(limit=size, offset=offset)
     except Exception as e:
