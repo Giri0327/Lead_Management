@@ -20,7 +20,7 @@ async def CreateUser(user:UserInfo,current_user = Depends(role_required([1])),db
     return x.Create_user()
 
 @router.get("/view_Users")
-async def ViewUser(current_user = Depends(role_required([1])),db:Session=Depends(get_db)):
+async def ViewUser(current_user = Depends(role_required([1,2])),db:Session=Depends(get_db)):
     x=ADDUser(None,db)
     return x.view_users()
 
