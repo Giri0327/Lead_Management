@@ -19,7 +19,7 @@ class Salespipeline:
             .join(Stage, Lead.Stage_ID == Stage.Stage_ID)
             .group_by(Lead.Stage_ID).order_by(Stage.Stage_ID.asc()).all()
         )
-        return query
+        return [row._asdict() for row in query]
     
     def pipe(self):
         results = (

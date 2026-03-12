@@ -13,6 +13,7 @@ async def salespipeline(current_user = Depends(role_required([1,2])),db: Session
         data=Salespipeline(db)
         return data.salespipeline_count()
     except Exception as e:
+        print(e)
         raise HTTPException(status_code=400, detail=str(e))
     
 @router.post("/view")
