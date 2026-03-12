@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 #from sqlalchemy.orm import session
 from app.db import get_db,session
 from app.crud.dashboard_crud import Dashboard

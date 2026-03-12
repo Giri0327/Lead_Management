@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-from app.schema import Lead_Activites_Schema
 from app.models import Lead_Activity,Lead_Sources_Table,File_Activity_Table
 from app.models.Lead_Table import Lead
 from app.models.User_Table import User
@@ -8,6 +7,7 @@ from app.models.File_Activity_Table import Activity_file
 from fastapi import APIRouter, UploadFile, File, Depends
 import cloudinary.uploader
 from app.core.security import cloudinary
+
 
 from sqlalchemy import func
 
@@ -117,14 +117,16 @@ class Files:
         self.user_id = user_id
         self.activity = activity
 
-    def add_file(self,file: UploadFile = File(...)):
+    def add_file(self,current_user,file: UploadFile = File(...)):
 
+        user_id=current_user
         activity = self.db.query(Lead_Activity).filter(
             Lead_Activity.Activity_ID == self.activity_id
         ).first()
 
         if not activity:
             return {"error": "Activity not found"}
+        
         filename = file.filename.lower()
 
         if not filename.endswith((".pdf", ".jpg", ".jpeg",".png",".pptx",".xlsx")):
@@ -133,9 +135,19 @@ class Files:
                 detail="Only PNG and JPEG images are allowed"
             )
         
-        
-        result = cloudinary.uploader.upload(file.file)
+        # dbuser = self.db.query(User).filter(
+        #     User.User_ID == self.user_id
+        filename = file.filename.split(".")[0]   # remove extension    LEAD.jpg  [0]=LEAD, [1]=jpg
+        extension = file.filename.split(".")[1]
+
+        result = cloudinary.uploader.upload(
+            file.file,
+            public_id=filename,
+            format=extension
+        )
+
         print(result)
+        
         file_url = result["secure_url"]
 
         file = Activity_file(
@@ -147,7 +159,9 @@ class Files:
         self.db.commit()
         self.db.refresh(file)
 
-        return {"message": "File Added"}
+        return {"message": "File Added",
+                "file_Name":filename,
+                "file_URL":file_url}
     
     def view_file(self):
 
@@ -170,7 +184,14 @@ class Files:
         .all())
 
         return viewfile
-    
+     
+
+        # files = self.db.query(Activity_file).filter(
+        #     Activity_file.Activity_ID == self.activity_id
+        # ).all()
+
+        # print(files)
+            
     def view_recent_files(self):
 
         viewfile = (

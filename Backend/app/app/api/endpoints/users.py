@@ -1,9 +1,8 @@
 from fastapi import APIRouter, Depends,BackgroundTasks
 from sqlalchemy.orm import Session
-from fastapi.security import OAuth2PasswordRequestForm
-from app.db import session,get_db
+from app.db import get_db
 from sqlalchemy.orm import Session
-from app.crud import ADDUser,forgot_password,reset_password,verify_password,OTPTokenVerify,Verify_user,Resend_OTP,UpdateUser
+from app.crud import ADDUser,forgot_password,reset_password,OTPTokenVerify,Verify_user,Resend_OTP,UpdateUser
 from app.schema import UserInfo,Update_User,ForgotPass,ResetPass,ChangePass,UserVerify,UserLogin,resend_otp
 from app.core import oauth2_scheme    
 from app.api.deps import role_required 
