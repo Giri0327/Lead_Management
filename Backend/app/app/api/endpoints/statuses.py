@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from app.db import session,get_db
 from app.crud import create_status, delete_status, update_status, view_all_status
 from app.schema import Status

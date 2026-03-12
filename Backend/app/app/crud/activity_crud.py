@@ -84,30 +84,6 @@ class Details:
 
             return details
 
-# class Files:
-
-#     def __init__(self,activity_id,activity,db):
-#         self.db=db
-#         self.activity_id=activity_id
-#         self.activity=activity
-
-#     def add_file(self,activity_id):
-
-#         dbuser = self.db.query(Lead_Activity).filter(Lead_Activity.Activity_ID==activity_id).first()
-        
-#         if dbuser:
-
-#             file = File_Activity_Table(
-#                 Activity_ID = self.activity_id,
-#                 File_url = self.activity.file_url,
-
-#             )
-#             self.db.add(file)
-
-#             self.db.commit()
-#             self.db.refresh(file)
-
-#             return {"message":"File Added"}
         
 class Files:
 

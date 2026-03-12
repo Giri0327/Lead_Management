@@ -1,8 +1,7 @@
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile
+from fastapi import APIRouter, Depends, File,  UploadFile
 from app.db import get_db,session
 from app.crud import Activity,Details,Files
 from app.schema.Lead_Activites_Schema import Lead_Activity
-from app.schema.File_Activity_Schema import File_Activity
 from app.api.deps import role_required
 
 router = APIRouter(prefix="/lead", tags=["Activity"])

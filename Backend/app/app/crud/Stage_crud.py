@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-from app.schema import Stage_Schema
 from app.models import Stage
 from app.db import session
 
