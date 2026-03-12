@@ -16,6 +16,12 @@ async def salespipeline(current_user = Depends(role_required([1,2])),db: Session
         raise HTTPException(status_code=400, detail=str(e))
     
 @router.post("/view")
+def sale(current_user = Depends(role_required([2])),db: Session = Depends(get_db)):
+    try:
+        data=Salespipeline(db)
+        return data.pipe()
+    except Exception as e:
+        raise HTTPException(status_code=400, detail=str(e))
 async def sale(current_user = Depends(role_required([1,2])),db: Session = Depends(get_db)):
     data=Salespipeline(db)
     return data.pipe()
