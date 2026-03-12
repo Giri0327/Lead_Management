@@ -14,7 +14,7 @@ router =APIRouter(prefix="/user",tags=["User"])
 
 #CREATING USER
 
-@router.post("/CreateUser")
+@router.post("/Signup")
 async def CreateUser(user:UserInfo,current_user = Depends(role_required([1])),db:Session = Depends(get_db)):
     x= ADDUser(user,db)
     return x.Create_user()
