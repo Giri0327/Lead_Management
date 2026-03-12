@@ -1,13 +1,15 @@
 from fastapi import APIRouter, Depends,BackgroundTasks
 from sqlalchemy.orm import Session
-from fastapi.security import OAuth2PasswordRequestForm
 from app.db import session,get_db
 from sqlalchemy.orm import Session
 from app.crud import ADDUser,forgot_password,reset_password,verify_password,OTPTokenVerify,Verify_user,Resend_OTP,UpdateUser
 from app.schema import UserInfo,Update_User,ForgotPass,ResetPass,ChangePass,UserVerify,UserLogin,resend_otp
 from app.core import oauth2_scheme    
 from app.api.deps import role_required 
-
+from fastapi import APIRouter, UploadFile, File, Depends
+import cloudinary.uploader
+from app.core.security import cloudinary
+from fastapi import Form
 
 #router
 router =APIRouter(prefix="/user",tags=["User"])
@@ -15,21 +17,36 @@ router =APIRouter(prefix="/user",tags=["User"])
 #CREATING USER
 
 @router.post("/Signup")
-async def CreateUser(user:UserInfo,current_user = Depends(role_required([1])),db:Session = Depends(get_db)):
+async def CreateUser(user:UserInfo,db:Session = Depends(get_db)):
     x= ADDUser(user,db)
     return x.Create_user()
 
 @router.get("/view_Users")
-async def ViewUser(current_user = Depends(role_required([1])),db:Session=Depends(get_db)):
+async def ViewUser(current_user = Depends(role_required([1,2])),db:Session=Depends(get_db)):
     x=ADDUser(None,db)
     return x.view_users()
 
-#Updating User Values 
+@router.put("/UpdateUser")
+async def update_user(
+    first_name: str = Form(...),
+    last_name: str = Form(...),
+    email: str = Form(...),
+    phone: str = Form(...),
+    file: UploadFile = File(...),
+    current_user = Depends(role_required([2])),
+    db: Session = Depends(get_db)
+):
+    
+    service = UpdateUser(None,db)
 
-@router.put("/UpdateUser/{user_id}")
-async def update_user(user: Update_User,current_user = Depends(role_required([2])), db: Session = Depends(get_db)):
-    x = UpdateUser(user, db)
-    return x.Update_user(current_user["user_id"])
+    return service.Update_user(
+        current_user["user_id"],
+        first_name,
+        last_name,
+        email,
+        phone,
+        file
+    )
 
 @router.put("/Twofath")
 async def TwoFATH(current_user = Depends(role_required([2])),db:Session = Depends(get_db)):
@@ -74,6 +91,21 @@ async def Otpverify(user: UserVerify, db: Session = Depends(get_db)):
 @router.post("/resendOTP")
 async def ResendOTP(user:resend_otp,background_task:BackgroundTasks,db:Session=Depends(get_db)):
     return Resend_OTP(user.reset_key,db,background_task)
+
+# @router.put("/update_profile_pic/{user_id}")
+# async def update_profile_pic(
+#     user_id: int,
+#     file: UploadFile = File(...),
+#     db: Session = Depends(get_db)
+# ):
+    
+#     service = UpdateUser(None,db)
+#     return service.upload_profile_pic(user_id, file)
+
+
+
+
+
 
 
 '''from app.db import Base,engine

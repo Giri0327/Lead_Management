@@ -9,6 +9,12 @@ from sqlalchemy.orm import Session
 from app.models import User,Token
 from app.schema import ForgotPass,ResetPass
 from app.core import get_password_hash,verify_password,create_token,get_otp,emailOTP,reset_key,pwd_context
+from app.core.security import decode_token
+from app.db import session,get_db
+from fastapi.security import OAuth2PasswordRequestForm
+from fastapi import APIRouter, UploadFile, File, Depends
+import cloudinary.uploader
+from app.core.security import cloudinary
 
 #CREATE USER
 class ADDUser:
@@ -50,29 +56,55 @@ class ADDUser:
     def view_users(self):
         users = self.db.query(User).all()
         return users
-    
-        
+
 class UpdateUser:
     def __init__(self, user, db: Session):
         self.user = user
         self.db = db
         
-    def Update_user(self,current_user):
-        user_id = current_user
+    def Update_user(self, user_id, first_name, last_name, email, phone, file):
+
         user = self.db.query(User).filter(User.User_ID == user_id).first()
+
         if not user:
-            raise HTTPException(status_code=404,
-                                detail="Invalid User")
-        user.First_Name = self.user.first_name
-        user.Last_Name = self.user.last_name
-        user.Email = self.user.email
-        user.Phone = self.user.phone
-        user.Profile_Pic_URL = self.user.profile_pic_URL
+            raise HTTPException(status_code=404, detail="Invalid User")
+        
+        filename = file.filename.lower()
+
+        if not filename.endswith((".png", ".jpg", ".jpeg")):
+            raise HTTPException(
+                status_code=400,
+                detail="Only PNG and JPEG images are allowed"
+            )
+        
+        result = cloudinary.uploader.upload(file.file)
+        # print(result)
+        image_url = result["secure_url"]
+
+        user.First_Name = first_name
+        user.Last_Name = last_name
+        user.Email = email
+        user.Phone = phone
+        user.Profile_Pic_URL = image_url
 
         self.db.commit()
         self.db.refresh(user)
 
-        return "User updated successfully"
+        return {
+            "message": "User updated successfully",
+        }
+    
+
+    # def upload_profile_pic(self,user_id:int,file: UploadFile = File(...)):
+
+    #      user = self.db.query(User).filter(User.User_ID == user_id).first()
+    #      result = cloudinary.uploader.upload(file.file)
+    #      image_url = result["secure_url"]
+    #      user.Profile_Pic_URL = image_url
+    #      self.db.commit()
+    #      self.db.refresh(user)
+    #      return "User Profile Photo updated successfully"
+
     
     def Twofath(self,current_user):
         user_id = current_user
@@ -170,8 +202,8 @@ class Verify_user(Userabs):
             except HTTPException:
                 raise
             except Exception as e:
-                #print(e)   # show real error in terminal
-                raise HTTPException(status_code=500, detail="Internal Server Error")
+                 #print(e)   # show real error in terminal
+                 raise HTTPException(status_code=500, detail="Internal Server Error")
                         
 
 #OTP and TOKEN VERIFICATION for USER          
@@ -298,3 +330,5 @@ def reset_password(user: ResetPass, otp: int, reset_key: str, db: Session):
     return {
         "Message": "Password reset successful"
     }
+
+
