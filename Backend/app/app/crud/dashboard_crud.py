@@ -12,15 +12,18 @@ class Dashboard:
         self.db=db
 
     def total_lead(self):
-        totallead=self.db.query(func.count(Lead.Lead_ID)).scalar()
-
+        
         today = datetime.today()
         start = today.replace(day=1,hour=0,minute=0,second=0,microsecond=0)
         next_month = (start + timedelta(days=32)).replace(day=1)
         prev_month_end = start - timedelta(days=1)
         prev_month_start = prev_month_end.replace(
-            day=1,hour=0,minute=0,second=0, microsecond=0)
+        day=1,hour=0,minute=0,second=0, microsecond=0)
 
+
+
+        totallead=self.db.query(func.count(Lead.Lead_ID)).scalar()
+        
         current_month_leads = (self.db.query(func.count(Lead.Lead_ID))
                                .filter(Lead.Created_At >= start,
                                        Lead.Created_At < next_month)
@@ -28,6 +31,7 @@ class Dashboard:
         previous_month_leads = (self.db.query(func.count(Lead.Lead_ID))
                                 .filter(Lead.Created_At >= prev_month_start,
                                         Lead.Created_At < start).scalar())
+        
 
         if previous_month_leads == 0:
             vs_last_month = 100 if current_month_leads > 0 else 0
@@ -39,14 +43,8 @@ class Dashboard:
 
 
 
-        high_priority=self.db.query(func.count(
-            Lead.Lead_ID).label("Lead_count")).filter(
-                Lead.Priority_ID==1).first()
-
-
-        total_pipeline_value=(
-            self.db.query(func.sum(Lead.Value).label("Total_Pipeline_Value"))
-            ).first()
+    
+        
 
 
         Active_opportunities = (
@@ -57,13 +55,7 @@ class Dashboard:
         
         
 
-        Conversion_rate=(self.db.query(func.count(Lead.Lead_ID))
-                        .filter(Lead.Status_ID==3)).scalar()
-        #precentage=(Conversion_rate/totallead)*100
-        if totallead:
-            percentage = round((Conversion_rate / totallead) * 100, 1)
-        else:
-            percentage = 0
+        
 
 
         this_month_Conversion_rate =(self.db.query(func.count(Lead.Lead_ID))
@@ -87,12 +79,35 @@ class Dashboard:
 
         Conversion_percent_vs_last_month = round(Conversion_, 2)
 
+
+
+        # Conversion_rate=(self.db.query(func.count(Lead.Lead_ID))
+        #                 .filter(Lead.Status_ID==3)).scalar()
+        #precentage=(Conversion_rate/totallead)*100
+
         
+        if current_month_leads:
+            percentage = round((this_month_Conversion_rate / current_month_leads) * 100, 1)
+        else:
+            percentage = 0
+
+
+
+        
+
         New_leads_today=(self.db.query(func.count(Lead.Lead_ID))).filter(
             Lead.Stage_ID==1,func.date(Lead.Created_At) == today).scalar()
-    
+        
+        high_priority=self.db.query(func.count(
+            Lead.Lead_ID).label("Lead_count")).filter(
+                Lead.Priority_ID==1).first()
 
-        return ({"Title":"Total Leads","total_leads": totallead,
+        total_pipeline_value=(
+            self.db.query(func.sum(Lead.Value).label("Total_Pipeline_Value"))
+            ).first()
+        
+
+        return ({"Title":"Total Leads","total_leads": current_month_leads,
                  "%_vs_last_month":vs_last_month},
                 {"Title":"Leads in Pipeline",
                  "Active_opportunities":Active_opportunities.Active_opportunities},
