@@ -138,7 +138,7 @@ class UpdateUser:
         return {"message":"Password changed Succesfully"}
 
    
-   
+
 #USER LOGIN and OTP Generation
 class Userabs(ABC):
     @abstractmethod
