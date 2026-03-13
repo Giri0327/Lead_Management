@@ -1,4 +1,3 @@
-#from token import PERCENT
 import calendar
 from app.models.Lead_Table import Lead
 from app.models.Stage_Table import Stage

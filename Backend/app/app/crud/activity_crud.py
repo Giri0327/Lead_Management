@@ -1,10 +1,10 @@
 from fastapi import HTTPException
-from app.models import Lead_Activity,Lead_Sources_Table,File_Activity_Table
+from app.models import Lead_Activity
 from app.models.Lead_Table import Lead
 from app.models.User_Table import User
 from app.models.Lead_Sources_Table import Sources
 from app.models.File_Activity_Table import Activity_file
-from fastapi import APIRouter, UploadFile, File, Depends
+from fastapi import UploadFile, File, Depends
 import cloudinary.uploader
 from app.core.security import cloudinary
 
@@ -12,7 +12,7 @@ from app.core.security import cloudinary
 from sqlalchemy import func
 
 class Activity:
-    def __init__(self,activity,db):
+    def __init__(self,activity,db):  
         self.activity=activity
         self.db=db
         

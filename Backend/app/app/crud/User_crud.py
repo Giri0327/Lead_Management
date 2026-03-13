@@ -88,17 +88,6 @@ class UpdateUser:
         return {
             "message": "User updated successfully",
         }
-    
-
-    # def upload_profile_pic(self,user_id:int,file: UploadFile = File(...)):
-
-    #      user = self.db.query(User).filter(User.User_ID == user_id).first()
-    #      result = cloudinary.uploader.upload(file.file)
-    #      image_url = result["secure_url"]
-    #      user.Profile_Pic_URL = image_url
-    #      self.db.commit()
-    #      self.db.refresh(user)
-    #      return "User Profile Photo updated successfully"
 
 
     def Logout(self,current_user):
@@ -108,8 +97,7 @@ class UpdateUser:
             raise HTTPException(status_code=404,
                                 detail="Invalid User")
         
-        user.Token = None 
-        self.db.commit()
+        user.Token = None   
 
         return {"message":"Logout Success"}
     
@@ -149,8 +137,8 @@ class UpdateUser:
 
         return {"message":"Password changed Succesfully"}
 
-
    
+
 #USER LOGIN and OTP Generation
 class Userabs(ABC):
     @abstractmethod
@@ -165,7 +153,7 @@ class Verify_user(Userabs):
              self.background_tasks = background_tasks
 
         def verify_user(self):  
-            #try:
+            try:
                 user = self.db.query(User).filter(
                 or_(
                         User.Username == self.user_data.username_or_email,
@@ -203,17 +191,16 @@ class Verify_user(Userabs):
                     self.db.commit()
 
                     self.background_tasks.add_task(emailOTP,user.Email,otp,text)
-                    #emailOTP(user.Email, otp, text)
                     return {"message":"OTP sent to your email for verification","resetkey":resetkey}
                   
-            #except HTTPException:
-            #     raise
-            # except Exception as e:
-            #      #print(e)   # show real error in terminal
-            #      raise HTTPException(status_code=500, detail="Internal Server Error")
+            except HTTPException:
+                raise
+            except Exception as e:
+                 #print(e)   # show real error in terminal
+                 raise HTTPException(status_code=500, detail="Internal Server Error")
                         
 
-#OTP and TOKEN VERIFICATION for USER          
+#OTP and TOKEN VERIFICATION for USER
 class OTPToken(ABC):
     @abstractmethod
     def otp_verify(self):
