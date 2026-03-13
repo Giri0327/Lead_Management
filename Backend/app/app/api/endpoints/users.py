@@ -24,6 +24,7 @@ async def ViewUser(current_user = Depends(role_required([1,2])),db:Session=Depen
     x=ADDUser(None,db)
     return x.view_users()
 
+
 @router.put("/UpdateUser")
 async def update_user(
     first_name: str = Form(...),
@@ -40,11 +41,8 @@ async def update_user(
 
     return service.Update_user(
         current_user["user_id"],
-        first_name,
-        last_name,
-        email,
-        phone,
-        file
+        first_name,last_name,
+        email,phone,file
     )
 
 @router.put("/Twofath")
@@ -64,10 +62,10 @@ async def Change_Pass(user:ChangePass,current_user = Depends(role_required([2]))
     return x.change_password(current_user["user_id"])
 
 @router.post("View_UserBy_id")
-async def view_by_id(current_user = Depends(role_required([2])),db:Session=Depends(get_db)):
+async def view_by_id(current_user = Depends(role_required([1,2])),db:Session=Depends(get_db)):
     x=ADDUser(None,db)
     return x.view_userby_id(current_user)
-
+    
 #RESET PASSWORD USING FORGT PASSWORD
 
 @router.post("/forgot_password")

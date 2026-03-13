@@ -108,19 +108,21 @@ class Dashboard:
             ).first()
         
 
-        return ({"Title":"Total Leads","total_leads": current_month_leads,
-                 "%_vs_last_month":vs_last_month},
-                {"Title":"Leads in Pipeline",
-                 "Active_opportunities":Active_opportunities.Active_opportunities},
-                {"Title":"Conversion Rate",
-                 "Conversion_rate":percentage,
-                 "Conversion_percent_vs_last_month":Conversion_percent_vs_last_month},
-                {"Title":"New Leads Today",
-                 "New_leads_today":New_leads_today},
-                {"Title":"High Priority",
-                 "high_priority_leads": high_priority.Lead_count},
-                {"Title":"Total Pipeline Value",
-                 "total_pipeline_value": total_pipeline_value.Total_Pipeline_Value})
+        return [{
+        "title": "Total Leads",
+        "value": current_month_leads,
+        "percent_vs_last_month": vs_last_month},{
+        "title": "Leads in Pipeline",
+        "value": Active_opportunities.Active_opportunities},{
+        "title": "Conversion Rate",
+        "value": percentage,
+        "percent_vs_last_month": Conversion_percent_vs_last_month},{
+        "title": "New Leads Today",
+        "value": New_leads_today},{
+        "title": "High Priority",
+        "value": high_priority.Lead_count},{
+        "title": "Total Pipeline Value",
+        "value": total_pipeline_value.Total_Pipeline_Value}]
                   
     
     def recentlead(self):

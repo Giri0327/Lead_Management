@@ -42,7 +42,7 @@ class ADDUser:
                            Roles.Role_Name,
                            User.Phone,User.Profile_Pic_URL).join(Roles, User.Role_ID == Roles.Role_ID)
                            .filter(User.User_ID == userid)
-                           .first())  
+                           .first())
         if user:
             return user._asdict()
 
@@ -165,7 +165,7 @@ class Verify_user(Userabs):
              self.background_tasks = background_tasks
 
         def verify_user(self):  
-            try:
+            #try:
                 user = self.db.query(User).filter(
                 or_(
                         User.Username == self.user_data.username_or_email,
@@ -206,11 +206,11 @@ class Verify_user(Userabs):
                     #emailOTP(user.Email, otp, text)
                     return {"message":"OTP sent to your email for verification","resetkey":resetkey}
                   
-            except HTTPException:
-                raise
-            except Exception as e:
-                 #print(e)   # show real error in terminal
-                 raise HTTPException(status_code=500, detail="Internal Server Error")
+            #except HTTPException:
+            #     raise
+            # except Exception as e:
+            #      #print(e)   # show real error in terminal
+            #      raise HTTPException(status_code=500, detail="Internal Server Error")
                         
 
 #OTP and TOKEN VERIFICATION for USER          
