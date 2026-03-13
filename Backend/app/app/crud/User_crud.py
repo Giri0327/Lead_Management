@@ -40,7 +40,8 @@ class ADDUser:
                            User.Last_Name,
                            User.Email,
                            Roles.Role_Name,
-                           User.Phone,User.Profile_Pic_URL).join(Roles, User.Role_ID == Roles.Role_ID)
+                           User.Phone,
+                           User.Profile_Pic_URL).join(Roles, User.Role_ID == Roles.Role_ID)
                            .filter(User.User_ID == userid)
                            .first())
         if user:

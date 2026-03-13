@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends
 #from sqlalchemy.orm import session
 from app.db import get_db,session
 from app.crud.dashboard_crud import Dashboard
-
+from app.crud.activity_crud import Files
 from app.schema import *
 from app.api.deps import role_required
 
@@ -36,3 +36,8 @@ async def graph_(current_user = Depends(role_required([1,2])),db:session=Depends
     return pipe.graph()
 
 
+
+@router.get("/view_all_lead_notes")
+async def view_all_notes(current_user = Depends(role_required([1,2])), db: session = Depends(get_db)):
+    creator = Files(None, None, None, db)
+    return creator.view_recent_files(current_user["user_id"])

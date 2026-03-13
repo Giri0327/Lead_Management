@@ -43,8 +43,3 @@ async def view_Files(activity_id:int,current_user = Depends(role_required([1,2])
 #     creator = Files(user_id,None,None, db)
 #     view_all_file = creator.view_recent_files()
 #     return view_all_file
-
-@router.get("/view_all_lead_notes")
-async def view_all_notes(user_id: int,current_user = Depends(role_required([1,2])), db: session = Depends(get_db)):
-    creator = Files(None, user_id, None, db)
-    return creator.view_recent_files()

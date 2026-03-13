@@ -173,7 +173,7 @@ class Files:
      
 # VIEW RECENT ACTIVITY IN DASHBOARD PAGE
 
-    def view_recent_files(self):
+    def view_recent_files(self,user_id):
 
         viewfile = (
             self.db.query(
@@ -182,7 +182,7 @@ class Files:
                 
             )
             .join(Lead, Lead_Activity.Lead_ID == Lead.Lead_ID)
-            .filter(Lead_Activity.User_ID == self.user_id)
+            .filter(Lead_Activity.User_ID == user_id)
             .order_by(Lead_Activity.Scheduled_On.desc())
             .all()
         )
