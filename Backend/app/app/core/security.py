@@ -1,3 +1,5 @@
+import datetime
+
 from passlib.context import CryptContext
 import jwt 
 from datetime import datetime as dt
@@ -8,6 +10,7 @@ from email.message import EmailMessage
 from dotenv import load_dotenv
 import smtplib
 from email.mime.text import MIMEText
+#from app.api.endpoints.users import Logout
 from app.models import User
 import os
 from zoneinfo import ZoneInfo
@@ -15,6 +18,8 @@ import cloudinary
 import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
 from fastapi.security import OAuth2PasswordBearer
+
+
 
 load_dotenv()
 
@@ -57,6 +62,9 @@ def decode_token(token:str):
         return {"user_id":user_id,
                 "role":role_id}
     except jwt.ExpiredSignatureError:
+        if payload["exp"] >datetime.now():
+            print("update db")
+            
         return "Token Expired"
     except jwt.InvalidTokenError:
         return "Invalid Token"
