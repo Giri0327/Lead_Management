@@ -20,8 +20,6 @@ class Dashboard:
         prev_month_start = prev_month_end.replace(
         day=1,hour=0,minute=0,second=0, microsecond=0)
 
-
-
         totallead=self.db.query(func.count(Lead.Lead_ID)).scalar()
         
         current_month_leads = (self.db.query(func.count(Lead.Lead_ID))
@@ -40,22 +38,14 @@ class Dashboard:
                  ) / previous_month_leads) * 100
 
         vs_last_month = round(vs_last_month, 2)
-
-
-
-    
         
 
 
         Active_opportunities = (
             self.db.query(func.count(Lead.Lead_ID)
                           .label("Active_opportunities"))
-                          .filter(and_(Lead.Source_ID != 5,
-                                       Lead.Source_ID != 6)).first())
-        
-        
-
-        
+                          .filter(and_(Lead.Stage_ID != 5,
+                                       Lead.Stage_ID != 6)).first())        
 
 
         this_month_Conversion_rate =(self.db.query(func.count(Lead.Lead_ID))
