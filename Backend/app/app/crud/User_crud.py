@@ -70,6 +70,7 @@ class UpdateUser:
             raise HTTPException(status_code=404, detail="Invalid User")
         
         filename = file.filename.lower()
+        #print(filename)
 
         if not filename.endswith((".png", ".jpg", ".jpeg")):
             raise HTTPException(
@@ -120,6 +121,7 @@ class UpdateUser:
         return {"message":"Two-Factor Authentication Updated"}
     
     def change_password(self,token):
+        
         user_id = token
 
         new=self.db.query(User).filter(User.User_ID == user_id).first()

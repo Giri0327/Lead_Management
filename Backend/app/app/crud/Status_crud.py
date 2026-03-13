@@ -3,6 +3,8 @@ from app.schema import Status_Schema
 from app.models import Status
 from app.db import session
 
+
+
 def create_status(user,db:session):
         new_status = Status(
         Status_Name=user.status_name

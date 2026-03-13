@@ -7,15 +7,15 @@ from app.models.File_Activity_Table import Activity_file
 from fastapi import APIRouter, UploadFile, File, Depends
 import cloudinary.uploader
 from app.core.security import cloudinary
-
-
 from sqlalchemy import func
+
 
 class Activity:
     def __init__(self,activity,db):
         self.activity=activity
         self.db=db
-        
+
+# ADD ACTIVITY TO LEAD        
 
     def add_activity(self,lead_id):
 
@@ -42,7 +42,10 @@ class Activity:
             self.db.refresh(activity)
 
             return {"message":"Activity Added"}
-    
+
+#VIEW ACTIVITIES 
+
+
     def view_activity(self):
 
         view_activities = (self.db.query(
@@ -84,31 +87,6 @@ class Details:
 
             return details
 
-# class Files:
-
-#     def __init__(self,activity_id,activity,db):
-#         self.db=db
-#         self.activity_id=activity_id
-#         self.activity=activity
-
-#     def add_file(self,activity_id):
-
-#         dbuser = self.db.query(Lead_Activity).filter(Lead_Activity.Activity_ID==activity_id).first()
-        
-#         if dbuser:
-
-#             file = File_Activity_Table(
-#                 Activity_ID = self.activity_id,
-#                 File_url = self.activity.file_url,
-
-#             )
-#             self.db.add(file)
-
-#             self.db.commit()
-#             self.db.refresh(file)
-
-#             return {"message":"File Added"}
-        
 class Files:
 
     def __init__(self, activity_id, user_id,activity, db):
