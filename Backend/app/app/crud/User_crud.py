@@ -196,7 +196,7 @@ class Verify_user(Userabs):
                                         detail="Invalid Credientials")
                 if not user.Is_two_fath:
                     token_gen = create_token(user)
-                    self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
+                    #self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
                     new_token = Token(User_Id = user.User_ID,
                                     Token = token_gen)
                     self.db.add(new_token)

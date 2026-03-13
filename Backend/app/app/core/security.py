@@ -57,7 +57,7 @@ def decode_token(token:str):
         return {"user_id":user_id,
                 "role":role_id}
     except jwt.ExpiredSignatureError:
-        return "Token Expired"
+        return "Login Expired"
     except jwt.InvalidTokenError:
         return "Invalid Token"
     
