@@ -8,21 +8,38 @@ from sqlalchemy import func
 class Salespipeline:
     def __init__(self,db):
         self.db=db
-    def salespipeline_count(self):
+    def salespipeline_count(self,current_user):
+        current_id = current_user["user_id"]
+        role = current_user["role"]
+
         query = (
             self.db.query(
                 Stage.Stage_ID.label("stage_ID"),
                 Stage.Stage_Name.label("stage_name"),
                 func.count(Lead.Stage_ID).label("lead_count"),
-                func.sum(Lead.Value).label("total_value")
-            )
+                func.sum(Lead.Value).label("total_value"))
             .join(Stage, Lead.Stage_ID == Stage.Stage_ID)
-            .group_by(Lead.Stage_ID).order_by(Stage.Stage_ID.asc()).all()
-        )
-        return [row._asdict() for row in query]
+            #.group_by(Lead.Stage_ID).order_by(Stage.Stage_ID.asc()).all()
+            )
+        
+        if role !=1:
+            query = query.filter(Lead.Owner_ID== current_id)
+        result=(
+            query.group_by(Lead.Stage_ID).order_by(Stage.Stage_ID.asc()).all())    
+
+        #return [row._asdict() for row in query]
+        return [row._asdict() for row in result]
+
     
-    def pipe(self):
-        results = (
+
+
+
+    def pipe(self,current_user):
+        current_id = current_user["user_id"]
+        role = current_user["role"]
+
+
+        query = (
             self.db.query(
                 Stage.Stage_ID.label("stage_ID"),
                 Stage.Stage_Name.label("stage_name"),
@@ -35,8 +52,16 @@ class Salespipeline:
             )
             .join(Stage, Lead.Stage_ID == Stage.Stage_ID)
             .join(User, Lead.Owner_ID == User.User_ID)
-            .join(Priority, Lead.Priority_ID == Priority.Priority_ID).order_by(Stage.Stage_ID.asc())
-            .all())
+            .join(Priority, Lead.Priority_ID == Priority.Priority_ID))
+            
+        
+        if role!=1:
+            query=query.filter(Lead.Owner_ID== current_id)
+
+        results=(
+            query.order_by(Stage.Stage_ID.asc()).all())
+
+
         Data = {}
         for row in results:
             #print(row)
@@ -62,4 +87,7 @@ class Salespipeline:
                 "priority": row.priority_name,
                 "owner": row.owner_name
             })
+
+            
+
         return list(Data.values())

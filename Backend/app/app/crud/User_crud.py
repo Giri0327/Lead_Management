@@ -39,7 +39,8 @@ class ADDUser:
                            User.Last_Name,
                            User.Email,
                            Roles.Role_Name,
-                           User.Phone,User.Profile_Pic_URL).join(Roles, User.Role_ID == Roles.Role_ID)
+                           User.Phone,
+                           User.Profile_Pic_URL).join(Roles, User.Role_ID == Roles.Role_ID)
                            .filter(User.User_ID == user_id)
                            .first())
         if user:
@@ -70,6 +71,7 @@ class UpdateUser:
             raise HTTPException(status_code=404, detail="Invalid User")
         
         filename = file.filename.lower()
+        #print(filename)
 
         if not filename.endswith((".png", ".jpg", ".jpeg")):
             raise HTTPException(

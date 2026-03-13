@@ -7,26 +7,26 @@ from app.models.File_Activity_Table import Activity_file
 from fastapi import UploadFile, File, Depends
 import cloudinary.uploader
 from app.core.security import cloudinary
-
-
 from sqlalchemy import func
+
 
 class Activity:
     def __init__(self,activity,db):  
         self.activity=activity
         self.db=db
-        
 
-    def add_activity(self,lead_id):
+# ADD ACTIVITY TO LEAD       
 
-        dbuser = self.db.query(Lead_Activity).filter(Lead_Activity.Lead_ID==lead_id).first()
+    def add_activity(self,user_id):
+
+        dbuser = self.db.query(Lead_Activity).filter(Lead_Activity.Lead_ID==self.activity.lead_id).first()
         
         if dbuser:
 
             activity = Lead_Activity(
 
                 Lead_ID = self.activity.lead_id,
-                User_ID = self.activity.user_id,
+                User_ID = user_id,
                 Notes = self.activity.notes,
                 Scheduled_On = self.activity.scheduled_on,
 
@@ -42,8 +42,11 @@ class Activity:
             self.db.refresh(activity)
 
             return {"message":"Activity Added"}
-    
-    def view_activity(self):
+
+# VIEW ACTIVITIY TIMELINE
+
+
+    def view_activity(self,lead_id):
 
         view_activities = (self.db.query(
             Lead_Activity.Notes,
@@ -51,11 +54,13 @@ class Activity:
             User.Username
         )
         .join(User,Lead_Activity.User_ID == User.User_ID)
+        .filter(Lead_Activity.Lead_ID == lead_id)
         .order_by(Lead_Activity.Scheduled_On.asc())
         .all()
         )
         return view_activities
 
+# SHOW LEAD DETAILS 
 
 class Details:
     def __init__(self,activity,db):
@@ -92,6 +97,8 @@ class Files:
         self.activity_id = activity_id
         self.user_id = user_id
         self.activity = activity
+
+# ADD FILE IF NEEDED FOR AN ACTIVITY
 
     def add_file(self,current_user,file: UploadFile = File(...)):
 
@@ -138,7 +145,10 @@ class Files:
         return {"message": "File Added",
                 "file_Name":filename,
                 "file_URL":file_url}
-    
+
+
+# VIEW FILES AVAILABLE IN AN ACTIVITY
+
     def view_file(self):
 
         activity = self.db.query(Lead_Activity).filter(
@@ -161,14 +171,9 @@ class Files:
 
         return viewfile
      
+# VIEW RECENT ACTIVITY IN DASHBOARD PAGE
 
-        # files = self.db.query(Activity_file).filter(
-        #     Activity_file.Activity_ID == self.activity_id
-        # ).all()
-
-        # print(files)
-            
-    def view_recent_files(self):
+    def view_recent_files(self,user_id):
 
         viewfile = (
             self.db.query(
@@ -177,7 +182,7 @@ class Files:
                 
             )
             .join(Lead, Lead_Activity.Lead_ID == Lead.Lead_ID)
-            .filter(Lead_Activity.User_ID == self.user_id)
+            .filter(Lead_Activity.User_ID == user_id)
             .order_by(Lead_Activity.Scheduled_On.desc())
             .all()
         )

@@ -113,7 +113,7 @@ class Create:
         results = (
             query.order_by(Lead.Lead_ID.asc()).offset(offset)
             .limit(limit).all()
-        )
+            )
         return [row._asdict() for row in results]
 
 class Updateleadd:

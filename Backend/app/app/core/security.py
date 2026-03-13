@@ -1,4 +1,3 @@
-from fastapi import Depends
 from passlib.context import CryptContext
 import jwt 
 from datetime import datetime as dt
@@ -15,10 +14,10 @@ from zoneinfo import ZoneInfo
 import cloudinary
 import cloudinary.uploader
 from cloudinary.utils import cloudinary_url
+from fastapi.security import OAuth2PasswordBearer
 
 load_dotenv()
 
-from fastapi.security import OAuth2PasswordBearer
 
 oauth2_scheme= OAuth2PasswordBearer(tokenUrl="/user/Login")
 
