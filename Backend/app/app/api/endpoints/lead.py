@@ -1,3 +1,5 @@
+from typing import Optional
+
 from fastapi import APIRouter, Depends, HTTPException
 #from sqlalchemy.orm import session
 from app.db import get_db,session
@@ -50,21 +52,21 @@ async def followup_schedule(followup:Follow_up_schedule,current_user = Depends(r
 @router.get("/next_followup")
 async def next_followup(lead_id:int,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
         creator = Createfollowup(lead_id,None,db)
-        upcoming_followup = creator.get_next_followup(lead_id)
+        upcoming_followup = creator.get_next_followup(lead_id,current_user)
         return upcoming_followup
     
 
 @router.get("/upcoming_followups")
-async def upcoming_followups(lead_id,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
+async def upcoming_followups(lead_id: Optional[int] = None,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
         creator = Createfollowup(None,None,db)
-        upcoming_followup = creator.view_upcoming_followups(lead_id)
+        upcoming_followup = creator.view_upcoming_followups(lead_id,current_user)
         return upcoming_followup
     
 
 @router.get("/this_week_followups")
-async def this_week_followups(current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
+async def this_week_followups(lead_id: Optional[int] = None,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
         creator = Createfollowup(None,None,db)
-        this_week_followup = creator.view_this_week_followups()
+        this_week_followup = creator.view_this_week_followups(lead_id,current_user)
         return this_week_followup
     
 
@@ -75,7 +77,7 @@ async def update_followups(followup_id:int,followup:Follow_up_schedule,current_u
         return update_followup
     
 @router.get("/track_followups")
-async def trackfollowup(current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
+async def trackfollowup(lead_id:Optional[int]=None,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
      creator = Createfollowup(None,None,db)
-     track = creator.track_followups()
+     track = creator.track_followups(lead_id,current_user)
      return track
