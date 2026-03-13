@@ -117,12 +117,17 @@ class UpdateUser:
 
     def Logout(self,current_user):
         user_id = current_user["user_id"]
-        user = self.db.query(Token).filter(Token.User_ID == user_id).first()
+        user = self.db.query(Token).filter(Token.User_Id == user_id).first()
         if not user:
             raise HTTPException(status_code=404,
                                 detail="Invalid User")
         
-        user.Token = None   
+        user.Token = None
+        user.update_At = datetime.utcnow()  # optional if DB auto-updates
+
+        self.db.commit()
+        self.db.refresh(user)
+
 
         return {"message":"Logout Success"}
     
