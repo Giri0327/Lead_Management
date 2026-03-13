@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-from app.schema import Status_Schema
 from app.models import Status
 from app.db import session
 

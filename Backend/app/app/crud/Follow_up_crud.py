@@ -3,13 +3,17 @@ from fastapi import HTTPException
 from app.models import Lead,Follow_Up,User
 from sqlalchemy import func
 
+
 class Createfollowup:
+
     def __init__(self,lead_id, followup, db):
         self.lead_id = lead_id
         self.followup = followup
         self.db = db
     
-    def schedule_followup(self):
+# ADD FOLLOW UP 
+
+    def schedule_followup(self,user_id):
 
         lead = self.db.query(Lead).filter(Lead.Lead_ID == self.followup.lead_id).first()
 
@@ -17,7 +21,7 @@ class Createfollowup:
             raise HTTPException(status_code=404, detail="Lead not found")
         
         new_followup = Follow_Up(
-            User_ID = self.followup.user_id,
+            User_ID = user_id,
             Lead_ID = self.followup.lead_id,
             Notes = self.followup.notes,
             Contact_Type = self.followup.contact_type,
@@ -29,7 +33,9 @@ class Createfollowup:
         self.db.refresh(new_followup)
 
         return {"message":"Follow-up scheduled!"}
-    
+
+# NEXT FOLLOWUP FOR A LEAD
+
     def get_next_followup(self, lead_id:int):
         
         followup = (
@@ -48,9 +54,10 @@ class Createfollowup:
             return {"message":"No followup scheduled"}
 
         return followup
-    
 
-    def view_upcoming_followups(self):
+#     
+
+    def view_upcoming_followups(self,lead_id):
         view_followups =(
             self.db.query(
                 Lead.Lead_Name,
@@ -61,6 +68,7 @@ class Createfollowup:
             )
         .join(Follow_Up,Lead.Lead_ID ==Follow_Up.Lead_ID)
         .filter(Follow_Up.Contacted_On > datetime.now())
+        .filter(Follow_Up.Lead_ID == lead_id)
         .all()
 
         )

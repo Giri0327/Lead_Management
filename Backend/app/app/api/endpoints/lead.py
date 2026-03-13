@@ -25,7 +25,7 @@ async def view_lead(page:int, size: int,current_user = Depends(role_required([1,
     try:
         all_leads = Create(None,db)
         offset = (page - 1) * size
-        return all_leads.view_lead(limit=size, offset=offset)
+        return all_leads.view_lead(current_user,limit=size, offset=offset)
     except Exception as e:
         return e
 
@@ -36,7 +36,7 @@ async def update_lead(leadupdate:Updatelead,current_user = Depends(role_required
 
 
 @router.get("/view/{lead_id}")
-async def view_lead_by_id(lead_id: int,current_user = Depends(role_required([1,2])), db: session = Depends(get_db)):
+async def view_lead_by_id(lead_id: int,current_user = Depends(role_required([1])), db: session = Depends(get_db)):
     lead=ViewLeadByID(db, lead_id)
     return lead.view_lead_by_id()
 
@@ -44,7 +44,7 @@ async def view_lead_by_id(lead_id: int,current_user = Depends(role_required([1,2
 @router.post("/schedule-followup")
 async def followup_schedule(followup:Follow_up_schedule,current_user = Depends(role_required([2])),db:session=Depends(get_db)):
         creator = Createfollowup(None,followup, db)
-        new_followup = creator.schedule_followup()
+        new_followup = creator.schedule_followup(current_user["user_id"])
         return new_followup
 
 @router.get("/next_followup")
@@ -55,9 +55,9 @@ async def next_followup(lead_id:int,current_user = Depends(role_required([1,2]))
     
 
 @router.get("/upcoming_followups")
-async def upcoming_followups(current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
+async def upcoming_followups(lead_id,current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
         creator = Createfollowup(None,None,db)
-        upcoming_followup = creator.view_upcoming_followups()
+        upcoming_followup = creator.view_upcoming_followups(lead_id)
         return upcoming_followup
     
 

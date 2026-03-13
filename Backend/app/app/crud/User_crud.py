@@ -9,11 +9,6 @@ from sqlalchemy.orm import Session
 from app.models import User,Token
 from app.schema import ForgotPass,ResetPass
 from app.core import get_password_hash,verify_password,create_token,get_otp,emailOTP,reset_key,pwd_context
-from app.core.security import decode_token
-from app.db import session,get_db
-from fastapi.security import OAuth2PasswordRequestForm
-from fastapi import APIRouter, UploadFile, File, Depends
-import cloudinary.uploader
 from app.core.security import cloudinary
 
 #CREATE USER
@@ -45,9 +40,9 @@ class ADDUser:
                            User.Last_Name,
                            User.Email,
                            Roles.Role_Name,
-                           User.Phone,).join(Roles, User.Role_ID == Roles.Role_ID)
+                           User.Phone,User.Profile_Pic_URL).join(Roles, User.Role_ID == Roles.Role_ID)
                            .filter(User.User_ID == userid)
-                           .first())  
+                           .first())
         if user:
             return user._asdict()
 
@@ -94,18 +89,18 @@ class UpdateUser:
         return {
             "message": "User updated successfully",
         }
-    
 
-    # def upload_profile_pic(self,user_id:int,file: UploadFile = File(...)):
 
-    #      user = self.db.query(User).filter(User.User_ID == user_id).first()
-    #      result = cloudinary.uploader.upload(file.file)
-    #      image_url = result["secure_url"]
-    #      user.Profile_Pic_URL = image_url
-    #      self.db.commit()
-    #      self.db.refresh(user)
-    #      return "User Profile Photo updated successfully"
+    def Logout(self,current_user):
+        user_id = current_user
+        user = self.db.query(Token).filter(Token.User_ID == user_id).first()
+        if not user:
+            raise HTTPException(status_code=404,
+                                detail="Invalid User")
+        
+        user.Token = None   
 
+        return {"message":"Logout Success"}
     
     def Twofath(self,current_user):
         user_id = current_user
@@ -144,8 +139,8 @@ class UpdateUser:
 
         return {"message":"Password changed Succesfully"}
 
-
    
+
 #USER LOGIN and OTP Generation
 class Userabs(ABC):
     @abstractmethod
@@ -198,7 +193,6 @@ class Verify_user(Userabs):
                     self.db.commit()
 
                     self.background_tasks.add_task(emailOTP,user.Email,otp,text)
-                    #emailOTP(user.Email, otp, text)
                     return {"message":"OTP sent to your email for verification","resetkey":resetkey}
                   
             except HTTPException:
@@ -208,7 +202,7 @@ class Verify_user(Userabs):
                  raise HTTPException(status_code=500, detail="Internal Server Error")
                         
 
-#OTP and TOKEN VERIFICATION for USER          
+#OTP and TOKEN VERIFICATION for USER
 class OTPToken(ABC):
     @abstractmethod
     def otp_verify(self):

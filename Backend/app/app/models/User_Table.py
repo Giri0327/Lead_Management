@@ -20,11 +20,9 @@ class User(Base):
     Password= Column(String(255),nullable=False)
     OTP= Column(Integer)
     OTP_Expiry= Column(DateTime)
-    User_Role_id = Column(Integer,ForeignKey("user_role.User_Role_id"))
-    # User_Role_id=Column(String(255))
-    user_role = relationship("User_Role",back_populates="user")
 
-
+    User_Role_id=Column(Integer,ForeignKey("user_role.User_Role_id"))
+    user_role =relationship("User_Role",back_populates="user")
 
     Is_two_fath=Column(Boolean)
     Reset_Key=Column(String(255))

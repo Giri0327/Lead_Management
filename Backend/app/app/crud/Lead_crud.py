@@ -1,5 +1,6 @@
+from ast import Not
+
 from app.models import Lead,User,Sources,Stage,Status,Priority
-from fastapi import HTTPException, status
 from sqlalchemy.orm import joinedload
 
 class Create:
@@ -29,12 +30,67 @@ class Create:
         if new_lead:
             return {
                 "message": "Lead created successfully",
-                "Lead_ID": new_lead.Lead_ID
-            } 
+                "Lead_ID": new_lead.Lead_ID} 
         
-    def view_lead(self, limit, offset):
+    """def view_lead(self,current_user, limit, offset):
+        current_id=current_user["user_id"]
+        role=current_user["role"]
+        print(role)
 
-        lead=(self.db.query(Lead.Lead_ID,
+    
+        if  role == 1:
+            #query = query.filter(Lead.Owner_ID == current_id)
+            query=(self.db.query(
+            Lead.Lead_ID,
+            Lead.Lead_Name.label("lead_name"),
+            Lead.Company_Name.label("company"),
+            Lead.Email,
+            Lead.Phone,
+            User.Username.label("owner"),
+            Lead.Value,
+            Sources.Source_Name,
+            Stage.Stage_Name,
+            Status.Status_Name,
+            Priority.Priority_Name)
+            .join(Stage, Lead.Stage_ID == Stage.Stage_ID,isouter=True)
+            .join(Priority, Lead.Priority_ID == Priority.Priority_ID,isouter=True)
+            .join(Status, Lead.Status_ID == Status.Status_ID,isouter=True)
+            .join(User, Lead.Owner_ID == User.User_ID,isouter=True)
+            .join(Sources, Lead.Source_ID == Sources.Source_ID,isouter=True)
+            .order_by(Lead.Lead_ID.asc())
+            .offset(offset)
+            .limit(limit)).all()
+            return [row._asdict() for row in query]
+        else:
+
+            query=(self.db.query(
+                Lead.Lead_ID,
+                Lead.Lead_Name.label("lead_name"),
+                Lead.Company_Name.label("company"),
+                Lead.Email,
+                Lead.Phone,
+                User.Username.label("owner"),
+                Lead.Value,
+                Sources.Source_Name,
+                Stage.Stage_Name,
+                Status.Status_Name,
+                Priority.Priority_Name).filter(Lead.Owner_ID == current_id)
+                .join(Stage, Lead.Stage_ID == Stage.Stage_ID,isouter=True)
+                .join(Priority, Lead.Priority_ID == Priority.Priority_ID,isouter=True)
+                .join(Status, Lead.Status_ID == Status.Status_ID,isouter=True)
+                .join(User, Lead.Owner_ID == User.User_ID,isouter=True)
+                .join(Sources, Lead.Source_ID == Sources.Source_ID,isouter=True)
+                .order_by(Lead.Lead_ID.asc())
+                .offset(offset)
+                .limit(limit)).all()
+            return [row._asdict() for row in query]"""
+    def view_lead(self, current_user, limit, offset):
+        current_id = current_user["user_id"]
+        role = current_user["role"]
+
+        query = (
+            self.db.query(
+                Lead.Lead_ID,
                 Lead.Lead_Name.label("lead_name"),
                 Lead.Company_Name.label("company"),
                 Lead.Email,
@@ -45,15 +101,20 @@ class Create:
                 Stage.Stage_Name,
                 Status.Status_Name,
                 Priority.Priority_Name)
-                .join(Stage, Lead.Stage_ID == Stage.Stage_ID)
-                .join(Priority, Lead.Priority_ID == Priority.Priority_ID)
-                .join(Status, Lead.Status_ID == Status.Status_ID)
-                .join(User, Lead.Owner_ID == User.User_ID)
-                .join(Sources, Lead.Source_ID == Sources.Source_ID)
-                .order_by(Lead.Lead_ID.asc()).offset(offset).limit(limit).all())
-        #print(lead)
+            .join(Stage, Lead.Stage_ID == Stage.Stage_ID)
+            .join(Priority, Lead.Priority_ID == Priority.Priority_ID)
+            .join(Status, Lead.Status_ID == Status.Status_ID)
+            .join(User, Lead.Owner_ID == User.User_ID)
+            .join(Sources, Lead.Source_ID == Sources.Source_ID))
+        
+        if role != 1:
+            query = query.filter(Lead.Owner_ID == current_id)
 
-        return [row._asdict() for row in lead]
+        results = (
+            query.order_by(Lead.Lead_ID.asc()).offset(offset)
+            .limit(limit).all()
+        )
+        return [row._asdict() for row in results]
 
 class Updateleadd:
     def __init__(self,db,lead):

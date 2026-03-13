@@ -1,5 +1,4 @@
 from fastapi import HTTPException
-from app.schema import Priority_Schema
 from app.models import Priority
 from app.db import session
 

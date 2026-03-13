@@ -8,11 +8,8 @@ DATABASE_URL=os.getenv("DATABASE_URL")
 cert_path = os.getenv("ca")
 
 engine = create_engine(DATABASE_URL,
-    connect_args={
-        "ssl": {
-            "ca": cert_path
-        }
-    },
+    #connect_args={"ssl": {"ca": cert_path}},
+    connect_args={"ssl": {"ssl_disabled": False}},
     pool_pre_ping=True,pool_recycle=3600
 )
 
