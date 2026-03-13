@@ -34,14 +34,13 @@ class ADDUser:
             return "User created successfully"  
 
     def view_userby_id(self,current_user):
-        userid = current_user["user_id"]
-        #print(type(userid))
+        user_id = current_user["user_id"]
         user=(self.db.query(User.First_Name,
                            User.Last_Name,
                            User.Email,
                            Roles.Role_Name,
                            User.Phone,User.Profile_Pic_URL).join(Roles, User.Role_ID == Roles.Role_ID)
-                           .filter(User.User_ID == userid)
+                           .filter(User.User_ID == user_id)
                            .first())
         if user:
             return user._asdict()
@@ -49,8 +48,14 @@ class ADDUser:
         return None 
         
     def view_users(self):
-        users = self.db.query(User).all()
-        return users
+        users = (self.db.query(User.User_ID,
+                           User.First_Name,
+                           User.Last_Name,
+                           User.Email,
+                           User_Role.user_role,
+                           User.Phone).join(User_Role, User.User_Role_id == User_Role.User_Role_id).all())
+        
+        return  [row._asdict() for row in users]
 
 class UpdateUser:
     def __init__(self, user, db: Session):
@@ -88,10 +93,28 @@ class UpdateUser:
         return {
             "message": "User updated successfully",
         }
+    
+    def AdminUser_Update(self, user_id, first_name, last_name, email, user_role, phone):
+
+        user = self.db.query(User).filter(User.User_ID == user_id).first()
+        
+        if not user:
+            return {"message": "User not found"}
+        
+        user.First_Name = first_name
+        user.Last_Name = last_name
+        user.Email = email
+        user.Phone = phone
+        user.User_Role_id = user_role   # if role_id is stored
+
+        self.db.commit()
+        self.db.refresh(user)
+
+        return {"message": "User updated successfully"}
 
 
     def Logout(self,current_user):
-        user_id = current_user
+        user_id = current_user["user_id"]
         user = self.db.query(Token).filter(Token.User_ID == user_id).first()
         if not user:
             raise HTTPException(status_code=404,
@@ -102,7 +125,7 @@ class UpdateUser:
         return {"message":"Logout Success"}
     
     def Twofath(self,current_user):
-        user_id = current_user
+        user_id = current_user["user_id"]
         user = self.db.query(User).filter(User.User_ID == user_id).first()
 
         if not user:
@@ -114,8 +137,8 @@ class UpdateUser:
 
         return {"message":"Two-Factor Authentication Updated"}
     
-    def change_password(self,token):
-        user_id = token
+    def change_password(self,current_user):
+        user_id = current_user["user_id"]
 
         new=self.db.query(User).filter(User.User_ID == user_id).first()
         if not new:

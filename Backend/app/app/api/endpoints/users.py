@@ -19,10 +19,35 @@ async def CreateUser(user:UserInfo,db:Session = Depends(get_db)):
     x= ADDUser(user,db)
     return x.Create_user()
 
-@router.get("/view_Users")
-async def ViewUser(current_user = Depends(role_required([1,2])),db:Session=Depends(get_db)):
+@router.get("/Adminview_Users")
+async def ViewUser(current_user = Depends(role_required([1])),db:Session=Depends(get_db)):
     x=ADDUser(None,db)
     return x.view_users()
+
+
+@router.put("/AdminUpdatesUsers")
+async def Admin_Upd_user(
+    user_id: int = Form(...),
+    first_name: str = Form(...),
+    last_name: str = Form(...),
+    email: str = Form(...),
+    user_role : str =Form(...),
+    phone: str = Form(...),
+
+    current_user = Depends(role_required([1])),
+    db: Session = Depends(get_db)
+):
+    x = UpdateUser(None, db)
+
+    return x.AdminUser_Update(
+        user_id,
+        first_name,
+        last_name,
+        email,
+        user_role,
+        phone
+    )
+
 
 
 @router.put("/UpdateUser")
@@ -48,18 +73,18 @@ async def update_user(
 @router.put("/Twofath")
 async def TwoFATH(current_user = Depends(role_required([2])),db:Session = Depends(get_db)):
     x=UpdateUser(current_user,db)
-    return x.Twofath(current_user["user_id"])
+    return x.Twofath(current_user)
 
 @router.put("/Logout")
 async def Logout(current_user = Depends(role_required([2])),db:Session = Depends(get_db)):
     x=UpdateUser(current_user,db)
-    return x.Logout(current_user["user_id"])
+    return x.Logout(current_user)
 
 @router.post("/change_password")
 async def Change_Pass(user:ChangePass,current_user = Depends(role_required([2])),
                       db:Session = Depends(get_db)):
     x=UpdateUser(user,db)
-    return x.change_password(current_user["user_id"])
+    return x.change_password(current_user)
 
 @router.post("View_UserBy_id")
 async def view_by_id(current_user = Depends(role_required([1,2])),db:Session=Depends(get_db)):
