@@ -82,7 +82,7 @@ class UpdateUser:
         result = cloudinary.uploader.upload(file.file)
         # print(result)
         image_url = result["secure_url"]
-
+        
         user.First_Name = first_name
         user.Last_Name = last_name
         user.Email = email
@@ -117,12 +117,13 @@ class UpdateUser:
 
     def Logout(self,current_user):
         user_id = current_user["user_id"]
-        user = self.db.query(Token).filter(Token.User_ID == user_id).first()
+        user = self.db.query(Token).filter(Token.User_Id == user_id).first()
         if not user:
             raise HTTPException(status_code=404,
                                 detail="Invalid User")
         
         user.Token = None   
+        self.db.commit()
 
         return {"message":"Logout Success"}
     
