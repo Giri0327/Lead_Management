@@ -1,3 +1,5 @@
+#import datetime
+from datetime import datetime, timedelta
 from sqlalchemy import Column,String,Integer,DateTime,ForeignKey
 from app.db import Base
 from sqlalchemy.sql import func
@@ -15,7 +17,7 @@ class Token(Base):
     Token = Column(String(255))
     Token_Expiry = Column(DateTime)
     Device_Type = Column(String(100))
-    Created_At= Column(DateTime,server_default=func.now())
+    Created_At= Column(DateTime,default=datetime.now())
     update_At=Column(DateTime)
 
 

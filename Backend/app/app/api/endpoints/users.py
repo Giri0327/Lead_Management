@@ -76,7 +76,7 @@ async def TwoFATH(current_user = Depends(role_required([2])),db:Session = Depend
     return x.Twofath(current_user)
 
 @router.put("/Logout")
-async def logout(current_user = Depends(role_required([1,2])),db:Session = Depends(get_db)):
+async def Logout(current_user = Depends(role_required([1,2])),db:Session = Depends(get_db)):
     x=UpdateUser(current_user,db)
     return x.Logout(current_user)
 

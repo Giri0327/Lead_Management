@@ -127,7 +127,7 @@ class Files:
         if not filename.endswith((".pdf", ".jpg", ".jpeg",".png",".pptx",".xlsx")):
             raise HTTPException(
                 status_code=400,
-                detail="Only PNG and JPEG images are allowed"
+                detail="Only PDF, JPG, JPEG, PNG, PPTX and XLSX files are allowed"
             )
         
         # dbuser = self.db.query(User).filter(

@@ -30,7 +30,7 @@ class StageCRUD:
                 dbuser=self.db.query(Stage).filter(Stage.Stage_ID==stage_id).first()
                 if not dbuser:
                         raise HTTPException(status_code=404,
-                                                detail="Invalid User")
+                                                detail="Invalid Stage")
                 dbuser.Stage_Name=self.user.stage_name
                 self.db.commit()
                 self.db.refresh(dbuser)
@@ -52,4 +52,4 @@ class StageCRUD:
                 
 
 
-        
+                
