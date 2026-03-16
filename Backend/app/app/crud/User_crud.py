@@ -152,11 +152,10 @@ class UpdateUser:
                                 detail="Invalid User")
         
         user.Token = None
-        user.update_At = datetime.now()  # optional if DB auto-updates
+        user.update_At = datetime.utcnow()  # optional if DB auto-updates
 
         self.db.commit()
         self.db.refresh(user)
-
 
         return {"message":"Logout Success"}
     
@@ -208,10 +207,11 @@ class Userabs(ABC):
         pass
 
 class Verify_user(Userabs):
-        def __init__(self,db:Session,user_data,background_tasks):
+        def __init__(self,db:Session,request,background_task,user_data):
              self.db=db
              self.user_data=user_data
-             self.background_tasks = background_tasks
+             self.request = request
+             self.background_task = background_task
          
         #Verify user and password for login 
         def verify_user(self):  
@@ -233,13 +233,15 @@ class Verify_user(Userabs):
                                         detail="Invalid Credentials")
                 if not user.Is_two_fath:
                     token_gen = create_token(user)
-                    user_agent = request.headers.get("user-agent","")
+                    user_agent = self.request.headers.get("user-agent","")
                     device_type = get_device_type(user_agent)
+                    token_expiry = datetime.utcnow()
 
                     '''self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()'''
                     #creates token when user is without twofath auth 
                     new_token = Token(User_Id = user.User_ID,
                                       Device_Type = device_type,
+                                      Token_Expiry = token_expiry ,
                                       Token = token_gen)
                     self.db.add(new_token)
                     #self.db.add()
@@ -247,6 +249,7 @@ class Verify_user(Userabs):
                     self.db.refresh(new_token)
                     return {"message":"Login successful",
                         "token": token_gen} 
+                
                 #generates otp is user has Twofath authentication
                 else:
                     otp = get_otp()
@@ -260,7 +263,7 @@ class Verify_user(Userabs):
 
                     self.db.commit()
 
-                    self.background_tasks.add_task(emailOTP,user.Email,otp,text)
+                    self.background_task.add_task(emailOTP,user.Email,otp,text)
                     return {"message":"OTP sent to your email for verification","resetkey":resetkey}
                   
             except HTTPException:
@@ -278,10 +281,11 @@ class OTPToken(ABC):
         pass
 
 class OTPTokenVerify(OTPToken):
-    def __init__(self, db: Session, otp: int ,resetkey : str):
+    def __init__(self, db: Session,request, otp: int ,resetkey : str):
         self.db = db
         self.OTP = otp
         self.resetkey = resetkey
+        self.request = request
     #verify otp with the generated reset key
     def otp_verify(self):
         user = self.db.query(User).filter(User.Reset_Key == self.resetkey).first()
@@ -304,7 +308,7 @@ class OTPTokenVerify(OTPToken):
             self.db.commit()
             
             token_gen = create_token(user)
-            user_agent = request.headers.get("user-agent","")
+            user_agent = self.request.headers.get("user-agent","")
             device_type = get_device_type(user_agent)
             #self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
             new_token = Token(User_Id = user.User_ID,
@@ -355,7 +359,7 @@ def forgot_password(user:ForgotPass,db:Session,background_tasks):
                             detail = "User not Found!")
     else:
         otp = get_otp()
-        expiry = (datetime.now(timezone.utc)+timedelta(minutes=10))
+        expiry = (datetime.utcnow(timezone.utc)+timedelta(minutes=10))
     
         text = "OTP for forget password"
         resetkey = reset_key()  
