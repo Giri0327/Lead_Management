@@ -13,27 +13,26 @@ router = APIRouter(prefix="/Dashboard", tags=["Dashboard"])
 @router.post("/")
 async def dash_board(current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
     crud=Dashboard(db)
-    return crud.total_lead()
+    return crud.total_lead(current_user)
 @router.post("/Recentleads")
 async def recent_lead(current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
     recent=Dashboard(db)
-    return recent.recentlead()
+    return recent.recentlead(current_user)
 @router.post("/Pipeline_by_Stage")
 async def pipeline_by_stage(current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
     pipe=Dashboard(db)
-    return pipe.Pipeline_by_stage()
+    return pipe.Pipeline_by_stage(current_user)
 
 @router.post("/Lead_Distribution")
 async def distribution(current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
     pipe=Dashboard(db)
-    return pipe.Lead_distribution()
-
+    return pipe.Lead_distribution(current_user)
 
 
 @router.post("/graph")
 async def graph_(current_user = Depends(role_required([1,2])),db:session=Depends(get_db)):
     pipe=Dashboard(db)
-    return pipe.graph()
+    return pipe.graph(current_user)
 
 
 
