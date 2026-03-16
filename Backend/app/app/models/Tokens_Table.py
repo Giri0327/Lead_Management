@@ -19,6 +19,7 @@ class Token(Base):
     Device_Type = Column(String(100))
     Created_At= Column(DateTime,default=datetime.utcnow)
     update_At=Column(DateTime)
+    
 
 
 

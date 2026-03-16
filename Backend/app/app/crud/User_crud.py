@@ -358,7 +358,7 @@ def forgot_password(user:ForgotPass,db:Session,background_tasks):
                             detail = "User not Found!")
     else:
         otp = get_otp()
-        expiry = (datetime.now(timezone.utc)+timedelta(minutes=10))
+        expiry = (datetime.utcnow(timezone.utc)+timedelta(minutes=10))
     
         text = "OTP for forget password"
         resetkey = reset_key()  
