@@ -54,6 +54,7 @@ def create_token(user):
     return token
 
 
+
 def get_device_type(user_agent:str):
     if "Mobile" in user_agent:
         return "Mobile"

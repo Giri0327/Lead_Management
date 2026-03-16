@@ -35,7 +35,10 @@ def get_current_user(token: HTTPAuthorizationCredentials = Depends(security),db:
                 status_code=401,
                 detail="Session not found"
             )
-        
+        if sessionn.Token_Expiry is None:
+            sessionn.Token_Expiry = datetime.now()
+            db.commit()
+
         if datetime.now() - sessionn.Token_Expiry > INACTIVITY_LIMIT:
 
             sessionn.update_At = datetime.now()

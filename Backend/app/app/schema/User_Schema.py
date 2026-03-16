@@ -8,7 +8,7 @@ class UserInfo(BaseModel):
     email: EmailStr
     phone:str
     password: str = Field(min_length=3)
-    role_id:int
+    role_id:int = 1
     is_active:bool
 
 

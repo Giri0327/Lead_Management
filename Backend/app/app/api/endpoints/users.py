@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends,BackgroundTasks
+from fastapi import APIRouter, Depends,BackgroundTasks,Request
 from sqlalchemy.orm import Session
 from app.db import session,get_db
 from sqlalchemy.orm import Session
@@ -109,8 +109,8 @@ async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,current_user = Depends
 #LOGIN FUNCTIONS
 
 @router.post("/Login")
-async def UserLogin(background_tasks:BackgroundTasks,user_data:UserLogin,db:Session=Depends(get_db)):
-    login= Verify_user(db,user_data,background_tasks)
+async def UserLogin(background_task:BackgroundTasks,request:Request,user_data:UserLogin,db:Session=Depends(get_db)):
+    login= Verify_user(db,request,background_task,user_data)
     result = login.verify_user()
     return result  
 
