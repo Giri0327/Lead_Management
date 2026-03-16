@@ -61,8 +61,7 @@ class Createfollowup:
         if not followup:
             return {"message":"No followup scheduled"}
         return followup
-
-#     
+    
     def view_upcoming_followups(self,lead_id,current_user):
         
         current_id = current_user["user_id"]

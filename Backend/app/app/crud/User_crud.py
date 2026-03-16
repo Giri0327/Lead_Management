@@ -1,5 +1,6 @@
 from abc import ABC,abstractmethod
 from fastapi import HTTPException,status
+from fastapi import Request as request
 from datetime import datetime,timedelta,timezone
 from sqlalchemy import or_
 from app.models import *
@@ -9,7 +10,7 @@ from sqlalchemy.orm import Session
 from app.models import User,Token
 from app.schema import ForgotPass,ResetPass
 from app.core import get_password_hash,verify_password,create_token,get_otp,emailOTP,reset_key,pwd_context
-from app.core.security import cloudinary
+from app.core.security import cloudinary,get_device_type
 
 #CREATE USER
 class ADDUser:
@@ -18,6 +19,20 @@ class ADDUser:
         self.db = db
         
     def Create_user(self):
+        #throws error if username already exist
+        exist_username = self.db.query(User).filter(User.Username == self.user.username).first()
+        if exist_username:
+            raise HTTPException(
+                status_code=404,
+                detail="Username Aleady Exist"
+            )
+        #throws error if email already exist
+        exist_email = self.db.query(User).filter(User.Email == self.user.email).first()
+        if exist_email:
+            raise HTTPException(
+                status_code=404,
+                detail="Email already Exist"
+            )
         x=User(Username = self.user.username,
             First_Name = self.user.first_name,
             Last_Name = self.user.last_name,
@@ -27,13 +42,16 @@ class ADDUser:
             Role_ID=self.user.role_id,
             Is_Active = self.user.is_active
             )
+        
         self.db.add(x)
         self.db.commit()
         self.db.refresh(x)
         if x is not None:   
-            return "User created successfully"  
-
+            return "User created successfully"\
+              
+    #Admin can view user with their user_id
     def view_userby_id(self,current_user):
+       
         user_id = current_user["user_id"]
         user=(self.db.query(User.First_Name,
                            User.Last_Name,
@@ -47,8 +65,10 @@ class ADDUser:
             return user._asdict()
 
         return None 
-        
+    
+    #view all users by the admin     
     def view_users(self):
+        
         users = (self.db.query(User.User_ID,
                            User.First_Name,
                            User.Last_Name,
@@ -62,16 +82,24 @@ class UpdateUser:
     def __init__(self, user, db: Session):
         self.user = user
         self.db = db
-        
-    def Update_user(self, user_id, first_name, last_name, email, phone, file):
 
+    #user can update the user profile    
+    def Update_user(self, user_id, first_name, last_name, email, phone, file):
+        
         user = self.db.query(User).filter(User.User_ID == user_id).first()
 
         if not user:
             raise HTTPException(status_code=404, detail="Invalid User")
+    
+        email_exist = self.db.query(User).filter(user.Email == email,
+                                                 User.User_ID != user_id).first()
+        if email_exist:
+            raise HTTPException(
+                status_code=404,
+                detail="Email Already Exist Enter New Email"
+            )
         
         filename = file.filename.lower()
-        #print(filename)
 
         if not filename.endswith((".png", ".jpg", ".jpeg")):
             raise HTTPException(
@@ -96,8 +124,9 @@ class UpdateUser:
             "message": "User updated successfully",
         }
     
+    #Admin can update the users Profile with his admin Access
     def AdminUser_Update(self, user_id, first_name, last_name, email, user_role, phone):
-
+        
         user = self.db.query(User).filter(User.User_ID == user_id).first()
         
         if not user:
@@ -113,8 +142,8 @@ class UpdateUser:
         self.db.refresh(user)
 
         return {"message": "User updated successfully"}
-
-
+ 
+    #Logout Fucntion Deletes token and updates Logout time in DB
     def Logout(self,current_user):
         user_id = current_user["user_id"]
         user = self.db.query(Token).filter(Token.User_Id == user_id).first()
@@ -131,6 +160,7 @@ class UpdateUser:
 
         return {"message":"Logout Success"}
     
+    #User can Enabel or Disable the TwoFactor Authencation for Security
     def Twofath(self,current_user):
         user_id = current_user["user_id"]
         user = self.db.query(User).filter(User.User_ID == user_id).first()
@@ -138,12 +168,16 @@ class UpdateUser:
         if not user:
             raise HTTPException(status_code=404,
                                 detail="Invalid User")
+        
         user.Is_two_fath = not user.Is_two_fath
-
         self.db.commit()
 
-        return {"message":"Two-Factor Authentication Updated"}
-    
+        if user.Is_two_fath:
+            return "Two Factor authentication Enabled"
+        else:
+            return "Two Factor authentication Disabled"            
+
+    #User Can change their Password In the profile Security without authentication when they know their old password
     def change_password(self,current_user):
         user_id = current_user["user_id"]
 
@@ -167,21 +201,19 @@ class UpdateUser:
 
         return {"message":"Password changed Succesfully"}
 
-   
-
 #USER LOGIN and OTP Generation
 class Userabs(ABC):
     @abstractmethod
     def verify_user(self):
         pass
 
-
 class Verify_user(Userabs):
         def __init__(self,db:Session,user_data,background_tasks):
              self.db=db
              self.user_data=user_data
              self.background_tasks = background_tasks
-
+         
+        #Verify user and password for login 
         def verify_user(self):  
             try:
                 user = self.db.query(User).filter(
@@ -201,13 +233,19 @@ class Verify_user(Userabs):
                                         detail="Invalid Credientials")
                 if not user.Is_two_fath:
                     token_gen = create_token(user)
-                    #self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
+                    user_agent = request.headers.get("user-agent","")
+                    device_type = get_device_type(user_agent)
+
+                    '''self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()'''
+                    #creates token when user is without twofath auth 
                     new_token = Token(User_Id = user.User_ID,
-                                    Token = token_gen)
+                                      Device_Type = device_type,
+                                      Token = token_gen)
                     self.db.add(new_token)
                     self.db.commit()
                     return {"message":"Login successful",
                         "token": token_gen} 
+                #generates otp is user has Twofath authentication
                 else:
                     otp = get_otp()
                     text = "OTP for your login "
@@ -236,13 +274,12 @@ class OTPToken(ABC):
     def otp_verify(self):
         pass
 
-
 class OTPTokenVerify(OTPToken):
     def __init__(self, db: Session, otp: int ,resetkey : str):
         self.db = db
         self.OTP = otp
         self.resetkey = resetkey
-
+    #verify otp with the generated reset key
     def otp_verify(self):
         user = self.db.query(User).filter(User.Reset_Key == self.resetkey).first()
 
@@ -264,9 +301,12 @@ class OTPTokenVerify(OTPToken):
             self.db.commit()
             
             token_gen = create_token(user)
-            self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
+            user_agent = request.headers.get("user-agent","")
+            device_type = get_device_type(user_agent)
+            #self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()
             new_token = Token(User_Id = user.User_ID,
-                            Token = token_gen)
+                              Device_Type = device_type,
+                               Token = token_gen)
             self.db.add(new_token)
             self.db.commit()
 
@@ -275,7 +315,6 @@ class OTPTokenVerify(OTPToken):
                     "token": token_gen } 
 
 #RESEND OTP after OTP expiry
-
 def Resend_OTP(reset_key,db:Session,background_tasks):
     user = db.query(User).filter(User.Reset_Key == reset_key).first()
     if not user:
@@ -307,8 +346,6 @@ def forgot_password(user:ForgotPass,db:Session,background_tasks):
 
     dbuser = db.query(User).filter(User.Email == user.email).first()
 
-
-
     if not dbuser:
         raise HTTPException(status_code = status.HTTP_404_NOT_FOUND,
                             detail = "User not Found!")
@@ -328,7 +365,6 @@ def forgot_password(user:ForgotPass,db:Session,background_tasks):
                 "resetkey":resetkey}
 
 #USER RESET PASSWORD after FORGET PASSWORD
-
 def reset_password(user: ResetPass, otp: int, reset_key: str, db: Session):
     dbuser = db.query(User).filter(User.Reset_Key == reset_key).first()
 

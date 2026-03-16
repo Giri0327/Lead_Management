@@ -1,5 +1,5 @@
 import datetime
-
+from fastapi import Request as request
 from passlib.context import CryptContext
 import jwt 
 from datetime import datetime as dt
@@ -50,9 +50,18 @@ def create_token(user):
         "role":user.Role_ID,
         "exp":expire
     }
-
     token = jwt.encode(payload,SECRET_KEY,algorithm=ALGORITHM)
     return token
+
+
+def get_device_type(user_agent:str):
+    if "Mobile" in user_agent:
+        return "Mobile"
+    elif "Tablet" in user_agent:
+        return "Tablet"
+    else:
+        return "Desktop"
+
 
 def decode_token(token:str):
     try:
