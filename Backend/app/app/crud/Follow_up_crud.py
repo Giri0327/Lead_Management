@@ -37,28 +37,38 @@ class Createfollowup:
 # NEXT FOLLOWUP FOR A LEAD
 
     def get_next_followup(self, lead_id:int):
-        
+
+        # current_id = current_user["user_id"]
+        # role = current_user["role"]
+
         followup = (
             self.db.query(User.Username,
                           Follow_Up.Contact_Type,
                           Follow_Up.Contacted_On,
                           Follow_Up.Notes)
+            .join(User, Follow_Up.User_ID == User.User_ID)
             .filter(Follow_Up.Lead_ID == lead_id)
             .filter(Follow_Up.Contacted_On > datetime.now())
             .filter(Follow_Up.Status == False)
-            .order_by(Follow_Up.Contacted_On.asc())
-            .first()
+            .order_by(Follow_Up.Contacted_On.asc()).first()
+           
         )
-
+        # if role !=1:
+        #     query = followup.filter(Follow_Up.User_ID == current_id)
+        # result = (
+        #     query.order_by(Follow_Up.Contacted_On.asc()).first()
+        # )
         if not followup:
             return {"message":"No followup scheduled"}
-
         return followup
 
 #     
+    def view_upcoming_followups(self,lead_id,current_user):
+        
+        current_id = current_user["user_id"]
+        role = current_user["role"]
 
-    def view_upcoming_followups(self,lead_id):
-        view_followups =(
+        query =(
             self.db.query(
                 Lead.Lead_Name,
                 Lead.Company_Name,
@@ -68,21 +78,33 @@ class Createfollowup:
             )
         .join(Follow_Up,Lead.Lead_ID ==Follow_Up.Lead_ID)
         .filter(Follow_Up.Contacted_On > datetime.now())
-        .filter(Follow_Up.Lead_ID == lead_id)
-        .all()
-
+        # .filter(Follow_Up.Lead_ID == lead_id)   
         )
-        return view_followups
-    from datetime import datetime, timedelta
 
-    def view_this_week_followups(self):
+        if lead_id:
+            query = query.filter(Follow_Up.Lead_ID == lead_id)
+
+        if role != 1:
+            query = query.filter(Follow_Up.User_ID == current_id)
+
+        result = query.order_by(Follow_Up.Contacted_On.asc()).all()
+
+        if not result:
+            return {"message": "No upcoming followups"}
+
+        return result
+
+    def view_this_week_followups(self,lead_id,current_user):
+
+        current_id = current_user["user_id"]
+        role = current_user["role"]
 
         today = datetime.now()
 
         start_of_week = today - timedelta(days=today.weekday())
         end_of_week = start_of_week + timedelta(days=6)
 
-        view_followups = (
+        query = (
             self.db.query(
                 Lead.Lead_Name,
                 Lead.Company_Name,
@@ -95,10 +117,17 @@ class Createfollowup:
                 Follow_Up.Contacted_On >= start_of_week,
                 Follow_Up.Contacted_On <= end_of_week
             )
-            .all()
+            # .all()
         )
 
-        return view_followups
+        if lead_id:
+            query = query.filter(Follow_Up.Lead_ID == lead_id)
+
+        if role !=1:
+            query = query.filter(Follow_Up.User_ID==current_id)
+        query=query.order_by(Follow_Up.Contacted_On.asc()).all()
+
+        return query
 
     def update_followup(self,followup_id:int):
         leaduser = self.db.query(Follow_Up).filter(Follow_Up.Follow_Up_ID==followup_id).first()
@@ -118,32 +147,42 @@ class Createfollowup:
         self.db.commit()
         return {"message":"Updated Successfully!!"}
     
-    def track_followups(self):
+    def track_followups(self,lead_id,current_user):
+
+        current_id = current_user["user_id"]
+        role = current_user["role"]
+
+        query = self.db.query(Follow_Up)
+
+
+        if lead_id:
+            query = query.filter(Follow_Up.Lead_ID==lead_id)
+
+        if role !=1:
+            query=query.filter(Follow_Up.User_ID==current_id)
 
         today=datetime.now().date()
         thisweek = today +timedelta(days=7)
        
-        today_count = (self.db.query(func.count(Follow_Up.Contacted_On))
-            .filter(func.date(Follow_Up.Contacted_On) == today)
-            .scalar()
-        )
+        today_count = query.filter(
+            func.date(Follow_Up.Contacted_On) == today
+        ).count()
 
-        thisweek_count = (self.db.query(func.count(Follow_Up.Contacted_On))
-            .filter(Follow_Up.Contacted_On.between(today, thisweek))
-            .scalar()
-    )
-        overdue_count = (self.db.query(func.count(Follow_Up.Contacted_On))
-            .filter(Follow_Up.Contacted_On<today,Follow_Up.Status==False)
-            .scalar())
+        thisweek_count = query.filter(
+            func.date(Follow_Up.Contacted_On).between(today, thisweek)
+        ).count()
+
+        overdue_count = query.filter(
+            func.date(Follow_Up.Contacted_On) < today,
+            Follow_Up.Status == False
+        ).count()
+
+        completed_count = query.filter(
+            func.date(Follow_Up.Contacted_On) < today,
+            Follow_Up.Status == True
+        ).count()
         
-        completed_count = (self.db.query(func.count(Follow_Up.Contacted_On))
-            .filter(Follow_Up.Contacted_On <today,Follow_Up.Status==True)
-            .scalar())
-    # today_count = (
-    #     self.db.query(func.count(Follow_Up.Contacted_On))
-    #     .filter(Follow_Up.Contacted_On == today)
-    #     .scalar()
-    # )
+
         return {"today_count":today_count,
                 "thisweek_count":thisweek_count,
                 "overdue_count":overdue_count,

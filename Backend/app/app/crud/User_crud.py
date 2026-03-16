@@ -122,8 +122,12 @@ class UpdateUser:
             raise HTTPException(status_code=404,
                                 detail="Invalid User")
         
-        user.Token = None   
+        user.Token = None
+        user.update_At = datetime.utcnow()  # optional if DB auto-updates
+
         self.db.commit()
+        self.db.refresh(user)
+
 
         return {"message":"Logout Success"}
     
