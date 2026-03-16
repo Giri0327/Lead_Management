@@ -146,13 +146,13 @@ class UpdateUser:
     #Logout Fucntion Deletes token and updates Logout time in DB
     def Logout(self,current_user):
         user_id = current_user["user_id"]
-        user = self.db.query(Token).filter(Token.User_Id == user_id).first()
+        user = self.db.query(Token).filter(Token.User_Id == user_id).order_by(Token.Created_At.desc()).first()
         if not user:
             raise HTTPException(status_code=404,
                                 detail="Invalid User")
         
         user.Token = None
-        user.update_At = datetime.utcnow()  # optional if DB auto-updates
+        user.update_At = datetime.now()  # optional if DB auto-updates
 
         self.db.commit()
         self.db.refresh(user)
@@ -223,14 +223,14 @@ class Verify_user(Userabs):
                         )
                     ).first()
                 if not user:
-                    raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,
-                                        detail="Invalid Credientials")
+                    raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
+                                        detail="Invalid Credentials")
                 
                 verify_user_password = verify_password(self.user_data.password,user.Password)
 
                 if not verify_user_password:
                     raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED,
-                                        detail="Invalid Credientials")
+                                        detail="Invalid Credentials")
                 if not user.Is_two_fath:
                     token_gen = create_token(user)
                     user_agent = request.headers.get("user-agent","")
@@ -242,14 +242,16 @@ class Verify_user(Userabs):
                                       Device_Type = device_type,
                                       Token = token_gen)
                     self.db.add(new_token)
+                    #self.db.add()
                     self.db.commit()
+                    self.db.refresh(new_token)
                     return {"message":"Login successful",
                         "token": token_gen} 
                 #generates otp is user has Twofath authentication
                 else:
                     otp = get_otp()
                     text = "OTP for your login "
-                    expiry = datetime.utcnow()+ timedelta(minutes=2)
+                    expiry = datetime.utcnow()+ timedelta(minutes=5)
                     resetkey = reset_key()
 
                     user.OTP = otp
@@ -309,6 +311,7 @@ class OTPTokenVerify(OTPToken):
                                Token = token_gen)
             self.db.add(new_token)
             self.db.commit()
+            self.db.refresh(new_token)
 
             return {"message": "OTP Verified Successfully",
                     "messgae2": "Login Success",
