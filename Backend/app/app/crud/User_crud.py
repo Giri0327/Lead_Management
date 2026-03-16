@@ -152,7 +152,7 @@ class UpdateUser:
                                 detail="Invalid User")
         
         user.Token = None
-        user.update_At = datetime.now()  # optional if DB auto-updates
+        user.update_At = datetime.utcnow()  # optional if DB auto-updates
 
         self.db.commit()
         self.db.refresh(user)

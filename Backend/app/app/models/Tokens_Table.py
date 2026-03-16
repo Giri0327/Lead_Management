@@ -17,7 +17,7 @@ class Token(Base):
     Token = Column(String(255))
     Token_Expiry = Column(DateTime)
     Device_Type = Column(String(100))
-    Created_At= Column(DateTime,default=datetime.now())
+    Created_At= Column(DateTime,default=datetime.utcnow)
     update_At=Column(DateTime)
 
 

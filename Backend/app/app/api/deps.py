@@ -9,7 +9,7 @@ from fastapi import HTTPException,status
 from app.db import get_db,session
 from app.models import Token
 
-INACTIVITY_LIMIT = timedelta(hours=1)
+INACTIVITY_LIMIT =  timedelta(hours=1)
 #INACTIVITY_LIMIT = timedelta(minutes=1)
 
 security = HTTPBearer()
@@ -28,27 +28,28 @@ def get_current_user(token: HTTPAuthorizationCredentials = Depends(security),db:
         
         sessionn = db.query(Token).filter(
             Token.Token == actual_token,
-            Token.update_At == None).first()
+            Token.update_At == None).order_by(Token.Created_At.desc()).first()
         
         if not sessionn:
             raise HTTPException(
                 status_code=401,
                 detail="Session not found"
             )
-        if sessionn.Token_Expiry is None:
-            sessionn.Token_Expiry = datetime.now()
-            db.commit()
+        # if sessionn.Token_Expiry is None:
+        #     sessionn.Token_Expiry = datetime.now()
+        #     db.commit()
 
-        if datetime.now() - sessionn.Token_Expiry > INACTIVITY_LIMIT:
+        if datetime.utcnow() - sessionn.Token_Expiry > INACTIVITY_LIMIT:
 
-            sessionn.update_At = datetime.now()
+            sessionn.update_At = datetime.utcnow()
+            sessionn.Token=None
             db.commit()
 
             raise HTTPException(
                 status_code=401,
                 detail="Session expired due to inactivity"
             )
-        sessionn.Token_Expiry = datetime.now()
+        sessionn.Token_Expiry = datetime.utcnow()
         db.commit()
 
         return user
@@ -60,7 +61,7 @@ def get_current_user(token: HTTPAuthorizationCredentials = Depends(security),db:
             Token.Token == actual_token).first()
 
         if sessionn and not sessionn.update_At:
-            sessionn.update_At = datetime.now()
+            sessionn.update_At = datetime.utcnow()
             db.commit()
         
 
