@@ -47,7 +47,7 @@ class ADDUser:
         self.db.commit()
         self.db.refresh(x)
         if x is not None:   
-            return "User created successfully"\
+            return "User created successfully"
               
     #Admin can view user with their user_id
     def view_userby_id(self,current_user):
@@ -275,6 +275,7 @@ class Verify_user(Userabs):
                         
 
 #OTP and TOKEN VERIFICATION for USER
+
 class OTPToken(ABC):
     @abstractmethod
     def otp_verify(self):

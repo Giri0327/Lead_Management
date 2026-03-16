@@ -1,5 +1,5 @@
 from pydantic import BaseModel
 
-class Priority(BaseModel):
+class Priority_Schema(BaseModel):
     priority_name:str
     

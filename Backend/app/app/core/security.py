@@ -3,7 +3,6 @@ from fastapi import Request as request
 from passlib.context import CryptContext
 import jwt 
 from datetime import datetime as dt
-from datetime import timedelta
 import random 
 import smtplib
 from email.message import EmailMessage

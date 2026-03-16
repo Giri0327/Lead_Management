@@ -8,6 +8,8 @@ class Create:
         self.leads = leads
         self.db = db
 
+# ADD NEW LEAD
+
     def create_lead(self):
         new_lead = Lead(
             Lead_Name = self.leads.Lead_Name,
@@ -84,6 +86,9 @@ class Create:
                 .offset(offset)
                 .limit(limit)).all()
             return [row._asdict() for row in query]"""
+    
+# VIEW ALL LEADS 
+
     def view_lead(self, current_user, limit, offset):
         current_id = current_user["user_id"]
         role = current_user["role"]
@@ -116,6 +121,8 @@ class Create:
             )
         return [row._asdict() for row in results]
 
+# UPDATE LEAD
+
 class Updateleadd:
     def __init__(self,db,lead):
         self.db=db
@@ -130,7 +137,9 @@ class Updateleadd:
         })
         self.db.commit()
         return "updated successfully"
-    
+
+# VIEW LEAD BY ID
+ 
 class ViewLeadByID:
     def __init__(self,db,lead_id):
         self.db=db

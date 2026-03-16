@@ -2,39 +2,52 @@ from fastapi import HTTPException
 from app.models import Sources
 from app.db import session
 
+class SourceCRUD:
+       
+        def __init__(self,user,db):
+              self.user=user
+              self.db=db
 
-def create_Source(user,db:session):
-        new_Source = Sources(
-        Source_Name=user.source_name
-    )
-        db.add(new_Source)
-        db.commit()
-        db.refresh(new_Source)
-        return {"Source Created succesfully"}
+# CREATE SOURCE
 
-def view_all_Source(db:session):
-        dbuser=db.query(Sources).all()
-        return dbuser
+        def create_Source(self):
+                new_Source = Sources(
+                Source_Name=self.user.source_name
+        )
+                self.db.add(new_Source)
+                self.db.commit()
+                self.db.refresh(new_Source)
+                return {"Source Created succesfully"}
 
-def update_Source(source_id:int,user,db:session):
-        dbuser=db.query(Sources).filter(Sources.Source_ID==source_id).first()
-        if not dbuser:
-            raise HTTPException(status_code=404,
-                                detail="Invalid User")
-        dbuser.Source_Name=user.source_name
-        db.commit()
-        db.refresh(dbuser)
-        return {"message":"Source Updated Succesfully!!"}
+# VIEW ALL SOURCE
 
-def delete_Source(source_id:int,db:session):
-       dbuser = db.query(Sources).filter(Sources.Source_ID==source_id).first()
-       if not dbuser:
-              raise HTTPException(status_code=404,detail="User not Found!!")
-       db.delete(dbuser)
-       db.commit()
-       return {"message":"Source Deleted succesfully!!"}
+        def view_all_Source(self):
+                dbuser=self.db.query(Sources).all()
+                return dbuser
+        
+# UPDATE SOURCE
 
-                
+        def update_Source(self,source_id:int):
+                dbuser=self.db.query(Sources).filter(Sources.Source_ID==source_id).first()
+                if not dbuser:
+                        raise HTTPException(status_code=404,
+                                                detail="Invalid User")
+                dbuser.Source_Name=self.user.source_name
+                self.db.commit()
+                self.db.refresh(dbuser)
+                return {"message":"Source Updated Succesfully!!"}
+
+# DELETE SOURCE
+
+        def delete_Source(source_id:int,self):
+                dbuser = self.db.query(Sources).filter(Sources.Source_ID==source_id).first()
+                if not dbuser:
+                        raise HTTPException(status_code=404,detail="User not Found!!")
+                self.db.delete(dbuser)
+                self.db.commit()
+                return {"message":"Source Deleted succesfully!!"}
+
+                        
 
         
         

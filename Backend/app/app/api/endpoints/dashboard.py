@@ -35,8 +35,9 @@ async def graph_(current_user = Depends(role_required([1,2])),db:session=Depends
     return pipe.graph(current_user)
 
 
+# VIEW RECENT ACTIVITY IN DASHBOARD PAGE
 
 @router.get("/view_all_lead_notes")
 async def view_all_notes(current_user = Depends(role_required([1,2])), db: session = Depends(get_db)):
-    creator = Files(None, None, None, db)
-    return creator.view_recent_files(current_user["user_id"])
+    creator = Dashboard(db)
+    return creator.view_recent_files(current_user)
