@@ -11,6 +11,7 @@ from sqlalchemy import func
 
 
 class Activity:
+
     def __init__(self,activity,db):  
         self.activity=activity
         self.db=db
@@ -18,10 +19,6 @@ class Activity:
 # ADD ACTIVITY TO LEAD       
 
     def add_activity(self,user_id):
-
-        dbuser = self.db.query(Lead_Activity).filter(Lead_Activity.Lead_ID==self.activity.lead_id).first()
-        
-        if dbuser:
 
             activity = Lead_Activity(
 
@@ -32,35 +29,54 @@ class Activity:
 
             )
             self.db.add(activity)
+            self.db.commit()
+            self.db.refresh(activity)
 
             lead = self.db.query(Lead).filter(Lead.Lead_ID == activity.Lead_ID).first()
 
             if lead:
-                lead.Last_Contacted = activity.Scheduled_On
-
+                lead.Last_Contacted = activity.Created_At
+            
             self.db.commit()
             self.db.refresh(activity)
 
             return {"message":"Activity Added"}
 
-# VIEW ACTIVITIY TIMELINE
+# VIEW ACTIVITIY TIMELINE (NOTES OF COMPLETED ACTIVIITES)
 
+    def view_activity(self,lead_id,current_user):
 
-    def view_activity(self,lead_id):
+        current_id = current_user["user_id"]
+        role = current_user["role"]
 
-        view_activities = (self.db.query(
+        query = (self.db.query(
             Lead_Activity.Notes,
             Lead_Activity.Scheduled_On,
             User.Username
         )
         .join(User,Lead_Activity.User_ID == User.User_ID)
-        .filter(Lead_Activity.Lead_ID == lead_id)
-        .order_by(Lead_Activity.Scheduled_On.asc())
-        .all()
+        # .filter(Lead_Activity.Lead_ID == lead_id)
+        # .order_by(Lead_Activity.Scheduled_On.asc())
+        
         )
-        return view_activities
 
-# SHOW LEAD DETAILS 
+        if lead_id:
+            query=query.filter(Lead_Activity.Lead_ID == lead_id)
+
+        if role!=1:
+            query=query.filter(Lead_Activity.User_ID ==current_id)
+
+        result = query.order_by(Lead_Activity.Scheduled_On.asc()).all()
+
+        if not result:
+            return {"message":"No Activities!!"}
+        
+        return result
+
+
+        # return view_activities
+
+# SHOW RECENT LEAD DETAILS
 
 class Details:
     def __init__(self,activity,db):
@@ -69,11 +85,7 @@ class Details:
     
     def show_details (self,lead_id):
 
-        dbuser = self.db.query(Lead_Activity).filter(Lead_Activity.Lead_ID==lead_id).first()
-        
-        if dbuser:
-
-            details = (self.db.query(
+        query = (self.db.query(
 
                 Lead_Activity.Scheduled_On,
                 Lead.Last_Contacted,
@@ -85,11 +97,11 @@ class Details:
             .join(Sources,Lead.Source_ID == Sources.Source_ID)
             .filter(Lead.Lead_ID == lead_id)
             .order_by(Lead_Activity.Scheduled_On.desc())
-            .all())
+            .first())
 
-            return details
+        return query
 
-        
+       
 class Files:
 
     def __init__(self, activity_id, user_id,activity, db):
@@ -149,44 +161,50 @@ class Files:
 
 # VIEW FILES AVAILABLE IN AN ACTIVITY
 
-    def view_file(self):
+    def view_file(self,activity_id,current_user):
 
-        activity = self.db.query(Lead_Activity).filter(
-            Lead_Activity.Activity_ID == self.activity_id
-        ).first()
+        current_id = current_user["user_id"]
+        role = current_user["role"]
 
-        if not activity:
-            return {"error": "Activity not found"}
-        
-        viewfile = (self.db.query(
+        query = (self.db.query(
             Activity_file.Activity_file_ID,
             Activity_file.Activity_ID,
             Lead.Lead_Name,
             Activity_file.File_url
         )
         .join(Lead_Activity, Activity_file.Activity_ID == Lead_Activity.Activity_ID)
-        .join(Lead, Lead_Activity.Lead_ID == Lead.Lead_ID)
-        .filter(Activity_file.Activity_ID == self.activity_id)
-        .all())
+        .join(Lead, Lead_Activity.Lead_ID == Lead.Lead_ID))
+        # .filter(Activity_file.Activity_ID == self.activity_id)
+        # .all())
+        if activity_id:
+                query= query.filter(Lead_Activity.Activity_ID==activity_id)
+        if role !=1:
+                query=query.filter(Lead_Activity.User_ID==current_id)
 
-        return viewfile
+        query = query.all()
+        return query
      
-# VIEW RECENT ACTIVITY IN DASHBOARD PAGE
+# # VIEW RECENT ACTIVITY IN DASHBOARD PAGE
 
-    def view_recent_files(self,user_id):
+#     def view_recent_files(self,current_user):
 
-        viewfile = (
-            self.db.query(
-                Lead_Activity.Notes,
-                Lead.Lead_Name,
-                
-            )
-            .join(Lead, Lead_Activity.Lead_ID == Lead.Lead_ID)
-            .filter(Lead_Activity.User_ID == user_id)
-            .order_by(Lead_Activity.Scheduled_On.desc())
-            .all()
-        )
+#         current_id = current_user["user_id"]
+#         role = current_user["role"]
 
-        return viewfile
+#         query = (
+#             self.db.query(
+#                 Lead_Activity.Notes,
+#                 Lead.Lead_Name,               
+#             )
+#             .join(Lead, Lead_Activity.Lead_ID == Lead.Lead_ID)
+#         )
+
+#         if role!=1:
+#              query=query.filter(Lead_Activity.User_ID==current_id)
+
+#         result = query.order_by(Lead_Activity.Scheduled_On.desc()).all()
+
+
+#         return result
             
 

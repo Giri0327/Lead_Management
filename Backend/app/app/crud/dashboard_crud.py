@@ -1,5 +1,6 @@
 import calendar
 from app.models.Lead_Table import Lead
+from app.models.Lead_Activities_Table import Lead_Activity
 from app.models.Stage_Table import Stage
 from app.models.Priority_Table import Priority
 from sqlalchemy import func,and_
@@ -138,6 +139,28 @@ class Dashboard:
                             .join(Priority, Lead.Priority_ID == Priority.Priority_ID)
                             .order_by(Lead.Created_At.desc())).limit(5).all()
         return recentleads
+    
+# VIEW RECENT ACTIVITY IN DASHBOARD PAGE
+
+    def view_recent_files(self,current_user):
+
+        current_id = current_user["user_id"]
+        role = current_user["role"]
+
+        query = (
+            self.db.query(
+                Lead_Activity.Notes,
+                Lead.Lead_Name,               
+            )
+            .join(Lead, Lead_Activity.Lead_ID == Lead.Lead_ID)
+        )
+
+        if role!=1:
+             query=query.filter(Lead_Activity.User_ID==current_id)
+
+        result = query.order_by(Lead_Activity.Scheduled_On.desc()).all()
+
+        return result
 
 # COUNT OF STAGE (BAR CHART)
 

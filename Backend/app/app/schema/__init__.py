@@ -3,7 +3,7 @@ from app.schema.Tokens_Schema import Tokens
 from app.schema.Status_Schema import Status
 from app.schema.Stage_Schema import Stage
 from app.schema.Roles_Schema import Roles
-from app.schema.Priority_Schema import Priority
+from app.schema.Priority_Schema import Priority_Schema
 from app.schema.Lead_Source_Schema import Lead_Source
 from app.schema.Lead_Schema import Leads,LeadResponse
 from app.schema.Lead_Notes_Schema import Lead_Notes

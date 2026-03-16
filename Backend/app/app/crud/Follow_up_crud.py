@@ -11,7 +11,7 @@ class Createfollowup:
         self.followup = followup
         self.db = db
     
-# ADD FOLLOW UP 
+# ADD FOLLOW UP FOR A LEAD
 
     def schedule_followup(self,user_id):
 
@@ -34,7 +34,7 @@ class Createfollowup:
 
         return {"message":"Follow-up scheduled!"}
 
-# NEXT FOLLOWUP FOR A LEAD
+# NEXT UPCOMING FOLLOWUP FOR A LEAD
 
     def get_next_followup(self, lead_id:int):
 
@@ -62,7 +62,8 @@ class Createfollowup:
             return {"message":"No followup scheduled"}
         return followup
 
-#     
+# ALL UPCOMING FOLLOWUPS FOR A LEAD
+    
     def view_upcoming_followups(self,lead_id,current_user):
         
         current_id = current_user["user_id"]
@@ -93,6 +94,9 @@ class Createfollowup:
             return {"message": "No upcoming followups"}
 
         return result
+
+
+# THIS WEEK FOLLOWUPS FOR A LEAD
 
     def view_this_week_followups(self,lead_id,current_user):
 
@@ -129,6 +133,8 @@ class Createfollowup:
 
         return query
 
+# UPDATE FOLLOWUP
+
     def update_followup(self,followup_id:int):
         leaduser = self.db.query(Follow_Up).filter(Follow_Up.Follow_Up_ID==followup_id).first()
     
@@ -146,7 +152,9 @@ class Createfollowup:
         })
         self.db.commit()
         return {"message":"Updated Successfully!!"}
-    
+
+# COUNT FOLLOWUPS 
+
     def track_followups(self,lead_id,current_user):
 
         current_id = current_user["user_id"]
@@ -163,19 +171,27 @@ class Createfollowup:
 
         today=datetime.now().date()
         thisweek = today +timedelta(days=7)
-       
+
+# NO OF FOLLLOW UPS TODAY
+
         today_count = query.filter(
             func.date(Follow_Up.Contacted_On) == today
         ).count()
+
+# NO OF FOLLLOW UPS THIS WEEK
 
         thisweek_count = query.filter(
             func.date(Follow_Up.Contacted_On).between(today, thisweek)
         ).count()
 
+# NO OF FOLLLOW UPS OVERDUE (NOT COMPLETED)
+
         overdue_count = query.filter(
             func.date(Follow_Up.Contacted_On) < today,
             Follow_Up.Status == False
         ).count()
+
+# NO OF FOLLLOW UPS COMPLETED 
 
         completed_count = query.filter(
             func.date(Follow_Up.Contacted_On) < today,

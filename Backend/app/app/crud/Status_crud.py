@@ -2,43 +2,54 @@ from fastapi import HTTPException
 from app.models import Status
 from app.db import session
 
+class StatusCRUD:
+        def __init__(self,user,db):
+              self.user = user
+              self.db = db
 
+# CREATE STATUS
 
-def create_status(user,db:session):
-        new_status = Status(
-        Status_Name=user.status_name
-    )
-        db.add(new_status)
-        db.commit()
-        db.refresh(new_status)
-        return {"Status Created succesfully"}
+        def create_status(self):
+                new_status = Status(
+                Status_Name=self.user.status_name
+        )
+                self.db.add(new_status)
+                self.db.commit()
+                self.db.refresh(new_status)
+                return {"Status Created succesfully"}
 
-def view_all_status(db:session):
-        dbuser=db.query(Status).all()
-        return dbuser
+# VIEW ALL STATUS
 
-def update_status(status_id:int,user,db:session):
-        dbuser=db.query(Status).filter(Status.Status_ID==status_id).first()
-        if not dbuser:
-            raise HTTPException(status_code=404,
-                                detail="Invalid User")
-        dbuser.Status_Name=user.status_name
-        db.commit()
-        db.refresh(dbuser)
-        return {"message":"Status Updated Succesfully!!"}
+        def view_all_status(self):
+                dbuser=self.db.query(Status).all()
+                return dbuser
 
-def delete_status(status_id:int,db:session):
-       dbuser = db.query(Status).filter(Status.Status_ID==status_id).first()
-       if not dbuser:
-              raise HTTPException(status_code=404,detail="User not Found!!")
-       db.delete(dbuser)
-       db.commit()
-       return {"message":"Status Deleted succesfully!!"}
+# UPDATE STATUS
+
+        def update_status(self,status_id):
+                dbuser=self.db.query(Status).filter(Status.Status_ID==status_id).first()
+                if not dbuser:
+                        raise HTTPException(status_code=404,
+                                                detail="Invalid User")
+                dbuser.Status_Name=self.user.status_name
+                self.db.commit()
+                self.db.refresh(dbuser)
+                return {"message":"Status Updated Succesfully!!"}
+
+# DELETE STATUS
+
+        def delete_status(self,status_id:int):
+                dbuser = self.db.query(Status).filter(Status.Status_ID==status_id).first()
+                if not dbuser:
+                        raise HTTPException(status_code=404,detail="User not Found!!")
+                self.db.delete(dbuser)
+                self.db.commit()
+                return {"message":"Status Deleted succesfully!!"}
+
+                        
 
                 
-
-        
-        
+                
 
 
-        
+                
