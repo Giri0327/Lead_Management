@@ -77,8 +77,14 @@ def get_current_user(
 def role_required(allowed_roles: list):
 
     def checker(user=Depends(get_current_user)):
+        if not user:
+            raise HTTPException(
+                status_code=403,
+                detail="You are not authorized to perform this action"
+            )
 
-        if not user or getattr(user, "role", None) not in allowed_roles:
+
+        if user["role"] not in allowed_roles:
             raise HTTPException(
                 status_code=403,
                 detail="You are not authorized to perform this action"

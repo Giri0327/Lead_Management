@@ -13,7 +13,7 @@ router = APIRouter(prefix="/Dashboard", tags=["Dashboard"])
 
 @router.post("/")
 async def dash_board(
-    current_user=Depends(role_required([1, 2])), db: session = Depends(get_db)
+    current_user=Depends(role_required([1,2])), db: session = Depends(get_db)
 ):
     crud = Dashboard(db)
     return crud.total_lead(current_user)
