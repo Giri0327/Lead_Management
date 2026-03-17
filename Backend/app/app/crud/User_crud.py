@@ -3,7 +3,6 @@ from fastapi import HTTPException, status
 from fastapi import Request as request
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import or_
-from zmq import NULL
 from app.models import *
 from sqlalchemy.orm import Session
 from starlette import status

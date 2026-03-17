@@ -25,7 +25,7 @@ load_dotenv()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/Login")
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
+pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto", bcrypt__rounds=10)
 
 
 def get_password_hash(password: str):
@@ -36,7 +36,7 @@ def verify_password(plain_password: str, password: str):
     return pwd_context.verify(plain_password, password)
 
 
-SECRET_KEY = "kscubauekvisubojnafwuerua58utsjkndc"
+SECRET_KEY = "kscubauekvisubojnafwueruutsjkndc"
 ALGORITHM = "HS256"
 
 
