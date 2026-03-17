@@ -1,7 +1,8 @@
 from ast import Not
 from hmac import new
+import queue
 
-from fastapi import HTTPException
+from fastapi import HTTPException, Query
 
 from app.models import Lead,User,Sources,Stage,Status,Priority
 from sqlalchemy.orm import joinedload
@@ -47,6 +48,21 @@ class Create:
         # else:
         #     raise HTTPException(status_code=403,
         #         detail="You are not authorized to perform this action")
+
+    def view_owner(self,current_user):
+        current_id = current_user["user_id"]
+        role = current_user["role"]
+
+        query=self.db.query(User.User_ID,User.Username)
+
+        if role!=1:
+            query=query.filter(User.User_ID==current_id).all()
+
+        results=query
+
+        #return query
+
+        return [row._asdict() for row in results]
     
 # VIEW ALL LEADS 
 

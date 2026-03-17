@@ -24,6 +24,11 @@ async def add_lead(leads: Leads,current_user = Depends(role_required([2])), db: 
     except Exception as e:
         raise HTTPException(status_code=400, detail=str(e))
     
+@router.post("/view_owner")
+async def View_owner(current_user = Depends(role_required([2])), db: session = Depends(get_db)):
+      owner = Create(None,db)
+      
+      return owner.view_owner(current_user)    
 # VIEW ALL LEADS 
 
 @router.get("/show")
