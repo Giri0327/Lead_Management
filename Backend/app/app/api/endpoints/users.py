@@ -95,13 +95,14 @@ async def view_by_id(current_user = Depends(role_required([1,2])),db:Session=Dep
 
 @router.post("/forgot_password")
 async def forgot_pass(user: ForgotPass, background_tasks:BackgroundTasks,
-                      current_user = Depends(role_required([1,2])),
+                      #current_user = Depends(role_required([1,2])),
                       db: Session = Depends(get_db)):
     
     return forgot_password(user, db,background_tasks)
 
 @router.post("/reset_password")
-async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,current_user = Depends(role_required([1,2])),
+async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,
+                     #current_user = Depends(role_required([1,2])),
                      db:Session = Depends(get_db)):
     return reset_password(user,db)
 
