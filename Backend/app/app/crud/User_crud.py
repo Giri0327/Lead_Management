@@ -139,7 +139,6 @@ class UpdateUser:
         }
         
 
-
     # Admin can update the users Profile with his admin Access
     def AdminUser_Update(self, user_id, first_name, last_name, email, user_role, phone):
 

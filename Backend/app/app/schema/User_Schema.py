@@ -2,21 +2,22 @@ from pydantic import BaseModel,EmailStr,Field
 
 
 class UserInfo(BaseModel):
-    username: str
+    username: str 
     first_name:str
     last_name: str
     email: EmailStr
-    phone:str
-    password: str = Field(min_length=3)
+    phone:str = Field(max_digits= 10)
+    password: str = Field(min_length=6,
+                          pattern=r'^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&]).+$')
     role_id:int = 1
-    is_active:bool
+    is_active:bool = True
 
 
 class Update_User(BaseModel):
     first_name:str
     last_name: str
     email: EmailStr
-    phone: str
+    phone: str = Field(max_digits= 10)
     role_id:str = Field(example="Admin/User")
     profile_pic_URL:str  
 
