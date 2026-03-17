@@ -18,7 +18,7 @@ router = APIRouter(prefix="/lead", tags=["Lead"])
 async def add_lead(leads: Leads,current_user = Depends(role_required([2])), db: session = Depends(get_db)):
     try:
         creator = Create(leads, db)
-        new_lead = creator.create_lead(current_user)
+        new_lead = creator.create_lead()
 
         return new_lead
     except Exception as e:
@@ -45,9 +45,9 @@ async def update_lead(leadupdate:Updatelead,current_user = Depends(role_required
 # VIEW LEAD BY ID
 
 @router.get("/view/{lead_id}")
-async def view_lead_by_id(lead_id: int,current_user = Depends(role_required([1,2])), db: session = Depends(get_db)):
+async def view_lead_by_id(lead_id: int,current_user = Depends(role_required([1])), db: session = Depends(get_db)):
     lead=ViewLeadByID(db, lead_id)
-    return lead.view_lead_by_id(current_user)
+    return lead.view_lead_by_id()
     
 # ADD FOLLOW UP FOR A LEAD
 
