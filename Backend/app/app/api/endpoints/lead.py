@@ -4,7 +4,7 @@ from fastapi import APIRouter, Depends, HTTPException
 #from sqlalchemy.orm import session
 from app.db import get_db,session
 from app.crud import Create
-from app.crud.Lead_crud import Updateleadd, ViewLeadByID,Create
+from app.crud.Lead_crud import Updateleadd, ViewLeadByID,Create,LeadSearch
 from app.crud.Follow_up_crud import Createfollowup
 from app.schema import *
 from app.schema.Lead_Schema import Updatelead
@@ -56,6 +56,13 @@ async def followup_schedule(followup:Follow_up_schedule,current_user = Depends(r
         creator = Createfollowup(None,followup, db)
         new_followup = creator.schedule_followup(current_user["user_id"])
         return new_followup
+
+#Search Leads with serch bar
+@router.get("/SerchLead")
+async def search_lead(input:str,page:int, size: int,current_user = Depends(role_required([1,2])),db: session = Depends(get_db)):
+      x= LeadSearch(db)
+      offset = (page - 1) * size
+      return x.search_lead(input,current_user,limit=size, offset=offset)
 
 # NEXT UPCOMING FOLLOWUP FOR A LEAD
 
