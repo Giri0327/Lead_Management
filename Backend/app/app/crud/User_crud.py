@@ -4,6 +4,7 @@ from fastapi import HTTPException, status
 from fastapi import Request as request
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import or_
+from zmq import NULL
 from app.models import *
 from sqlalchemy.orm import Session
 from starlette import status
@@ -98,42 +99,57 @@ class ADDUser:
 
 
 class UpdateUser:
-    def __init__(self, user, db: Session):
-        self.user = user
+    def __init__(self, db: Session):
         self.db = db
 
     # user can update the user profile
-    def Update_user(self, user_id, first_name, last_name, email, phone, file):
+    def Update_user(self, current_user, first_name, last_name, email, phone):
+        user_id=current_user["user_id"]
+        query=self.db.query(User).filter(User.User_ID==user_id).first()
+        if not query:
+            raise HTTPException(status_code=404, detail="Invalid User")
 
-        user = self.db.query(User).filter(User.User_ID == user_id).first()
+
+        email_exist = (self.db.query(User.Email)
+            .filter(User.Email == email, User.User_ID != user_id).first())
+
+
+        if email_exist:
+             print(email_exist)
+             raise HTTPException(
+                 status_code=404, detail="Email Already Exist Enter New Email")
+
+        query.First_Name = first_name
+        query.Last_Name = last_name
+        query.Email = email
+        query.Phone = phone
+    
+        self.db.commit()
+        self.db.refresh(query)
+
+        return {
+            "message": "User updated successfully",
+        }
+    
+
+    def Update_user_pic(self,current_user,file):
+        None
+        current_user=current_user["user_id"]
+        
+        user = self.db.query(User).filter(User.User_ID == current_user).first()
 
         if not user:
             raise HTTPException(status_code=404, detail="Invalid User")
-
-        email_exist = (
-            self.db.query(User)
-            .filter(user.Email == email, User.User_ID != user_id)
-            .first()
-        )
-        if email_exist:
-            raise HTTPException(
-                status_code=404, detail="Email Already Exist Enter New Email"
-            )
-
+        
         filename = file.filename.lower()
 
         if not filename.endswith((".png", ".jpg", ".jpeg")):
             raise HTTPException(
-                status_code=400, detail="Only PNG and JPEG images are allowed"
-            )
+                 status_code=400, detail="Only PNG and JPEG images are allowed")
 
         result = cloudinary.uploader.upload(file.file)
-        image_url = result["secure_url"]
+        image_url =result["secure_url"]
 
-        user.First_Name = first_name
-        user.Last_Name = last_name
-        user.Email = email
-        user.Phone = phone
         user.Profile_Pic_URL = image_url
 
         self.db.commit()
@@ -142,6 +158,8 @@ class UpdateUser:
         return {
             "message": "User updated successfully",
         }
+        
+
 
     # Admin can update the users Profile with his admin Access
     def AdminUser_Update(self, user_id, first_name, last_name, email, user_role, phone):
@@ -423,28 +441,30 @@ def forgot_password(user: ForgotPass, db: Session, background_tasks):
 
 
 # USER RESET PASSWORD after FORGET PASSWORD
-def reset_password(user: ResetPass, otp: int, reset_key: str, db: Session):
-    dbuser = db.query(User).filter(User.Reset_Key == reset_key).first()
+def reset_password(user: ResetPass, #otp: int,reset_key: str,
+                    db: Session):
+
+    dbuser = db.query(User).filter(User.Reset_Key == user.reset_key).first()
 
     if not dbuser:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid reset key"
         )
 
-    if datetime.utcnow() > dbuser.OTP_Expiry:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="OTP expired"
-        )
+    # if datetime.utcnow() > dbuser.OTP_Expiry:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST, detail="OTP expired"
+    #     )
 
-    if dbuser.OTP != otp:
-        raise HTTPException(
-            status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid OTP"
-        )
+    # if dbuser.OTP != user.otp:
+    #     raise HTTPException(
+    #         status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid OTP"
+    #     )
 
     dbuser.Password = pwd_context.hash(user.new_password)
 
-    dbuser.OTP = None
-    dbuser.OTP_Expiry = None
+    #dbuser.OTP = None
+    #dbuser.OTP_Expiry = None
     dbuser.Reset_Key = None
     db.commit()
 

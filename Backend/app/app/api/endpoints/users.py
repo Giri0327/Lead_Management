@@ -1,6 +1,7 @@
 from fastapi import APIRouter, Depends, BackgroundTasks, Request
 from sqlalchemy.orm import Session
 from app.db import session, get_db
+from typing import Optional
 from sqlalchemy.orm import Session
 from app.crud import (
     ADDUser,
@@ -61,22 +62,36 @@ async def Admin_Upd_user(
     return x.AdminUser_Update(user_id, first_name, last_name, email, user_role, phone)
 
 
+
+
 @router.put("/UpdateUser")
 async def update_user(
     first_name: str = Form(...),
     last_name: str = Form(...),
     email: str = Form(...),
     phone: str = Form(...),
-    file: UploadFile = File(...),
     current_user=Depends(role_required([1, 2])),
-    db: Session = Depends(get_db),
-):
+    db: Session = Depends(get_db)):
+    #file: Optional[UploadFile] = File(...),
+    #Lead_Name: Optional[str]=None
+    #file: Optional[UploadFile] = File(None),
+    #file_url: Optional[str] = Form(None),
+    #print(first_name,last_name,email,phone,current_user["user_id"])
 
-    service = UpdateUser(None, db)
+
+    service = UpdateUser(db)
 
     return service.Update_user(
-        current_user["user_id"], first_name, last_name, email, phone, file
-    )
+        current_user, first_name, last_name, email, phone)
+
+
+@router.post("add_profile_pic")
+async def addprofile(file: UploadFile = File(...),
+                     current_user=Depends(role_required([1, 2])),
+                     db: Session = Depends(get_db)):
+    service = UpdateUser(None, db)
+    return service.Update_user_pic(
+        current_user["user_id"], file)
 
 
 @router.put("/Twofath")
@@ -130,11 +145,11 @@ async def forgot_pass(
 @router.post("/reset_password")
 async def Reset_Pass(
     user: ResetPass,
-    otp: int,
-    reset_key: str,
+    #otp: int,
+    #reset_key: str,
     # current_user = Depends(role_required([1,2])),
-    db: Session = Depends(get_db),
-):
+    db: Session = Depends(get_db)):
+    print(user.resetkey,user.new_password)
     return reset_password(user, db)
 
 
@@ -155,7 +170,6 @@ async def UserLogin(
 
 @router.post("/Otpverify")
 async def Otpverify(user: UserVerify, db: Session = Depends(get_db)):
-    print(user.otp, user.resetkey)
     x = OTPTokenVerify(db, user.otp, user.resetkey)
     result = x.otp_verify()
     return result

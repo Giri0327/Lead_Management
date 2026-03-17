@@ -1,4 +1,5 @@
 from ast import Not
+from hmac import new
 
 from fastapi import HTTPException
 
@@ -32,17 +33,20 @@ class Create:
 
         
 
-        if new_lead and role==2:
-            self.db.add(new_lead)
-            self.db.commit()
-            self.db.refresh(new_lead)
-            return {
-                "message": "Lead created successfully",
-                "Lead_ID": new_lead.Lead_ID} 
+        if new_lead and role!=1:
+            new_lead=new_lead.filter(User.User_ID==current_id)
+
+            
+        self.db.add(new_lead)
+        self.db.commit()
+        self.db.refresh(new_lead)
+        return {
+            "message": "Lead created successfully",
+            "Lead_ID": new_lead.Lead_ID} 
         
-        else:
-            raise HTTPException(status_code=403,
-                detail="You are not authorized to perform this action")
+        # else:
+        #     raise HTTPException(status_code=403,
+        #         detail="You are not authorized to perform this action")
     
 # VIEW ALL LEADS 
 
