@@ -104,7 +104,7 @@ def emailOTP(to:str,otp:int,text:str):
     msg["From"] = myemail
     msg["To"] = to
 
-    print("Sending email to:",to)
+    
 
     server = smtplib.SMTP("smtp.gmail.com",587)
     server.starttls()
@@ -119,7 +119,6 @@ def reset_key():
     for i in range(30):
         reset_key += random.choice(s)
 
-    print("Generated reset_key:", reset_key)
     return reset_key
 
 
