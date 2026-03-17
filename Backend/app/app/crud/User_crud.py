@@ -1,5 +1,4 @@
 from abc import ABC, abstractmethod
-import re
 from fastapi import HTTPException, status
 from fastapi import Request as request
 from datetime import datetime, timedelta, timezone

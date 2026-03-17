@@ -1,8 +1,7 @@
 from ast import Not
 from hmac import new
-import queue
-
-from fastapi import HTTPException, Query
+from sqlalchemy import or_
+from fastapi import HTTPException
 
 from app.models import Lead,User,Sources,Stage,Status,Priority
 from sqlalchemy.orm import joinedload
@@ -146,3 +145,28 @@ class ViewLeadByID:
         return results
 
 
+class LeadSearch:
+    def __init__(self,db):
+        self.db = db
+
+    def search_lead(self,input, current_user, limit, offset):
+        user_id = current_user["user_id"]
+        role = current_user["role"]
+
+        query = self.db.query(Lead).filter(
+            or_(
+                Lead.Lead_Name.ilike(f"%{input}%"),
+                Lead.Company_Name.ilike(f"%{input}%"),
+                Lead.Email.ilike(f"%{input}%")
+            )
+        )
+
+        if role != 1:
+            query = query.filter(Lead.Owner_ID == user_id)
+
+        results = (
+            query.order_by(Lead.Lead_ID.asc()).offset(offset)
+            .limit(limit).all()
+            )
+        return results
+        
