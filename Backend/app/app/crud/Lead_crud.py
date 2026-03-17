@@ -123,7 +123,7 @@ class ViewLeadByID:
 
     def view_lead_by_id(self, current_user):
         current_id = current_user["user_id"]
-        # role = current_user["role"]
+        role = current_user["role"]
         results = (
             self.db.query(
                 Lead.Lead_Name.label("lead_name"),
@@ -143,9 +143,12 @@ class ViewLeadByID:
             .join(User, Lead.Owner_ID == User.User_ID)
             .join(Sources, Lead.Source_ID == Sources.Source_ID)
             .filter(Lead.Lead_ID == self.lead_id, Lead.Owner_ID == current_id)
-            .first()  # .one_or_none() # ensures only one record exists
+            #.first()  # .one_or_none() # ensures only one record exists
         )
-        return results
+        # if role!=1:
+        #     results=results.filter(Lead.Lead_ID==current_id)
+        
+        return results.first()
 
 
 class LeadSearch:

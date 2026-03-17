@@ -36,7 +36,7 @@ class Createfollowup:
 
     # NEXT UPCOMING FOLLOWUP FOR A LEAD
 
-    def get_next_followup(self, lead_id: int):
+    def get_next_followup(self, lead_id: int,current_user):
 
         # current_id = current_user["user_id"]
         # role = current_user["role"]
