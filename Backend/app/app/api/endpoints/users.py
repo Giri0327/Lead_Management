@@ -2,7 +2,7 @@ from fastapi import APIRouter, Depends,BackgroundTasks,Request
 from sqlalchemy.orm import Session
 from app.db import session,get_db
 from sqlalchemy.orm import Session
-from app.crud import ADDUser,forgot_password,reset_password,OTPTokenVerify,Verify_user,Resend_OTP,UpdateUser
+from app.crud import ADDUser,forgot_password,reset_password,OTPTokenVerify,Verify_user,Resend_OTP,UpdateUser,reset_otp_verify
 from app.schema import UserInfo,ForgotPass,ResetPass,ChangePass,UserVerify,UserLogin,resend_otp
 from app.core import oauth2_scheme    
 from app.api.deps import role_required 
@@ -95,13 +95,16 @@ async def view_by_id(current_user = Depends(role_required([1,2])),db:Session=Dep
 
 @router.post("/forgot_password")
 async def forgot_pass(user: ForgotPass, background_tasks:BackgroundTasks,
-                      current_user = Depends(role_required([1,2])),
                       db: Session = Depends(get_db)):
     
     return forgot_password(user, db,background_tasks)
 
+@router.post("/resetOTPverify")
+async def resetotpverify(user:UserVerify,db:Session = Depends(get_db)):
+    return reset_otp_verify(user,db)
+
 @router.post("/reset_password")
-async def Reset_Pass(user:ResetPass,otp:int,reset_key:str,current_user = Depends(role_required([1,2])),
+async def Reset_Pass(user:ResetPass,
                      db:Session = Depends(get_db)):
     return reset_password(user,db)
 

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session
 from starlette import status
 from sqlalchemy.orm import Session
 from app.models import User, Token
-from app.schema import ForgotPass, ResetPass
+from app.schema import ForgotPass, ResetPass,UserVerify
 from app.core import (
     get_password_hash,
     verify_password,
@@ -408,7 +408,7 @@ def forgot_password(user: ForgotPass, db: Session, background_tasks):
         )
     else:
         otp = get_otp()
-        expiry = datetime.utcnow(timezone.utc) + timedelta(minutes=10)
+        expiry = datetime.now(timezone.utc) + timedelta(minutes=10)
 
         text = "OTP for forget password"
         resetkey = reset_key()
@@ -422,8 +422,8 @@ def forgot_password(user: ForgotPass, db: Session, background_tasks):
 
 
 # USER RESET PASSWORD after FORGET PASSWORD
-def reset_password(user: ResetPass, otp: int, reset_key: str, db: Session):
-    dbuser = db.query(User).filter(User.Reset_Key == reset_key).first()
+def reset_otp_verify(user: UserVerify, db: Session):
+    dbuser = db.query(User).filter(User.Reset_Key == user.resetkey).first()
 
     if not dbuser:
         raise HTTPException(
@@ -435,16 +435,32 @@ def reset_password(user: ResetPass, otp: int, reset_key: str, db: Session):
             status_code=status.HTTP_400_BAD_REQUEST, detail="OTP expired"
         )
 
-    if dbuser.OTP != otp:
+    if dbuser.OTP != user.otp:
         raise HTTPException(
             status_code=status.HTTP_400_BAD_REQUEST, detail="Invalid OTP"
         )
-
-    dbuser.Password = pwd_context.hash(user.new_password)
-
-    dbuser.OTP = None
-    dbuser.OTP_Expiry = None
-    dbuser.Reset_Key = None
     db.commit()
 
-    return {"Message": "Password reset successful"}
+    return {"Message": True,
+            "resetkey": dbuser.Reset_Key}
+
+def reset_password(user:ResetPass,db:Session):
+    dbuser= db.query(User).filter(User.Reset_Key == user.resetkey).first()
+
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_404_NOT_FOUND,
+            detail="Reset key Mismatched"
+        )
+    dbuser.Password = pwd_context.hash(user.new_password)
+
+    dbuser.Reset_Key = None
+    dbuser.OTP = None
+    dbuser.OTP_Expiry = None
+
+    db.commit()
+
+    return{
+        "message":"password Reset Succesfull"
+    }
+
