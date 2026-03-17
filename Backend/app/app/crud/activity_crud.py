@@ -131,8 +131,8 @@ class Files:
             )
         
         # dbuser = self.db.query(User).filter(
-        #     User.User_ID == self.user_id
-        filename = file.filename.split(".")[0]   # remove extension    LEAD.jpg  [0]=LEAD, [1]=jpg
+                #     User.User_ID == self.user_id
+        filename = file.filename.split(".")[0]
         extension = file.filename.split(".")[1]
 
         result = cloudinary.uploader.upload(
@@ -142,22 +142,34 @@ class Files:
         )
 
         print(result)
-        
-        file_url = result["secure_url"]
 
-        file = Activity_file(
-            Activity_ID = self.activity_id,
-            File_url = file_url
+        version = result["version"]
+        public_id = result["public_id"]
+
+        url = f"https://res.cloudinary.com/dedavidqu/image/upload/v{version}/{public_id}.{extension}"
+
+  
+        short_url = url.replace(
+            "https://res.cloudinary.com/dedavidqu/image/upload/",
+            "CLOUDINARY/"
         )
 
-        self.db.add(file)
+        print(short_url)
+
+        file_data = Activity_file(
+            Activity_ID=self.activity_id,
+            File_url=short_url   
+        )
+
+        self.db.add(file_data)
         self.db.commit()
-        self.db.refresh(file)
+        self.db.refresh(file_data)
 
-        return {"message": "File Added",
-                "file_Name":filename,
-                "file_URL":file_url}
-
+        return {
+            "message": "File Added",
+            "file_Name": filename,
+            "file_URL": url  
+        }
 
 # VIEW FILES AVAILABLE IN AN ACTIVITY
 

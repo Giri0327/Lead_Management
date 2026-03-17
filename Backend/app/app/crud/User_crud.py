@@ -107,9 +107,24 @@ class UpdateUser:
                 detail="Only PNG and JPEG images are allowed"
             )
         
-        result = cloudinary.uploader.upload(file.file)
+        filename = file.filename.split(".")[0]
+        extension = file.filename.split(".")[1]
+
+        result = cloudinary.uploader.upload(file.file,format=extension)
         # print(result)
         image_url = result["secure_url"]
+        version = result["version"]
+        public_id = result["public_id"]
+
+        url = f"https://res.cloudinary.com/dedavidqu/image/upload/v{version}/{public_id}.{extension}"
+
+  
+        short_url = url.replace(
+            "https://res.cloudinary.com/dedavidqu/image/upload/",
+            "CLOUDINARY/"
+        )
+
+        print(short_url)       
         
         user.First_Name = first_name
         user.Last_Name = last_name
