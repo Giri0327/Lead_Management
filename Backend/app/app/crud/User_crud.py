@@ -279,7 +279,6 @@ class Verify_user(Userabs):
             if not user.Is_two_fath:
                 token_gen = create_token(user)
                 user_agent = self.request.headers.get("user-agent", "")
-                print(self.request.headers)
                 device_type = get_device_type(user_agent)
                 token_expiry = datetime.utcnow()
 

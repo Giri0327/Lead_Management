@@ -84,9 +84,9 @@ async def TwoFATH(
 
 @router.put("/Logout")
 async def Logout(
-    current_user=Depends(role_required([1, 2])), db: Session = Depends(get_db)
+    current_user = Depends(role_required([1,2])), db: Session = Depends(get_db)
 ):
-    x = UpdateUser(current_user, db)
+    x = UpdateUser(None, db)
     return x.Logout(current_user)
 
 
