@@ -1,4 +1,4 @@
-from pydantic import BaseModel,EmailStr,Field
+from pydantic import BaseModel, EmailStr, Field
 
 
 class UserInfo(BaseModel):
@@ -22,31 +22,34 @@ class Update_User(BaseModel):
     profile_pic_URL:str  
 
 class UserLogin(BaseModel):
-    username_or_email:str
+    username_or_email: str
     password: str = Field(min_length=3)
 
 
 class UserVerify(BaseModel):
-    otp: int 
+    otp: int
     resetkey: str
 
+
 class OTPVerify(BaseModel):
-    resetkey : str
+    resetkey: str
     otp: int
 
 
 class ForgotPass(BaseModel):
-    email:EmailStr
+    email: EmailStr
+
 
 class ResetPass(BaseModel):
-    resetkey:str
-    new_password:str = Field(min_length=3)
+    resetkey: str
+    new_password: str = Field(min_length=3)
+
 
 class ChangePass(BaseModel):
-    Current_Password:str 
-    New_Password:str = Field(min_length=6)
-    Confirm_Password:str = Field(min_length=6)
+    Current_Password: str
+    New_Password: str = Field(min_length=6)
+    Confirm_Password: str = Field(min_length=6)
 
 
 class resend_otp(BaseModel):
-    reset_key : str
+    reset_key: str

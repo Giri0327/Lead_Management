@@ -1,16 +1,17 @@
-from sqlalchemy import Column,String,Integer,DateTime
+from sqlalchemy import Column, String, Integer, DateTime
 from app.db import Base
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
+
 
 class Status(Base):
 
     __tablename__ = "status"
 
-    Status_ID = Column(Integer,primary_key=True,autoincrement=True)
-    status = relationship("Lead",back_populates="lead_status") 
+    Status_ID = Column(Integer, primary_key=True, autoincrement=True)
+    status = relationship("Lead", back_populates="lead_status")
 
     Status_Name = Column(String(255))
 
-    Created_At= Column(DateTime,server_default=func.now())
-    Updated_At=Column(DateTime,server_default=func.now(),onupdate=func.now())
+    Created_At = Column(DateTime, server_default=func.now())
+    Updated_At = Column(DateTime, server_default=func.now(), onupdate=func.now())
