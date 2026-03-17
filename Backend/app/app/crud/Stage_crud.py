@@ -2,54 +2,44 @@ from fastapi import HTTPException
 from app.models import Stage
 from app.db import session
 
+
 class StageCRUD:
-        def __init__(self,user,db):
-              self.user=user
-              self.db=db
+    def __init__(self, user, db):
+        self.user = user
+        self.db = db
 
-# CREATE STAGE
+    # CREATE STAGE
 
-        def create_Stage(self):
-                new_stage = Stage(
-                Stage_Name=self.user.stage_name
-        )
-                self.db.add(new_stage)
-                self.db.commit()
-                self.db.refresh(new_stage)
-                return {"Stage Created succesfully"}
+    def create_Stage(self):
+        new_stage = Stage(Stage_Name=self.user.stage_name)
+        self.db.add(new_stage)
+        self.db.commit()
+        self.db.refresh(new_stage)
+        return {"Stage Created succesfully"}
 
-# VIEW STAGE
+    # VIEW STAGE
 
-        def view_all_Stage(self):
-                dbuser=self.db.query(Stage).all()
-                return dbuser
+    def view_all_Stage(self):
+        dbuser = self.db.query(Stage).all()
+        return dbuser
 
-# UPDATE STAGE
+    # UPDATE STAGE
 
-        def update_Stage(self,stage_id:int):
-                dbuser=self.db.query(Stage).filter(Stage.Stage_ID==stage_id).first()
-                if not dbuser:
-                        raise HTTPException(status_code=404,
-                                                detail="Invalid Stage")
-                dbuser.Stage_Name=self.user.stage_name
-                self.db.commit()
-                self.db.refresh(dbuser)
-                return {"message":"Stage Updated Succesfully!!"}
+    def update_Stage(self, stage_id: int):
+        dbuser = self.db.query(Stage).filter(Stage.Stage_ID == stage_id).first()
+        if not dbuser:
+            raise HTTPException(status_code=404, detail="Invalid Stage")
+        dbuser.Stage_Name = self.user.stage_name
+        self.db.commit()
+        self.db.refresh(dbuser)
+        return {"message": "Stage Updated Succesfully!!"}
 
-# DELETE STAGE
+    # DELETE STAGE
 
-        def delete_Stage(self,stage_id:int):
-                dbuser = self.db.query(Stage).filter(Stage.Stage_ID==stage_id).first()
-                if not dbuser:
-                        raise HTTPException(status_code=404,detail="User not Found!!")
-                self.db.delete(dbuser)
-                self.db.commit()
-                return {"message":"Stage Deleted succesfully!!"}
-
-                        
-
-                
-                
-
-
-                
+    def delete_Stage(self, stage_id: int):
+        dbuser = self.db.query(Stage).filter(Stage.Stage_ID == stage_id).first()
+        if not dbuser:
+            raise HTTPException(status_code=404, detail="User not Found!!")
+        self.db.delete(dbuser)
+        self.db.commit()
+        return {"message": "Stage Deleted succesfully!!"}

@@ -1,28 +1,11 @@
 from fastapi import APIRouter, Depends, BackgroundTasks, Request
 from sqlalchemy.orm import Session
-from app.db import session, get_db
-from typing import Optional
+from app.db import get_db
 from sqlalchemy.orm import Session
-from app.crud import (
-    ADDUser,
-    forgot_password,
-    reset_password,
-    OTPTokenVerify,
-    Verify_user,
-    Resend_OTP,
-    UpdateUser,
-)
-from app.schema import (
-    UserInfo,
-    ForgotPass,
-    ResetPass,
-    ChangePass,
-    UserVerify,
-    UserLogin,
-    resend_otp,
-)
-from app.core import oauth2_scheme
-from app.api.deps import role_required
+from app.crud import ADDUser,OTPTokenVerify,Verify_user,UpdateUser,AuthService
+from app.schema import UserInfo,ForgotPass,ResetPass,ChangePass,UserVerify,UserLogin,resend_otp
+from app.core import oauth2_scheme    
+from app.api.deps import role_required 
 from fastapi import APIRouter, UploadFile, File, Depends
 from fastapi import Form
 
@@ -132,25 +115,21 @@ async def view_by_id(
 
 
 @router.post("/forgot_password")
-async def forgot_pass(
-    user: ForgotPass,
-    background_tasks: BackgroundTasks,
-    # current_user = Depends(role_required([1,2])),
-    db: Session = Depends(get_db),
-):
+async def forgot_pass(user: ForgotPass, background_tasks:BackgroundTasks,
+                      db: Session = Depends(get_db)):
+    x=AuthService(db)
+    return x.forgot_password(user,background_tasks)
 
-    return forgot_password(user, db, background_tasks)
-
+@router.post("/resetOTPverify")
+async def resetotpverify(user:UserVerify,db:Session = Depends(get_db)):
+    x=AuthService(db)
+    return x.reset_otp_verify(user)
 
 @router.post("/reset_password")
-async def Reset_Pass(
-    user: ResetPass,
-    #otp: int,
-    #reset_key: str,
-    # current_user = Depends(role_required([1,2])),
-    db: Session = Depends(get_db)):
-    print(user.resetkey,user.new_password)
-    return reset_password(user, db)
+async def Reset_Pass(user:ResetPass,
+                     db:Session = Depends(get_db)):
+    x=AuthService(db)
+    return x.reset_password(user)
 
 
 # LOGIN FUNCTIONS
@@ -170,16 +149,15 @@ async def UserLogin(
 
 @router.post("/Otpverify")
 async def Otpverify(user: UserVerify, db: Session = Depends(get_db)):
-    x = OTPTokenVerify(db, user.otp, user.resetkey)
+    x = OTPTokenVerify(db,  user.otp, user.resetkey)
     result = x.otp_verify()
     return result
 
 
 @router.post("/resendOTP")
-async def ResendOTP(
-    user: resend_otp, background_task: BackgroundTasks, db: Session = Depends(get_db)
-):
-    return Resend_OTP(user.reset_key, db, background_task)
+async def ResendOTP(user:resend_otp,background_task:BackgroundTasks,db:Session=Depends(get_db)):
+    x=AuthService(db)
+    return x.resend_otp(user.reset_key,background_task)
 
 
 """from app.db import Base,engine

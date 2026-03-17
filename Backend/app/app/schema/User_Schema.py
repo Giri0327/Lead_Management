@@ -38,8 +38,7 @@ class ForgotPass(BaseModel):
     email:EmailStr
 
 class ResetPass(BaseModel):
-    #otp : int 
-    resetkey : str 
+    resetkey:str
     new_password:str = Field(min_length=3)
 
 class ChangePass(BaseModel):
