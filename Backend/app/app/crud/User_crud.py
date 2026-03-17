@@ -103,42 +103,56 @@ class UpdateUser:
         self.db = db
 
     # user can update their user profile
-    def Update_user(self, user_id, first_name, last_name, email, phone, file):
+    def Update_user(self, current_user, first_name, last_name, email, phone):
+        usr = current_user["user_id"]
 
-        user = self.db.query(User).filter(User.User_ID == user_id).first()
-
-        if not user:
+        query = self.db.query(User).filter(User.User_ID == usr).first()
+        if not query:
             raise HTTPException(status_code=404, detail="Invalid User")
 
         email_exist = (
             self.db.query(User)
-            .filter(user.Email == email, User.User_ID != user_id)
+            .filter(User.User_ID != usr, or_(User.Email == email, User.Phone == phone))
             .first()
         )
+
         if email_exist:
-            raise HTTPException(
-                status_code=404, detail="Email Already Exist Enter New Email"
-            )
+            if email_exist.Email == email:
+                raise HTTPException(status_code=400, detail="Email already exists")
+            if email_exist.Phone == phone:
+                raise HTTPException(status_code=400, detail="Phone already exists")
 
-        filename = file.filename.lower()
-
-        if not filename.endswith((".png", ".jpg", ".jpeg")):
-            raise HTTPException(
-                 status_code=400, detail="Only PNG and JPEG images are allowed")
-
-        result = cloudinary.uploader.upload(file.file)
-        image_url =result["secure_url"]
-
-        user.Profile_Pic_URL = image_url
-
+        query.Email = email
+        query.First_Name = first_name
+        query.Last_Name = last_name
+        query.Phone = phone
         self.db.commit()
-        self.db.refresh(user)
 
         return {
             "message": "User updated successfully",
         }
-        
 
+    def Update_user_pic(self, current_user, file):
+        try:
+            user = current_user["user_id"]
+            query = self.db.query(User).filter(User.User_ID == user).first()
+
+            filename = file.filename.lower()
+            if not filename.endswith((".png", ".jpg", ".jpeg")):
+                raise HTTPException(
+                    status_code=400, detail="Only PNG and JPEG images are allowed"
+                )
+            result = cloudinary.uploader.upload(file.file)
+            image_url = result["secure_url"]
+            print(image_url)
+
+            query.Profile_Pic_URL = image_url
+
+            return "Uplode successfull"
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, details="Bad Reuest"
+            )
 
     # Admin can update the users Profile with his admin Access
     def AdminUser_Update(self, user_id, first_name, last_name, email, user_role, phone):
@@ -327,7 +341,7 @@ class OTPTokenVerify(OTPToken):
 
     # verify otp with the generated reset key
     def otp_verify(self):
-        
+
         user = self.db.query(User).filter(User.Reset_Key == self.resetkey).first()
 
         if not user:
@@ -341,8 +355,6 @@ class OTPTokenVerify(OTPToken):
                 user.OTP = None
                 user.OTP_Expiry = None
                 raise HTTPException(status_code=400, detail="OTP expired")
-
-            
 
             user.OTP = None
             user.OTP_Expiry = None
@@ -375,7 +387,6 @@ class AuthService:
     def resend_otp(self, reset_key, background_tasks):
 
         user = self.db.query(User).filter(User.Reset_Key == reset_key).first()
-
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"
