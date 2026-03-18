@@ -23,7 +23,7 @@ async def stage_create(
 
 @router.get("/view_Stage")
 async def view_stage(
-    current_user=Depends(role_required([1, 2])), db: session = Depends(get_db)
+    current_user=Depends(role_required([1,2])), db: session = Depends(get_db)
 ):
     stage = StageCRUD(None, db)
     new_stage = stage.view_all_Stage()

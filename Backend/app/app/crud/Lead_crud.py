@@ -146,7 +146,12 @@ class ViewLeadByID:
         )#.all()
 
         if role!=1:
-             results=results.filter(Lead.Owner_ID==current_id,Lead.Lead_ID==self.lead_id)
+            results=results.filter(Lead.Owner_ID==current_id,
+                Lead.Lead_ID==self.lead_id).first()
+            return results
+
+        results=results.filter(#Lead.Owner_ID==current_id,
+                Lead.Lead_ID==self.lead_id)
 
         return results.first()
 
