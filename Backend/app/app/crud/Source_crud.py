@@ -21,7 +21,7 @@ class SourceCRUD:
     # VIEW ALL SOURCE
 
     def view_all_Source(self):
-        dbuser = self.db.query(Sources).all()
+        dbuser = self.db.query(Sources.Source_ID,Sources.Source_Name).all()
         return dbuser
 
     # UPDATE SOURCE

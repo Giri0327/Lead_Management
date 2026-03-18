@@ -68,10 +68,12 @@ async def update_user(
 
 
 @router.post("/add_profile_pic")
-async def addprofile(file: UploadFile = File(...),current_user=Depends(role_required([1, 2])),db: Session = Depends(get_db)):
+async def addprofile(bgtask:BackgroundTasks,file: UploadFile = File(...),current_user=Depends(role_required([1, 2])),db: Session = Depends(get_db)):
     service = UpdateUser(None, db)
 
-    return service.Update_user_pic(current_user, file)
+    bgtask.add_task(service.Update_user_pic,current_user, file)
+    return {
+        "message":"Profile uploaded Succesfully"}
 
 
 @router.put("/Twofath")

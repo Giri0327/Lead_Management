@@ -22,7 +22,7 @@ class PriorityCRUD:
 
     def view_all_Priority(self):
 
-        dbuser = self.db.query(Priority).all()
+        dbuser = self.db.query(Priority.Priority_ID,Priority.Priority_Name).all()
         return dbuser
 
     # UPDATE PRIORITY

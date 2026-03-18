@@ -81,7 +81,7 @@ def role_required(allowed_roles: list):
             raise HTTPException(
                 status_code=403,
                 detail="You are not authorized to perform this action"
-            )
+)
 
 
         if user["role"] not in allowed_roles:
