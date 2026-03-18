@@ -62,7 +62,7 @@ async def update_user(
     #print(first_name,last_name,email,phone,current_user["user_id"])
 
 
-    service = UpdateUser(db)
+    service = UpdateUser(None,db)
 
     return service.Update_user(
         current_user, first_name, last_name, email, phone)
@@ -99,7 +99,7 @@ async def Logout(
 @router.post("/change_password")
 async def Change_Pass(
     user: ChangePass,
-    current_user=Depends(role_required([2])),
+    current_user=Depends(role_required([1,2])),
     db: Session = Depends(get_db),
 ):
     x = UpdateUser(user, db)
