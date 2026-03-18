@@ -20,7 +20,7 @@ class StageCRUD:
     # VIEW STAGE
 
     def view_all_Stage(self):
-        dbuser = self.db.query(Stage).all()
+        dbuser = self.db.query(Stage.Stage_ID,Stage.Stage_Name).all()
         return dbuser
 
     # UPDATE STAGE

@@ -20,7 +20,7 @@ class StatusCRUD:
     # VIEW ALL STATUS
 
     def view_all_status(self):
-        dbuser = self.db.query(Status).all()
+        dbuser = self.db.query(Status.Status_ID,Status.Status_Name).all()
         return dbuser
 
     # UPDATE STATUS

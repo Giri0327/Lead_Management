@@ -33,7 +33,7 @@ async def add_lead(
 
 @router.post("/view_owner")
 async def View_owner(
-    current_user=Depends(role_required([2])), db: session = Depends(get_db)
+    current_user=Depends(role_required([1,2])), db: session = Depends(get_db)
 ):
     owner = Create(None, db)
 

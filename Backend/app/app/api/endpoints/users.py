@@ -68,18 +68,21 @@ async def update_user(
         current_user, first_name, last_name, email, phone)
 
 
-@router.post("add_profile_pic")
-async def addprofile(file: UploadFile = File(...),
+@router.post("/add_profile_pic")
+async def addprofile(bgtask:BackgroundTasks,
+                     file: UploadFile = File(...),
                      current_user=Depends(role_required([1, 2])),
                      db: Session = Depends(get_db)):
     service = UpdateUser(None, db)
-    return service.Update_user_pic(
-        current_user["user_id"], file)
+
+    bgtask.add_task(service.Update_user_pic,current_user, file)
+    return {
+        "message":"Profile uploaded Succesfully"}
 
 
 @router.put("/Twofath")
 async def TwoFATH(
-    current_user=Depends(role_required([2])), db: Session = Depends(get_db)
+    current_user=Depends(role_required([1,2])), db: Session = Depends(get_db)
 ):
     x = UpdateUser(current_user, db)
     return x.Twofath(current_user)
@@ -148,8 +151,8 @@ async def UserLogin(
 
 
 @router.post("/Otpverify")
-async def Otpverify(user: UserVerify, db: Session = Depends(get_db)):
-    x = OTPTokenVerify(db,  user.otp, user.resetkey)
+async def Otpverify(user: UserVerify,request:Request, db: Session = Depends(get_db)):
+    x = OTPTokenVerify(db,user,request)
     result = x.otp_verify()
     return result
 

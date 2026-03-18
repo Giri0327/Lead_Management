@@ -2,6 +2,7 @@ from abc import ABC, abstractmethod
 from fastapi import HTTPException, status
 from fastapi import Request as request
 from datetime import datetime, timedelta, timezone
+from h11 import Request
 from sqlalchemy import or_
 from app.models import *
 from sqlalchemy.orm import Session
@@ -352,16 +353,21 @@ class OTPToken(ABC):
 
 
 class OTPTokenVerify(OTPToken):
-    def __init__(self, db: Session, request, otp: int, resetkey: str):
+    def __init__(self, db: Session,user:UserVerify, request:Request):
         self.db = db
-        self.OTP = otp
-        self.resetkey = resetkey
+        self.OTP = user.otp
+        self.resetkey = user.resetkey
         self.request = request
 
     # verify otp with the generated reset key
     def otp_verify(self):
+        
+
 
         user = self.db.query(User).filter(User.Reset_Key == self.resetkey).first()
+        # hp=self.db.query(User.Reset_Key).filter(User.Reset_Key==self.resetkey).first()
+       
+        
 
         if not user:
             raise HTTPException(status_code=404, detail="Not found")
@@ -383,8 +389,10 @@ class OTPTokenVerify(OTPToken):
             token_gen = create_token(user)
             user_agent = self.request.headers.get("user-agent", "")
             device_type = get_device_type(user_agent)
+            token_expiry = datetime.utcnow()
+
             new_token = Token(
-                User_Id=user.User_ID, Device_Type=device_type, Token=token_gen
+                User_Id=user.User_ID, Device_Type=device_type, Token=token_gen,Token_Expiry=token_expiry
             )
             self.db.add(new_token)
             self.db.commit()

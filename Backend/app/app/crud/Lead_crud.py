@@ -142,12 +142,17 @@ class ViewLeadByID:
             .join(Status, Lead.Status_ID == Status.Status_ID)
             .join(User, Lead.Owner_ID == User.User_ID)
             .join(Sources, Lead.Source_ID == Sources.Source_ID)
-            .filter(Lead.Lead_ID == self.lead_id, Lead.Owner_ID == current_id)
-            #.first()  # .one_or_none() # ensures only one record exists
-        )
-        # if role!=1:
-        #     results=results.filter(Lead.Lead_ID==current_id)
-        
+            #.filter(Lead.Lead_ID == self.lead_id, Lead.Owner_ID == current_id)
+        )#.all()
+
+        if role!=1:
+            results=results.filter(Lead.Owner_ID==current_id,
+                Lead.Lead_ID==self.lead_id).first()
+            return results
+
+        results=results.filter(#Lead.Owner_ID==current_id,
+                Lead.Lead_ID==self.lead_id)
+
         return results.first()
 
 

@@ -40,6 +40,8 @@ def get_current_user(
         # if sessionn.Token_Expiry is None:
         #     sessionn.Token_Expiry = datetime.now()
         #     db.commit()
+        if not sessionn.Token_Expiry:
+            raise HTTPException(status_code=401, detail="Invalid session expiry")
 
         if datetime.utcnow() - sessionn.Token_Expiry > INACTIVITY_LIMIT:
 
@@ -81,7 +83,7 @@ def role_required(allowed_roles: list):
             raise HTTPException(
                 status_code=403,
                 detail="You are not authorized to perform this action"
-            )
+)
 
 
         if user["role"] not in allowed_roles:
