@@ -9,7 +9,6 @@ class Follow_ups(BaseModel):
     
 
 class Follow_up_schedule(BaseModel):
-    # user_id:int
     lead_id:int
     notes:str
     contact_type:str

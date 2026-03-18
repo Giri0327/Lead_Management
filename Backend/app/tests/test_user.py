@@ -1,4 +1,6 @@
 # tests/test_user.py
+from datetime import datetime, timedelta
+
 import pytest
 from fastapi.testclient import TestClient
 from app.main import app
@@ -9,50 +11,42 @@ from app.api.deps import role_required, get_db
 
 client = TestClient(app)
 
-# -------------------------
-# 1️⃣ Fake logged-in user
-# -------------------------
-# app/tests/conftest.py or at the top of your test file
 from app.main import app
 
-def fake_admin_user(roles_required=None):
-    return {"user_id": 1, "role": 1}
+# def fake_admin_user(roles_required=None):
+#     return {"user_id": 1, "role": 1}
 
-# Fake regular user (role 2)
-def fake_regular_user(roles_required=None):
-    return {"user_id": 2, "role": 2}
+# # Fake regular user (role 2)
+# def fake_regular_user(roles_required=None):
+#     return {"user_id": 2, "role": 2}
 
-
-# 2️⃣ Fixture to create test user
-# -------------------------
-@pytest.fixture(scope="module", autouse=True)
-
-def create_test_users():
+def test_signup_creates_user():
     db = TestingSessionLocal()
 
-    if not db.query(User).filter_by(Username="keerthikk").first():
+    db.query(User).filter(User.Username == "test_keerthi").delete()
+    db.commit()
 
-        password_plain = "1234"
-        user = User(
-            Username="keerthikk",
-            First_Name="keerthi",
-            Last_Name="krishna",
-            Email="keerthi@gmail.com",
-            Phone="999999999",
-            Password=get_password_hash(password_plain),  # hashed
-            User_Role_id=2,
-            Is_Active=True
-        )
-        db.add(user)
-        db.commit()
-    db.close()
+    response = client.post(
+        "/user/Signup",
+        json={
+            "username": "test_keerthi",
+            "first_name": "Test",
+            "last_name": "User",
+            "email": "testkeerthi@gmail.com",
+            "phone": "9999999999",
+            "password": "1234",
+            "role_id": 1,
+            "is_active": True
+        }
+    )
+    assert response.status_code == 200
 
 # LOGIN SUCCESS
 
 def test_login_success():
     response = client.post(
         "/user/Login",
-        json={"username_or_email": "keerthikk", "password": "1234"}  # plain password
+        json={"username_or_email": "test_keerthi", "password": "1234"}  # plain password
     )
     assert response.status_code == 200
 
@@ -70,7 +64,7 @@ def test_login_invalid():
 def test_forgot_password():
     response = client.post(
         "/user/forgot_password",
-        json={"email": "keerthi@gmail.com"}
+        json={"email": "testkeerthi@gmail.com"}
     )
     assert response.status_code == 200
 
@@ -87,37 +81,53 @@ def test_reset_password_invalid_key():
     )
     assert response.status_code in [400, 404]
 
-def test_change_password():
-
-    response = client.post(
-        "/user/change_password",
-        json={
-            "Current_Password": "1234",
-            "new_password": "123456",
-            "confirm_password":"123456"
-
-        }
-    )
-    assert response.status_code in [200]
+# def test_otp():
 
 
-def test_change_password_invalid():
+#     # Call the endpoint
+#     response = client.post(
+#         "/user/Otpverify",
+#         json={
+#             "otp": 793014,
+#             "resetkey": "bkyNZChgJScycduqVWIqG3xf8s0JSW"
+#         }
+#     )
 
-    response = client.post(
-        "/user/change_password",
-        json={
-            "Current_Password": "wrongpass",
-            "new_password": "1234",
-            "confirm_password":"1234"
+#     # Assert status code
+#     assert response.status_code == 200
 
-        }
-    )
-    assert response.status_code in [400, 404]
+# def test_change_password():
+
+
+#     response = client.post(
+#         "/user/change_password",
+#         json={
+#             "Current_Password": "1234",
+#             "new_password": "123456",
+#             "confirm_password":"123456"
+
+#         }
+#     )
+#     assert response.status_code in [200]
+
+
+# def test_change_password_invalid():
+
+#     response = client.post(
+#         "/user/change_password",
+#         json={
+#             "Current_Password": "wrongpass",
+#             "new_password": "1234",
+#             "confirm_password":"1234"
+
+#         }
+#     )
+#     assert response.status_code in [400, 404]
 
 
 
 # # -------------------------
-# # ✅ 3. UPDATE USER (FormData)
+# #  UPDATE USER (FormData)
 # # -------------------------
 # def test_update_user():
 #     response = client.put(

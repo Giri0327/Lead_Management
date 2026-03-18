@@ -3,7 +3,6 @@ from fastapi import HTTPException, status
 from fastapi import Request as request
 from datetime import datetime, timedelta, timezone
 from sqlalchemy import or_
-from zmq import NULL
 from app.models import *
 from sqlalchemy.orm import Session
 from starlette import status
@@ -103,58 +102,77 @@ class UpdateUser:
         self.db = db
 
     # user can update their user profile
-    def Update_user(self, user_id, first_name, last_name, email, phone, file):
+    def Update_user(self, current_user, first_name, last_name, email, phone):
+        usr = current_user["user_id"]
 
-        user = self.db.query(User).filter(User.User_ID == user_id).first()
-
-        if not user:
+        query = self.db.query(User).filter(User.User_ID == usr).first()
+        if not query:
             raise HTTPException(status_code=404, detail="Invalid User")
 
         email_exist = (
             self.db.query(User)
-            .filter(user.Email == email, User.User_ID != user_id)
+            .filter(User.User_ID != usr, or_(User.Email == email, User.Phone == phone))
             .first()
         )
+
         if email_exist:
-            raise HTTPException(
-                status_code=404, detail="Email Already Exist Enter New Email"
-            )
+            if email_exist.Email == email:
+                raise HTTPException(status_code=400, detail="Email already exists")
+            if email_exist.Phone == phone:
+                raise HTTPException(status_code=400, detail="Phone already exists")
 
-        # filename = file.filename.lower()
-
-        # if not filename.endswith((".png", ".jpg", ".jpeg")):
-        #     raise HTTPException(
-        #          status_code=400, detail="Only PNG and JPEG images are allowed")
-       
-        # filename = file.filename.split(".")[0]
-        # extension = file.filename.split(".")[1]
-
-        # result = cloudinary.uploader.upload(file.file,
-        #     public_id=filename,
-        #     format=extension)
-        
-        # # image_url =result["secure_url"]
-        # version = result["version"]
-        # public_id = result["public_id"]
-
-        # url = f"https://res.cloudinary.com/dedavidqu/image/upload/v{version}/{public_id}.{extension}"
-
-  
-        # short_url = url.replace(
-        #     "https://res.cloudinary.com/dedavidqu/image/upload/",
-        #     "CLOUDINARY/"
-        # )
-
-        # user.Profile_Pic_URL = short_url
-
+        query.Email = email
+        query.First_Name = first_name
+        query.Last_Name = last_name
+        query.Phone = phone
         self.db.commit()
-        self.db.refresh(user)
 
         return {
             "message": "User updated successfully",
         }
-        
 
+    def Update_user_pic(self, current_user, file):
+        try:
+            user = current_user["user_id"]
+            query = self.db.query(User).filter(User.User_ID == user).first()
+
+            filename = file.filename.lower()
+
+            if not filename.endswith((".png", ".jpg", ".jpeg")):
+                raise HTTPException(
+                    status_code=400, detail="Only PNG and JPEG images are allowed"
+                )
+            filename = file.filename.split(".")[0]
+            extension = file.filename.split(".")[1]
+
+            result = cloudinary.uploader.upload(file.file,
+            public_id=filename,
+            format=extension)
+            # image_url = result["secure_url"]
+            version = result["version"]
+            public_id = result["public_id"]
+
+            url = f"https://res.cloudinary.com/dedavidqu/image/upload/v{version}/{public_id}.{extension}"
+
+    
+            short_url = url.replace(
+                "https://res.cloudinary.com/dedavidqu/image/upload/",
+                "CLOUDINARY/"
+            )
+
+            print(short_url)
+            
+            query.Profile_Pic_URL = short_url
+
+            self.db.commit()
+            self.db.refresh(query)
+
+
+            return "Upload successfull"
+        except:
+            raise HTTPException(
+                status_code=status.HTTP_400_BAD_REQUEST, details="Bad Request"
+            )
 
     # Admin can update the users Profile with his admin Access
     def AdminUser_Update(self, user_id, first_name, last_name, email, user_role, phone):
@@ -282,7 +300,6 @@ class Verify_user(Userabs):
             if not user.Is_two_fath:
                 token_gen = create_token(user)
                 user_agent = self.request.headers.get("user-agent", "")
-                print(self.request.headers)
                 device_type = get_device_type(user_agent)
                 token_expiry = datetime.utcnow()
 
@@ -343,7 +360,7 @@ class OTPTokenVerify(OTPToken):
 
     # verify otp with the generated reset key
     def otp_verify(self):
-        
+
         user = self.db.query(User).filter(User.Reset_Key == self.resetkey).first()
 
         if not user:
@@ -357,8 +374,6 @@ class OTPTokenVerify(OTPToken):
                 user.OTP = None
                 user.OTP_Expiry = None
                 raise HTTPException(status_code=400, detail="OTP expired")
-
-            
 
             user.OTP = None
             user.OTP_Expiry = None
@@ -391,7 +406,6 @@ class AuthService:
     def resend_otp(self, reset_key, background_tasks):
 
         user = self.db.query(User).filter(User.Reset_Key == reset_key).first()
-
         if not user:
             raise HTTPException(
                 status_code=status.HTTP_404_NOT_FOUND, detail="User not found"

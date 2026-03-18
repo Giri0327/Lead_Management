@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, ForeignKey, DateTime,TEXT
+from sqlalchemy import Column, Integer, ForeignKey, DateTime, TEXT
 from sqlalchemy.sql import func
 from sqlalchemy.orm import relationship
 from app.db import Base
@@ -7,8 +7,10 @@ from app.db import Base
 class Activity_file(Base):
     __tablename__ = "activity_file"
 
-    Activity_file_ID = Column(Integer, primary_key=True,autoincrement=True)
-    Activity_ID = Column(Integer, ForeignKey("lead_activity.Activity_ID", ondelete="CASCADE"))
+    Activity_file_ID = Column(Integer, primary_key=True, autoincrement=True)
+    Activity_ID = Column(
+        Integer, ForeignKey("lead_activity.Activity_ID", ondelete="CASCADE")
+    )
     File_url = Column(TEXT)
 
     # Relationships
