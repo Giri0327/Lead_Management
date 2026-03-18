@@ -18,7 +18,7 @@ from cloudinary.utils import cloudinary_url
 from fastapi.security import OAuth2PasswordBearer
 
 
-load_dotenv()
+
 
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/user/Login")
@@ -34,7 +34,7 @@ def verify_password(plain_password: str, password: str):
     return pwd_context.verify(plain_password, password)
 
 
-
+load_dotenv()
 SECRET_KEY=os.getenv("SECRET_KEY")
 ALGORITHM =os.getenv("ALGORITHM")
 
