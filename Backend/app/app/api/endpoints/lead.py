@@ -19,12 +19,12 @@ router = APIRouter(prefix="/lead", tags=["Lead"])
 @router.post("/create")
 async def add_lead(
     leads: Leads,
-    current_user=Depends(role_required([2])),
+    current_user=Depends(role_required([1,2])),
     db: session = Depends(get_db),
 ):
     try:
         creator = Create(leads, db)
-        new_lead = creator.create_lead()
+        new_lead = creator.create_lead(current_user)
 
         return new_lead
     except Exception as e:

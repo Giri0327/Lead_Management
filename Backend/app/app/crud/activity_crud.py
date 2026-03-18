@@ -75,25 +75,25 @@ class Activity:
 
 
 class Details:
-    def __init__(self, activity, db):
+    def __init__(self,db):
         self.db = db
-        self.activity = activity
+        #self.activity = activity
 
-    def show_details(self, lead_id):
+    def show_details(self, lead_id,current_user):
+       
 
         query = (
             self.db.query(
-                Lead_Activity.Scheduled_On,
+                Lead.Created_At,
                 Lead.Last_Contacted,
                 Sources.Source_Name,
-                Lead.Notes,
-            )
-            .join(Lead, Lead_Activity.Lead_ID == Lead.Lead_ID)
+                Lead.Notes)
+            #.join(Lead, Lead_Activity.Lead_ID == Lead.Lead_ID)
             .join(Sources, Lead.Source_ID == Sources.Source_ID)
-            .filter(Lead.Lead_ID == lead_id)
-            .order_by(Lead_Activity.Scheduled_On.desc())
-            .first()
-        )
+            .filter(Lead.Lead_ID == lead_id).first())
+            #.order_by(Lead_Activity.Scheduled_On.desc()))
+        
+
 
         return query
 

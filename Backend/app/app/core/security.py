@@ -9,8 +9,6 @@ from email.message import EmailMessage
 from dotenv import load_dotenv
 import smtplib
 from email.mime.text import MIMEText
-
-# from app.api.endpoints.users import Logout
 from app.models import User
 import os
 from zoneinfo import ZoneInfo
@@ -36,11 +34,20 @@ def verify_password(plain_password: str, password: str):
     return pwd_context.verify(plain_password, password)
 
 
-SECRET_KEY = "kscubauekvisubojnafwueruutsjkndc"
-ALGORITHM = "HS256"
+
+SECRET_KEY=os.getenv("SECRET_KEY")
+ALGORITHM =os.getenv("ALGORITHM")
+
+
 
 
 def create_token(user):
+
+    # now = dt.now()
+    # expire = now.replace(hours=24)
+    # if login time is alomst to expire time reset to sext day
+    # if expire <= now:
+    #     expire = expire.replace(day=expire.day + 1)
 
     now = dt.now()
     expire = now.replace(hour=23, minute=59, second=59, microsecond=0)
@@ -79,13 +86,6 @@ def decode_token(token: str):
 
 
 # Get User Information
-"""
-payload = decode_token(token):
-user_id = payload["user_id"]
-user_name = payload["username"]
-user_role = payload["role"]
-"""
-
 
 def get_otp():
     otp = random.randint(100000, 999999)
@@ -94,8 +94,9 @@ def get_otp():
 
 def emailOTP(to: str, otp: int, text: str):
 
-    myemail = "keerthikk0302@gmail.com"
-    mypass = "gmxqefyobsuwwnnl"
+    myemail=os.getenv("myemail")
+   
+    mypass=os.getenv("mypass")
     subject = text
     body = f""" Your OTP to reset pass is: {otp}
 

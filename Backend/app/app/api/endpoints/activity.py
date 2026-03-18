@@ -41,11 +41,11 @@ async def get_activity(
 
 @router.get("/activity_Details")
 async def activity_Details(
-    lead_id: int = None,
+    lead_id: int,
     current_user=Depends(role_required([1, 2])),
     db: session = Depends(get_db),
 ):
-    creator = Details(lead_id, db)
+    creator = Details(db)
     view_details = creator.show_details(lead_id, current_user)
     return view_details
 

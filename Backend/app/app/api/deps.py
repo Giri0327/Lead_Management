@@ -10,7 +10,6 @@ from app.db import get_db, session
 from app.models import Token
 
 INACTIVITY_LIMIT = timedelta(hours=1)
-# INACTIVITY_LIMIT = timedelta(minutes=1)
 
 security = HTTPBearer()
 
@@ -37,9 +36,7 @@ def get_current_user(
 
         if not sessionn:
             raise HTTPException(status_code=401, detail="Session not found")
-        # if sessionn.Token_Expiry is None:
-        #     sessionn.Token_Expiry = datetime.now()
-        #     db.commit()
+        
         if not sessionn.Token_Expiry:
             raise HTTPException(status_code=401, detail="Invalid session expiry")
 
