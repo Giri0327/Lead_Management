@@ -78,7 +78,7 @@ async def addprofile(bgtask:BackgroundTasks,file: UploadFile = File(...),current
 
 @router.put("/Twofath")
 async def TwoFATH(
-    current_user=Depends(role_required([2])), db: Session = Depends(get_db)
+    current_user=Depends(role_required([1,2])), db: Session = Depends(get_db)
 ):
     x = UpdateUser(current_user, db)
     return x.Twofath(current_user)
@@ -147,8 +147,8 @@ async def UserLogin(
 
 
 @router.post("/Otpverify")
-async def Otpverify(user: UserVerify, db: Session = Depends(get_db)):
-    x = OTPTokenVerify(db,  user.otp, user.resetkey)
+async def Otpverify(user: UserVerify,request:Request, db: Session = Depends(get_db)):
+    x = OTPTokenVerify(db,user,request)
     result = x.otp_verify()
     return result
 

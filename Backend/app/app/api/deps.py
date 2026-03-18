@@ -40,6 +40,8 @@ def get_current_user(
         # if sessionn.Token_Expiry is None:
         #     sessionn.Token_Expiry = datetime.now()
         #     db.commit()
+        if not sessionn.Token_Expiry:
+            raise HTTPException(status_code=401, detail="Invalid session expiry")
 
         if datetime.utcnow() - sessionn.Token_Expiry > INACTIVITY_LIMIT:
 
