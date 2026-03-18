@@ -120,16 +120,32 @@ class UpdateUser:
                 status_code=404, detail="Email Already Exist Enter New Email"
             )
 
-        filename = file.filename.lower()
+        # filename = file.filename.lower()
 
-        if not filename.endswith((".png", ".jpg", ".jpeg")):
-            raise HTTPException(
-                 status_code=400, detail="Only PNG and JPEG images are allowed")
+        # if not filename.endswith((".png", ".jpg", ".jpeg")):
+        #     raise HTTPException(
+        #          status_code=400, detail="Only PNG and JPEG images are allowed")
+       
+        # filename = file.filename.split(".")[0]
+        # extension = file.filename.split(".")[1]
 
-        result = cloudinary.uploader.upload(file.file)
-        image_url =result["secure_url"]
+        # result = cloudinary.uploader.upload(file.file,
+        #     public_id=filename,
+        #     format=extension)
+        
+        # # image_url =result["secure_url"]
+        # version = result["version"]
+        # public_id = result["public_id"]
 
-        user.Profile_Pic_URL = image_url
+        # url = f"https://res.cloudinary.com/dedavidqu/image/upload/v{version}/{public_id}.{extension}"
+
+  
+        # short_url = url.replace(
+        #     "https://res.cloudinary.com/dedavidqu/image/upload/",
+        #     "CLOUDINARY/"
+        # )
+
+        # user.Profile_Pic_URL = short_url
 
         self.db.commit()
         self.db.refresh(user)
