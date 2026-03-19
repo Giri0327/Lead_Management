@@ -340,6 +340,7 @@ class Verify_user(Userabs):
         except HTTPException:
             raise
         except Exception as e:
+            print("the error" ,e)
             raise HTTPException(status_code=500, detail="Internal Server Error")
 
 

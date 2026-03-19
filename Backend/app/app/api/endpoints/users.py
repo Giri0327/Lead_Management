@@ -143,8 +143,7 @@ async def UserLogin(
     background_task: BackgroundTasks,
     request: Request,
     user_data: UserLogin,
-    db: Session = Depends(get_db),
-):
+    db: Session = Depends(get_db)):
     login = Verify_user(db, request, background_task, user_data)
     result = login.verify_user()
     return result
