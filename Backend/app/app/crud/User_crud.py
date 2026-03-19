@@ -115,7 +115,7 @@ class ADDUser:
         return user_dict
     
 
-    
+
 
     # view all users by the admin
     def view_users(self):
@@ -342,8 +342,18 @@ class Verify_user(Userabs):
                 user_agent = self.request.headers.get("user-agent", "")
                 device_type = get_device_type(user_agent)
                 token_expiry = datetime.utcnow()
+                # try:
 
-                """self.db.query(Token).filter(Token.User_Id == user.User_ID).delete()"""
+                #     self.db.query(Token.Token).filter(Token.Token == token_gen).delete()
+                #     self.db.commit()
+                # except Exception as e:
+
+
+                #     print(e)
+                token_row = self.db.query(Token).filter(Token.Token == token_gen).first()
+                if token_row:
+                    token_row.Token = None
+                    self.db.commit()
                 # creates token when user is without twofath auth
                 new_token = Token(
                     User_Id=user.User_ID,
@@ -430,9 +440,13 @@ class OTPTokenVerify(OTPToken):
             user_agent = self.request.headers.get("user-agent", "")
             device_type = get_device_type(user_agent)
             token_expiry = datetime.utcnow()
+            #self.db.query(Token.Token).filter(Token.Token == token_gen).delete()
+            token_row = self.db.query(Token).filter(Token.Token == token_gen).first()
+            if token_row:
+                token_row.Token = None
+                self.db.commit()
 
-            new_token = Token(
-                User_Id=user.User_ID, Device_Type=device_type, Token=token_gen,Token_Expiry=token_expiry
+            new_token = Token(User_Id=user.User_ID, Device_Type=device_type, Token=token_gen,Token_Expiry=token_expiry
             )
             self.db.add(new_token)
             self.db.commit()
