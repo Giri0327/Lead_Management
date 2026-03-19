@@ -57,7 +57,7 @@ class ADDUser:
             return "User created successfully"
 
     # Admin can view user with their user_id
-    def view_userby_id(self, current_user):
+    def view_userby_idd(self, current_user):
 
         user_id = current_user["user_id"]
         user = (
@@ -73,10 +73,49 @@ class ADDUser:
             .filter(User.User_ID == user_id)
             .first()
         )
+        print(type(user.Profile_Pic_URL))
+        #user.Profile_Pic_URL="https://res.cloudinary.com/dedavidqu/image/upload/v"+user.Profile_Pic_URL #https://res.cloudinary.com/dedavidqu/image/upload/v
+        user.Profile_Pic_URL = f"https://res.cloudinary.com/dedavidqu/image/upload/v{user.Profile_Pic_URL}"
         if user:
             return user._asdict()
 
         return None
+    
+
+    def view_userby_id(self, current_user):
+
+        user_id = current_user["user_id"]
+
+        user = (
+            self.db.query(
+                User.First_Name,
+                User.Last_Name,
+                User.Email,
+                Roles.Role_Name,
+                User.Phone,
+                User.Profile_Pic_URL,
+            )
+            .join(Roles, User.Role_ID == Roles.Role_ID)
+            .filter(User.User_ID == user_id)
+            .first()
+        )
+
+        if not user:
+            return None
+
+        # Convert to dict first
+        user_dict = user._asdict()
+
+        # Safely update URL
+        if user_dict.get("Profile_Pic_URL"):
+            user_dict["Profile_Pic_URL"] = (
+                f"https://res.cloudinary.com/dedavidqu/image/upload/v{user_dict['Profile_Pic_URL']}"
+            )
+
+        return user_dict
+    
+
+    
 
     # view all users by the admin
     def view_users(self):
@@ -154,11 +193,11 @@ class UpdateUser:
             public_id = result["public_id"]
 
             url = f"https://res.cloudinary.com/dedavidqu/image/upload/v{version}/{public_id}.{extension}"
+            #https://res.cloudinary.com/dedavidqu/image/upload/v1773721885/dkr13wijueshrisxwfpl.png
 
     
             short_url = url.replace(
-                "https://res.cloudinary.com/dedavidqu/image/upload/",
-                "CLOUDINARY/"
+                "https://res.cloudinary.com/dedavidqu/image/upload/v",""
             )
 
             print(short_url)
