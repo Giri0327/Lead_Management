@@ -19,7 +19,7 @@ router = APIRouter(prefix="/lead", tags=["Lead"])
 @router.post("/create")
 async def add_lead(
     leads: Leads,
-    current_user=Depends(role_required([1,2])),
+    current_user=Depends(role_required([1, 2])),
     db: session = Depends(get_db),
 ):
     try:
@@ -33,7 +33,7 @@ async def add_lead(
 
 @router.post("/view_owner")
 async def View_owner(
-    current_user=Depends(role_required([1,2])), db: session = Depends(get_db)
+    current_user=Depends(role_required([1, 2])), db: session = Depends(get_db)
 ):
     owner = Create(None, db)
 
@@ -64,9 +64,16 @@ async def view_lead(
 @router.put("/update")
 async def update_lead(
     leadupdate: Updatelead,
-    current_user=Depends(role_required([2])),
+    current_user=Depends(role_required([1, 2])),
     db: session = Depends(get_db),
 ):
+    print(
+        leadupdate.lead_id,
+        leadupdate.stage_id,
+        leadupdate.status_id,
+        leadupdate.priority_id,
+    )
+
     data = Updateleadd(db, leadupdate)
     return data.update_lead()
 
@@ -77,7 +84,7 @@ async def update_lead(
 @router.get("/view/{lead_id}")
 async def view_lead_by_id(
     lead_id: int,
-    current_user=Depends(role_required([1,2])),
+    current_user=Depends(role_required([1, 2])),
     db: session = Depends(get_db),
 ):
     lead = ViewLeadByID(db, lead_id)
