@@ -24,7 +24,7 @@ class Activity:
             Lead_ID=self.activity.lead_id,
             User_ID=user_id,
             Notes=self.activity.notes,
-            #Scheduled_On=self.activity.scheduled_on,
+            Scheduled_On=self.activity.scheduled_on,
         )
         self.db.add(activity)
         self.db.commit()
